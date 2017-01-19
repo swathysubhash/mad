@@ -1,0 +1,59 @@
+
+
+// AccountUser
+	// AccountId
+	// Name
+	// Email
+	// Password
+	// Mobile
+	// Role
+
+// Roles
+	// Name
+	// Permissions
+
+// Store
+	// AccountId
+	// Id
+	// Name
+	// Location
+	// Serviceable Pincodes
+
+// Product
+	// AccountId
+	// Id
+	// Name
+	// Brand
+	// MasterCategory
+	// SubCategory
+	// SubSubCategory
+	// Price
+	// Discount
+	// Tags
+	// Quantity
+	// Color
+	// Images
+
+// ProductStore
+	// AccountId
+	// StoreId
+	// ProductId
+	// Availablity
+
+// User
+	// Id
+	// Name
+	// Email
+	// Phone
+	// Address
+
+// Order
+	// OrderItems
+	// OrderUser
+	// OrderAddress
+	// OrderStatus
+
+
+
+
+

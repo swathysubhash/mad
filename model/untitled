@@ -1,0 +1,108 @@
+
+
+type Style struct {
+	Columns int
+
+	LinkColor string
+	FontSize int
+	
+	HeaderBackgroundColor string
+	HeaderFontColor string
+	
+	SidePanelBackgroundColor string
+	SidePanelFontColor string
+	SidePanelLightFontColor string
+	SidePanelSecondaryFontColor string
+	
+	LeftPanelBackgroundColor string
+	LeftPanelFontColor string
+	LeftPanelLightFontColor string
+	LeftPanelHighlightFontColor string
+	LeftPanelHighlightBackgroundColor string
+	
+	RightPanelBackgroundColor string
+	RightPanelFontColor string
+	
+	CodeFontColor string	
+	CodeHighlightColor string
+	CodeBackgroundColor string
+
+	OrgNameFontColor string
+	OrgApiStringFontColor string
+
+}
+
+
+type Snippet
+ORG/APILIST
+
+type Api struct {
+	Id                 string `json:"-"` // Will be Slug + '-' + Version + primary Key
+	Name               string `json:"name"`
+	Description        string `json:"description"`
+	Protocol           string `json:"protocol"`
+	Host               string `json:"host"`
+	Slug               string `json:"slug,omitempty"`
+	Version            string `json:"version"`
+	PublishedRevision  int64  `json:"publishedRevision,omitempty"` -1
+	CurrentRevision    int64  `json:"currentRevision,omitempty"` 0	
+}
+
+
+
+
+
+ORG/:APIID/:REVISION/GROUPLIST
+
+	Id          string   `json:"-"` 'Name slug' - Primary Key
+	ApiId       string   `json:"apiId"`
+	Revision    string   `json:"revision"`
+	Name        string   `json:"name"`
+	Description string   `json:"description"`
+	Separator   bool     `json:"separator"`
+	Endpoints   []string `json:"endpoints,omitempty"`
+
+ORG/:APIID/:REVISION/ENDPOINTS
+	Id              string       `json:"-"` - Name + Group + Method
+	Name            string       `json:"name"`
+	Description     string       `json:"description"`
+	Group           string       `json:"group"`
+	Url 						string			 `json:"url"`
+	Method          string       `json:"method"`
+	QueryParameters []*Parameter `json:"queryParameters,omitempty"`
+	UrlParameters   []*Parameter `json:"urlParameters,omitempty"`
+	RequestHeaders  []*Header    `json:"requestHeaders,omitempty"`
+	RequestBody     Body         `json:"requestBody,omitempty"`
+	ResponseHeaders []*Header    `json:"requestHeaders,omitempty"`
+	ResponseBody    Body         `json:"requestBody,omitempty"`
+	LanguageSnippet []*Snippet `json:"languageSnippet, omitempty"`
+
+
+	Actions 
+
+	initial -> 
+
+		PublishedRevision - -1
+		CurrentRevision - 0
+			// Create Collections apilist, grouplist, endpoints with revision 0
+		// Update availableRevisions list
+
+	Publish -> 
+
+			1. Delete GroupList, Endpoints, Models with revision CurrentRevision + 1.
+			2. Create Collections apilist, grouplist, endpoints with revision CurrentRevision + 1. Copy from  	CurrentRevision
+			3. Make PublishedRevision = CurrentRevision, CurrentRevision CurrentRevision + 1
+
+	Restore to revision x -> 
+
+			1. Delete GroupList, Endpoints, Models with revision CurrentRevision + 1.
+			2. Create Collections apilist, grouplist, endpoints with revision CurrentRevision + 1. Copy from Revision x
+			3. Make CurrentRevision CurrentRevision + 1
+
+
+
+
+
+
+
+
