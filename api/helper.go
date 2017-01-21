@@ -47,6 +47,8 @@ func writeError(w http.ResponseWriter, code string, args *[]string) error {
 		message = strings.Replace(message, "{"+strconv.Itoa(index)+"}", arg, -1)
 	}
 
+	w.WriteHeader(http.StatusBadRequest)
+
 	return writeJSON(w, &model.ErrorResponse{
 		Object:  "error",
 		Code:    code,

@@ -1,6 +1,7 @@
 import Inferno from 'inferno'
 import Component from 'inferno-component'
 import { createApi } from '../../actions/api'
+import ApiForm from '../api_form'
 
 
 class ApiList extends Component {
@@ -21,14 +22,9 @@ class ApiList extends Component {
 		const state = store.getState()
 
 		store.dispatch({ type: 'CREATE_API_REQUEST' })
-		createApi(this.state.form).then((err, res) => {
-			if (err) {
-				store.dispatch({ type: 'CREATE_API_FAILURE', data: err})
-			} else {
-				store.dispatch({ type: 'CREATE_API_SUCCESS', data: res.body})
-			}			
-		})
-
+		createApi(this.state.form)
+		.then(res => store.dispatch({ type: 'CREATE_API_SUCCESS', data: res.data}))
+		.catch(err => store.dispatch({ type: 'CREATE_API_FAILURE', data: err.response.data}))
 	}
 
 
@@ -38,6 +34,7 @@ class ApiList extends Component {
 			<div>
 				<div>ApiList</div>
 				<button onClick={ this.createApiOnClick }>New</button>
+				<ApiForm />
 			</div>
 		);
 	}

@@ -6,6 +6,7 @@ import { Router, Route, IndexRoute } from 'inferno-router'
 export const routes = (
 	<Route path="/" component={Page}>
 		<IndexRoute component={Pages.ApiList}/>
+		<Route path="/apilist" component={Pages.ApiList} />
 		<Route path="/editor" component={Pages.Editor} />
 		<Route path="/account" component={Pages.UserProfile} />
 	</Route>

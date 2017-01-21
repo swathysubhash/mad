@@ -104,5 +104,48 @@ ORG/:APIID/:REVISION/ENDPOINTS
 
 
 
+Redux store
+
+
+{
+	entities:{
+		apis : {
+			byId: {
+				"Id1":{
+					groups:[groupsId array]
+				},
+				"Id2":{}
+			},
+			allIds:{}
+		},
+		groups : {
+			byId: {
+				"Id1":{
+					Endpoints: [EndpointId array]
+				},
+				"Id2":{
+
+				}
+			},
+			allIds:{}
+		}
+	},
+	ui: {
+		apis: {
+			formError: "",
+		}
+		groups: {
+			formError: ""
+		},
+		
+	}
+	
+
+
+
+}
+
+
+
 
 
