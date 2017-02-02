@@ -1,43 +1,40 @@
 import Inferno from 'inferno'
 import Component from 'inferno-component'
-import { createApi } from '../../actions/api'
+import { getApiList } from '../../actions/api'
 import ApiForm from '../api_form'
+import { connect } from 'inferno-redux'
 
 
 class ApiList extends Component {
 	constructor(props){
 		super(props)
-		this.createApiOnClick = this.createApiOnClick.bind(this)
-		this.state = {
-			form : {
-				name: "testapi-f2"
-			}
-		}
+		this.onApiRowClick = this.onApiRowClick.bind(this)
 	}
 
-	createApiOnClick(event) {
-		event.preventDefault()
+	onApiRowClick(apiId, event) {
+		this.context.router.push('/documents/' + apiId + '/editor')
+	}
 
+	componentDidMount() {
 		const store = this.context.store
 		const state = store.getState()
-
-		store.dispatch({ type: 'CREATE_API_REQUEST' })
-		createApi(this.state.form)
-		.then(res => store.dispatch({ type: 'CREATE_API_SUCCESS', data: res.data}))
-		.catch(err => store.dispatch({ type: 'CREATE_API_FAILURE', data: err.response.data}))
+		getApiList()
+		.then(res => store.dispatch({ type: 'GET_APILIST_SUCCESS', data: res.data}))
+		.catch(err => store.dispatch({ type: 'GET_APILIST_FAILURE', data: err.response.data}))
 	}
-
 
 	render() {
 		const state = this.context.store.getState()
+		const apis = state.entities.apis.byIds
+		const apiIds = Object.keys(apis)
 		return (
 			<div>
 				<div>ApiList</div>
 				<button onClick={ this.createApiOnClick }>New</button>
-				<ApiForm />
+				{apiIds.map(id => <div onClick={this.onApiRowClick.bind(this, id)}>{apis[id].name}</div>)}
 			</div>
 		);
 	}
 }
 
-export default ApiList
+export default connect(() => {})(ApiList)

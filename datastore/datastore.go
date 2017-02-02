@@ -8,6 +8,7 @@ import (
 type Datastore struct {
 	Group    *groupStore
 	Endpoint *endpointStore
+	Revision *revisionStore
 	Api      *apiStore
 	DB       *mgo.Database
 }
@@ -21,6 +22,7 @@ func NewDatastore(db *mgo.Database) *Datastore {
 	datastore := &Datastore{DB: db}
 	datastore.Group = &groupStore{datastore}
 	datastore.Endpoint = &endpointStore{datastore}
+	datastore.Revision = &revisionStore{datastore}
 	datastore.Api = &apiStore{datastore}
 
 	err := datastore.Api.EnsureIndex("Myntra")

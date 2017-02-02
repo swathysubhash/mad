@@ -149,3 +149,43 @@ Redux store
 
 
 
+// Endpoints 
+	EndpointId
+	ApiId
+	RevisionId
+
+
+
+	Editor load
+		_ Get ApiData -
+		- Fetch Revisions of ApiId
+		- Fetch Groups of ApiId
+		- Fetch Endpoints of ApiId
+		- Fetch Models of ApiId
+
+		Reorder - 
+
+	Doc Preview
+	 	- Get ApiData -
+	 	- Fetch Revisions of ApiId
+	 	- Fetch Groups of ApiId
+	 	- Fetch Endpoints of ApiId
+	 	- Fetch Models of ApiId
+
+
+
+//	//db["Myntra/APILIST"]
+	//.update({"_id": "587e3d626580ed17cd2b79dc"},
+	//{"$push": {"availableRevisions":{ $each: [{ "number": NumberLong(5), "groupList": []}], $slice: -3}}})
+	// c.Update(bson.M{
+	// 	"_id": group.ApiId,
+	// 	"availableRevisions.number": bson.M{
+	// 		"$eq": group.Revision,
+	// 	},
+	// },
+	// 	bson.M{
+	// 		"$push": bson.M{"availableRevisions.$.groupList": group.Id},
+	// 	})
+
+
+

@@ -1,0 +1,33 @@
+@import "../variables";
+
+.form-input {
+	position: relative;
+	&.error {
+		input, textarea {
+			border: none;
+			border-color:  @color-error;
+		}		
+	}
+}
+
+.form-input input, .form-input textarea {
+	width: 400px;
+	height: 40px;
+	margin-bottom: @space3;
+	border: 1px solid;
+	border-color: @color-border;
+	padding: @space1;
+}
+
+
+.form-input textarea {
+	height: 150px;
+	color: @color-font;
+}
+
+.form-input .error-message {
+	position: absolute;
+	bottom: @space1;
+	color: @color-error;
+	.font-small()
+}

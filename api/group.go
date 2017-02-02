@@ -14,10 +14,6 @@ import (
 )
 
 func createGroup(w http.ResponseWriter, r *http.Request) error {
-	vars := mux.Vars(r)
-	apiId := vars["APIID"]
-	revision, _ := strconv.ParseInt(vars["REVISION"], 10, 64)
-
 	var group model.Group
 	err := json.NewDecoder(r.Body).Decode(&group)
 
@@ -25,12 +21,11 @@ func createGroup(w http.ResponseWriter, r *http.Request) error {
 		return writeError(w, "C10001", &[]string{})
 	}
 
-	group.Id = bson.NewObjectId().Hex()
-	group.ApiId = apiId
+	group.GId = bson.NewObjectId().Hex()
+	group.Id = group.GId + "_" + strconv.FormatInt(group.Revision, 10)
 	group.Object = "group"
-	group.Revision = revision
 	group.Endpoints = &[]string{}
-
+	fmt.Println(group)
 	if err := validator.Validate(group); err != nil {
 		errs, ok := err.(validator.ErrorMap)
 		if ok {
@@ -38,8 +33,19 @@ func createGroup(w http.ResponseWriter, r *http.Request) error {
 				return writeError(w, "C10002", &[]string{f})
 			}
 		} else {
+			fmt.Println(errs)
 			return writeError(w, "C10001", &[]string{})
 		}
+	}
+
+	api, err := store.Api.Get("Myntra", group.ApiId)
+
+	if err != nil {
+		return writeError(w, "A90004", &[]string{group.ApiId})
+	}
+
+	if api.CurrentRevision != group.Revision {
+		return writeError(w, "C10004", &[]string{})
 	}
 
 	err = store.Group.Create("Myntra", &group)
@@ -56,11 +62,9 @@ func createGroup(w http.ResponseWriter, r *http.Request) error {
 
 func getGroup(w http.ResponseWriter, r *http.Request) error {
 	vars := mux.Vars(r)
-	apiId := vars["APIID"]
-	revision, _ := strconv.ParseInt(vars["REVISION"], 10, 64)
 	groupId := vars["GROUPID"]
 
-	group, err := store.Group.Get("Myntra", apiId, revision, groupId)
+	group, err := store.Group.Get("Myntra", groupId)
 
 	if err != nil {
 		return writeError(w, "G80002", &[]string{groupId})
@@ -89,18 +93,16 @@ func getAllGroup(w http.ResponseWriter, r *http.Request) error {
 
 func updateGroup(w http.ResponseWriter, r *http.Request) error {
 	vars := mux.Vars(r)
-	apiId := vars["APIID"]
-	revision, _ := strconv.ParseInt(vars["REVISION"], 10, 64)
 	groupId := vars["GROUPID"]
 
 	var group model.Group
 	err := json.NewDecoder(r.Body).Decode(&group)
-
+	fmt.Println("group", group)
 	if err != nil {
 		return writeError(w, "C10001", &[]string{})
 	}
 
-	oldGroup, err := store.Group.Get("Myntra", apiId, revision, groupId)
+	oldGroup, err := store.Group.Get("Myntra", groupId)
 
 	if err != nil {
 		return writeError(w, "G80004", &[]string{groupId})
@@ -119,7 +121,17 @@ func updateGroup(w http.ResponseWriter, r *http.Request) error {
 		}
 	}
 
-	err = store.Group.Update("Myntra", apiId, revision, groupId, &group)
+	api, err := store.Api.Get("Myntra", group.ApiId)
+
+	if err != nil {
+		return writeError(w, "A90004", &[]string{group.ApiId})
+	}
+
+	if api.CurrentRevision != group.Revision {
+		return writeError(w, "C10004", &[]string{})
+	}
+
+	err = store.Group.Update("Myntra", groupId, &group)
 
 	if err != nil {
 		if mgo.IsDup(err) {

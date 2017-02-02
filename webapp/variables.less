@@ -1,12 +1,14 @@
 @layout-max-width: 1024px;
 
-@font-family: 'Open Sans', sans-serif;
+@font-family: Lato, 'Open Sans', sans-serif;
 
-@color-font: #4c596b;
+@color-font: #3d464d;
 @color-label: #8c8c8c;
-@color-border: #e2e6e6;
+@color-border: #d0d4d9;
+@color-light: #d2d5d6;
 
-@color-blue: #2c9fdd;
+//@color-blue: #2c9fdd;
+@color-blue: #0070D2;
 @color-green: #4ac291;
 @color-violet: #9c27b0;
 @color-yellow: #feb909;
@@ -26,8 +28,7 @@
 @space2: 12px;
 @space3: 24px;
 @space4: 36px;
-@space5: 84px;
-
+@space5: 48px;
 
 
 .heading1(){
@@ -48,13 +49,20 @@
 }
 
 .font-normal() {
-	font-size: 14px;
-	line-height: 22px;	
+	font-size: 13px;
+	line-height: 22px;
+	color: @color-font;
 } 
 .font-small() {
 	font-size: 12px;
 	line-height: 18px;
 }
+
+.placeholder() {
+	color: @color-light;
+	.font-small()	
+}
+
 
 
 

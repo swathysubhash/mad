@@ -1,3 +1,4 @@
+import './form_input.less'
 import Inferno from 'inferno'
 import Component from 'inferno-component'
 
@@ -15,9 +16,10 @@ class FormInput extends Component {
 	}
 	render() {
 			let d = this.state.fieldData()
+			let formClass = `form-input ${d.error ? 'error': ''}`
 			return (
-						<div>
-							<div>
+						<div className={formClass}>
+							<div className="label">
 								<span>{this.state.label}</span>
 							</div>
 							<div>
@@ -26,13 +28,17 @@ class FormInput extends Component {
 									<textarea onBlur={this.props.validate} placeholder={this.state.placeholder}>
 										{d.value}
 									</textarea>
+									:this.state.type === 'checkbox' ?
+									<input type="checkbox" onChange={this.props.validate} checked={d.value}>
+										{d.label}
+									</input>
 									:
-									<input type="text" onBlur={this.props.validate} placeholder={this.state.placeholder}>
+									<input type="text" onBlur={this.props.validate} placeholder={this.state.placeholder} value={d.value}>
 										{d.value}
 									</input>
 								}
 							</div>
-							<div>
+							<div className="error-message">
 								<span>{d.error ? d.errorMessage : ''}</span>
 							</div>
 						</div>

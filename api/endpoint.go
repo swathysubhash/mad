@@ -14,10 +14,6 @@ import (
 )
 
 func createEndpoint(w http.ResponseWriter, r *http.Request) error {
-	vars := mux.Vars(r)
-	groupId := vars["GROUPID"]
-	revision, _ := strconv.ParseInt(vars["REVISION"], 10, 64)
-
 	var endpoint model.Endpoint
 	err := json.NewDecoder(r.Body).Decode(&endpoint)
 
@@ -25,11 +21,10 @@ func createEndpoint(w http.ResponseWriter, r *http.Request) error {
 		return writeError(w, "C10001", &[]string{})
 	}
 
-	endpoint.Id = bson.NewObjectId().Hex()
-	endpoint.GroupId = groupId
+	endpoint.EId = bson.NewObjectId().Hex()
+	endpoint.Id = endpoint.EId + "_" + strconv.FormatInt(endpoint.Revision, 10)
 	endpoint.Object = "endpoint"
-	endpoint.Revision = revision
-	fmt.Println(endpoint)
+
 	if err := validator.Validate(endpoint); err != nil {
 		errs, ok := err.(validator.ErrorMap)
 		if ok {
@@ -39,6 +34,16 @@ func createEndpoint(w http.ResponseWriter, r *http.Request) error {
 		} else {
 			return writeError(w, "C10001", &[]string{})
 		}
+	}
+
+	api, err := store.Api.Get("Myntra", endpoint.ApiId)
+
+	if err != nil {
+		return writeError(w, "A90004", &[]string{endpoint.ApiId})
+	}
+
+	if api.CurrentRevision != endpoint.Revision {
+		return writeError(w, "C10004", &[]string{})
 	}
 
 	err = store.Endpoint.Create("Myntra", &endpoint)
@@ -55,11 +60,9 @@ func createEndpoint(w http.ResponseWriter, r *http.Request) error {
 
 func getEndpoint(w http.ResponseWriter, r *http.Request) error {
 	vars := mux.Vars(r)
-	groupId := vars["GROUPID"]
-	revision, _ := strconv.ParseInt(vars["REVISION"], 10, 64)
 	endpointId := vars["ENDPOINTID"]
 
-	endpoint, err := store.Endpoint.Get("Myntra", groupId, revision, endpointId)
+	endpoint, err := store.Endpoint.Get("Myntra", endpointId)
 
 	if err != nil {
 		return writeError(w, "G80002", &[]string{endpointId})
@@ -72,8 +75,7 @@ func getEndpoint(w http.ResponseWriter, r *http.Request) error {
 func getAllEndpoint(w http.ResponseWriter, r *http.Request) error {
 	vars := mux.Vars(r)
 	groupId := vars["GROUPID"]
-	revision, _ := strconv.ParseInt(vars["REVISION"], 10, 64)
-	endpointList, err := store.Endpoint.GetAll("Myntra", groupId, revision)
+	endpointList, err := store.Endpoint.GetAll("Myntra", groupId)
 
 	if err != nil {
 		return writeError(w, "G80003", &[]string{})
@@ -88,8 +90,6 @@ func getAllEndpoint(w http.ResponseWriter, r *http.Request) error {
 
 func updateEndpoint(w http.ResponseWriter, r *http.Request) error {
 	vars := mux.Vars(r)
-	groupId := vars["GROUPID"]
-	revision, _ := strconv.ParseInt(vars["REVISION"], 10, 64)
 	endpointId := vars["endpointId"]
 
 	var endpoint model.Endpoint
@@ -99,11 +99,7 @@ func updateEndpoint(w http.ResponseWriter, r *http.Request) error {
 		return writeError(w, "C10001", &[]string{})
 	}
 
-	oldEndpoint, err := store.Endpoint.Get("Myntra", groupId, revision, endpointId)
-
-	if err != nil {
-		return writeError(w, "G80004", &[]string{groupId})
-	}
+	oldEndpoint, err := store.Endpoint.Get("Myntra", endpointId)
 
 	mergo.Merge(&endpoint, oldEndpoint)
 
@@ -118,7 +114,17 @@ func updateEndpoint(w http.ResponseWriter, r *http.Request) error {
 		}
 	}
 
-	err = store.Endpoint.Update("Myntra", groupId, revision, endpointId, &endpoint)
+	api, err := store.Api.Get("Myntra", endpoint.ApiId)
+
+	if err != nil {
+		return writeError(w, "A90004", &[]string{endpoint.ApiId})
+	}
+
+	if api.CurrentRevision != endpoint.Revision {
+		return writeError(w, "C10004", &[]string{})
+	}
+
+	err = store.Endpoint.Update("Myntra", endpointId, &endpoint)
 
 	if err != nil {
 		if mgo.IsDup(err) {

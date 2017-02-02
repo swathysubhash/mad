@@ -24,17 +24,6 @@ func (a *apiStore) EnsureIndex(orgName string) error {
 		return err
 	}
 
-	index = mgo.Index{
-		Key:    []string{"object"},
-		Unique: true,
-	}
-
-	err = c.EnsureIndex(index)
-
-	if err != nil {
-		return err
-	}
-
 	return err
 }
 
@@ -47,7 +36,7 @@ func (a *apiStore) Create(orgName string, api *model.Api) error {
 		ApiId:       api.Id,
 		Object:      "revision",
 		Number:      api.CurrentRevision,
-		GroupList:   []string{},
+		GroupList:   &[]string{},
 		CustomStyle: nil,
 	}
 
@@ -95,7 +84,7 @@ func (a *apiStore) GetAll(orgName string) (*[]model.Api, error) {
 	var apiList = make([]model.Api, 0)
 
 	c := a.DB.C(orgName + "/APILIST")
-	err := c.Find(bson.M{"object": "api"}).All(&apiList)
+	err := c.Find(bson.M{}).All(&apiList)
 
 	if err != nil {
 		return nil, err

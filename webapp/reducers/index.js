@@ -1,10 +1,9 @@
 import { combineReducers } from 'redux'
 import apiList from './api_list'
 import editor from './editor'
-
+import entities from './entities'
 const rootReducer = combineReducers({
-  apiList,
-  editor
+  entities
 })
 
 export default rootReducer

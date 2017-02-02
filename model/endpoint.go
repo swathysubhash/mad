@@ -8,9 +8,11 @@ type Snippet struct {
 
 type Endpoint struct {
 	Id               string       `json:"id,omitempty" bson:"_id,omitempty"`
+	EId              string       `json:"eid,omitempty" bson:"eid,omitempty"`
 	Name             string       `json:"name" bson:"name" validate:"nonzero"`
 	Object           string       `json:"object",omitempty" bson:"object,omitempty"`
 	Description      string       `json:"description" bson:"description" validate:"nonzero"`
+	ApiId            string       `json:"apiId" bson:"apiId" validate:"nonzero"`
 	GroupId          string       `json:"groupId" bson:"groupId" validate:"nonzero"`
 	Revision         int64        `json:"revision" bson:"revision"`
 	Url              string       `json:"url" bson:"url" validate:"nonzero"`
@@ -22,6 +24,14 @@ type Endpoint struct {
 	ResponseHeaders  []*Header    `json:"requestHeaders,omitempty" bson:"responseHeaders"`
 	ResponseBody     Body         `json:"requestBody,omitempty" bson:"responseBody"`
 	LanguageSnippets []*Snippet   `json:"languageSnippets, omitempty" bson:"languageSnippets"`
+}
+
+type EndpointBrief struct {
+	Id      string `json:"id,omitempty" bson:"_id,omitempty"`
+	Name    string `json:"name" bson:"name" validate:"nonzero"`
+	GroupId string `json:"groupId" bson:"groupId" validate:"nonzero"`
+	Object  string `json:"object",omitempty" bson:"object,omitempty"`
+	Method  string `json:"method" bson:"method" validate:"nonzero"`
 }
 
 type Parameter struct {

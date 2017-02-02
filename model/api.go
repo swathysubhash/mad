@@ -40,16 +40,25 @@ type Api struct {
 }
 
 type Revision struct {
-	Id          string   `json:"id,omitempty" bson:"_id,omitempty"`
-	ApiId       string   `json:"apiId" bson:"apiId" validate:"nonzero"`
-	Object      string   `json:"object",omitempty" bson:"object,omitempty"`
-	Number      int64    `json:"number" bson:"number" validate:"nonzero"`
-	GroupList   []string `json:"groupList" bson:"groupList" validate:"nonzero"`
-	CustomStyle *Style   `json:"customStyle,omitempty" bson:"customStyle,omitempty" validate:"nonzero"`
+	Id          string    `json:"id,omitempty" bson:"_id,omitempty"`
+	ApiId       string    `json:"apiId" bson:"apiId" validate:"nonzero"`
+	Object      string    `json:"object",omitempty" bson:"object,omitempty"`
+	Number      int64     `json:"number" bson:"number" validate:"nonzero"`
+	GroupList   *[]string `json:"groupList" bson:"groupList" validate:"nonzero"`
+	CustomStyle *Style    `json:"customStyle,omitempty" bson:"customStyle,omitempty" validate:"nonzero"`
 }
 
 type ApiListResponse struct {
 	Count  int    `json:"count"`
 	Object string `json:"object"`
 	Data   *[]Api `json:"data"`
+}
+
+type ApiSummary struct {
+	ApiId           string           `json:"apiId"`
+	Object          string           `json:"object"`
+	CurrentRevision int64            `json:"currentRevision" bson:"currentRevision"`
+	GroupIds        *[]string        `json:"groupIds" bson:"groupIds" validate:"nonzero"`
+	Groups          *[]GroupBrief    `json:"groups" bson:"groups" validate:"nonzero"`
+	Endpoints       *[]EndpointBrief `json:"endpoints" bson:"endpoints" validate:"nonzero"`
 }
