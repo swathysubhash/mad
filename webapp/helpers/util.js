@@ -1,20 +1,23 @@
 
-function isEmpty(obj) {
-	return !Object.keys(obj).find(o => {
-		console.log('1', typeof obj[o], obj[o].trim && obj[o].trim().length, typeof obj[o] === 'string' && obj[o].trim().length > 0)
-		if (typeof obj[o] === 'string' && obj[o].trim().length > 0){
-			console.log('REturn 1')
+import marked from 'marked'
+
+export function isEmpty(val) {
+	if (typeof val === 'string' && val.trim().length > 0){
 			return true
 		}
-		else if (typeof obj[o] !== 'undefined'){
-			console.log('REturn 2')
+		else if (typeof val !== 'string' && typeof val !== 'undefined'){
 			return true
 		}
-		console.log('REturn 3')
 		return false
-	})
 }
 
-function removeEmptyObjects(arr) {
-	return arr.filter(a => !isEmpty(a))
+export function removeEmptyObjects(arr, keys) {
+	return arr.filter(a => keys.find(k => isEmpty(a[k])))
+}
+
+export function renderMarkdown(md) {
+	marked.setOptions({
+		breaks: true,
+	})
+	return marked(md)
 }

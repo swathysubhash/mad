@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/extemporalgenome/slug"
 	"github.com/gorilla/mux"
 	"github.com/imdario/mergo"
 	"gopkg.in/mgo.v2"
@@ -11,6 +12,7 @@ import (
 	"mad/model"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 func createGroup(w http.ResponseWriter, r *http.Request) error {
@@ -21,11 +23,19 @@ func createGroup(w http.ResponseWriter, r *http.Request) error {
 		return writeError(w, "C10001", &[]string{})
 	}
 
+	currentTime := time.Now().Unix()
+
 	group.GId = bson.NewObjectId().Hex()
 	group.Id = group.GId + "_" + strconv.FormatInt(group.Revision, 10)
 	group.Object = "group"
+	group.Slug = slug.Slug(group.Name)
 	group.Endpoints = &[]string{}
-	fmt.Println(group)
+
+	group.CreatedBy = "SwathySubhash"
+	group.UpdatedBy = "SwathySubhash"
+	group.CreatedAt = currentTime
+	group.UpdatedAt = currentTime
+
 	if err := validator.Validate(group); err != nil {
 		errs, ok := err.(validator.ErrorMap)
 		if ok {
@@ -97,7 +107,7 @@ func updateGroup(w http.ResponseWriter, r *http.Request) error {
 
 	var group model.Group
 	err := json.NewDecoder(r.Body).Decode(&group)
-	fmt.Println("group", group)
+	group.Slug = slug.Slug(group.Name)
 	if err != nil {
 		return writeError(w, "C10001", &[]string{})
 	}
@@ -140,4 +150,8 @@ func updateGroup(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	return writeJSON(w, group)
+}
+
+func GetGroup(groupId string) (*model.Group, error) {
+	return store.Group.Get("Myntra", groupId)
 }

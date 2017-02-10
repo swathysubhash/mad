@@ -31,6 +31,10 @@ func Handler() *mux.Router {
 	m.Get("get:endpoint").Handler(handler(getEndpoint))
 	m.Get("update:endpoint").Handler(handler(updateEndpoint))
 
+	m.Get("create:access").Handler(handler(createAccess))
+	m.Get("get:access:byresource").Handler(handler(getAllAccess))
+	m.Get("update:access").Handler(handler(updateAccess))
+
 	return m
 }
 

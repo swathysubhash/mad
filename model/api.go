@@ -26,17 +26,23 @@ type Style struct {
 }
 
 type Api struct {
-	Id                string `json:"id,omitempty" bson:"_id,omitempty"`
-	Name              string `json:"name" bson:"name" validate:"nonzero"`
-	Description       string `json:"description" bson:"description"`
-	Protocol          string `json:"protocol" bson:"protocol" validate:"nonzero"`
-	Host              string `json:"host" bson:"host" validate:"nonzero"`
-	Slug              string `json:"slug,omitempty" bson:"slug,omitempty"`
-	Object            string `json:"object",omitempty" bson:"object,omitempty"`
-	Version           string `json:"version" bson:"version" validate:"nonzero,regexp=^v[0-9]*$"`
-	PublishedRevision int64  `json:"publishedRevision" bson:"publishedRevision"`
-	CurrentRevision   int64  `json:"currentRevision" bson:"currentRevision"`
-	// AvailableRevisions *[]Revision `json:"availableRevisions" bson:"availableRevisions"`
+	Id                   string `json:"id,omitempty" bson:"_id,omitempty"`
+	Name                 string `json:"name" bson:"name" validate:"nonzero"`
+	Description          string `json:"description" bson:"description"`
+	DescriptionHTML      string `json:"descriptionHTML" bson:"descriptionHTML"`
+	Protocol             string `json:"protocol" bson:"protocol" validate:"nonzero"`
+	Host                 string `json:"host" bson:"host" validate:"nonzero"`
+	Slug                 string `json:"slug,omitempty" bson:"slug,omitempty"`
+	Object               string `json:"object",omitempty" bson:"object,omitempty"`
+	Version              string `json:"version" bson:"version" validate:"nonzero,regexp=^v[0-9]*$"`
+	PublishedRevision    int64  `json:"publishedRevision" bson:"publishedRevision"`
+	CurrentRevision      int64  `json:"currentRevision" bson:"currentRevision"`
+	UpdatedBy            string `json:"updatedBy" bson:"updatedBy"`
+	CreatedBy            string `json:"createdBy" bson:"createdBy"`
+	UpdatedAt            int64  `json:"updatedAt" bson:"updatedAt"`
+	CreatedAt            int64  `json:"createdAt" bson:"createdAt"`
+	AnonymousAccessSlice []int  `json:"-" bson:"anonymousAccessSlice"`
+	AnonymousAccess      string `json:"anonymousAccess" bson:"anonymousAccess"`
 }
 
 type Revision struct {

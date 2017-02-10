@@ -6,7 +6,9 @@ import FormButton from '../../components/form_button'
 import Button from '../../components/button'
 import CodeMirror from '../../components/codemirror'
 import InputSet from '../../components/input_set'
+
 import { connect } from 'inferno-redux'
+import { renderMarkdown, removeEmptyObjects } from '../../helpers/util'
 
 import Form from '../../components/form'
 import Text from '../../components/text'
@@ -36,7 +38,7 @@ class DocumentsGroupCreate extends Component {
 
 	componentWillMount() {
 		if (this.props.params.groupId !== 'create') {
-			this.context.store.dispatch({ type: 'GROUP_SELECT', data: this.props.params.groupId})	
+			this.context.store.dispatch({ type: 'GROUP_SELECT', data: this.props.params.groupId})
 		}
 	}
 
@@ -57,10 +59,6 @@ class DocumentsGroupCreate extends Component {
 		}
 	}
 
-	// onComponentWillUpdate(lastProps, nextProps) {
-	// 	console.log(lastProps, nextProps)
-	// }
-
 	onSubmit(values) {
 		event.preventDefault()
 		const store = this.context.store
@@ -72,7 +70,8 @@ class DocumentsGroupCreate extends Component {
 			...values,
 			...{
 				apiId: apiId,
-				revision: api.currentRevision
+				revision: api.currentRevision,
+				descriptionHTML: renderMarkdown(values.description)
 			}
 		}
 

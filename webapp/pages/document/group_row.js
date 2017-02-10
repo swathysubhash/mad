@@ -20,8 +20,8 @@ class GroupRow extends Component {
 		const group = state.entities.groups.byIds[this.props.gId]
 		return (
 			<ul>
-				<div onClick={this.detail}>{group.name}</div>
-				{group.endpoints.map( e => <EndpointRow eId={e} apiId={this.props.apiId}/>)}
+				<div className={this.props.selected === this.props.gId ? 'selected': ''} onClick={this.detail}>{group.name}</div>
+				{group.endpoints.map( e => <EndpointRow eId={e} selected={this.props.selected} apiId={this.props.apiId}/>)}
 			</ul>
 		);	
 	}

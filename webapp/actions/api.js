@@ -1,5 +1,5 @@
 
-import {get, put} from 'axios'
+import {get, put, post} from 'axios'
 
 export function getApiList() {
 	return get('/madapi/apis')
@@ -11,6 +11,18 @@ export function getApi(data) {
 
 export function getApiSummary(data) {
 	return get('/madapi/apis/' + data.apiId + '/summary')
+}
+
+export function getApiAccess(data) {
+	return get('/madapi/access/' + data.documentId)
+}
+
+export function createApiAccess(data) {
+	return put('/madapi/access', data)
+}
+
+export function updateApiAccess(data) {
+	return post('/madapi/access/' + data.resourceId, data)
 }
 // export function createApi() {
 // 	return (dispatch, getState) => {
@@ -29,5 +41,9 @@ export function getApiSummary(data) {
 
 export function createApi(data) {
 	return put('/madapi/apis', data)
+}
+
+export function updateApi(data) {
+	return post('/madapi/apis/' + data.apiId, data)
 }
 

@@ -188,4 +188,24 @@ Redux store
 	// 	})
 
 
+// Accss List
+
+
+ApiList
+//UpdatedAt  Not modifiable by apis while updating
+//CreatedBy
+//UpdatedBy
+ReadAccess - PRIVATE | PUBLIC
+WriteAccess
+PublishAccess
+
+
+ApiId UserId Permission
+READ - 0
+WRITE - 1
+PUBLISH - 2 
+
+
+
+
 

@@ -24,6 +24,12 @@ func Api() *mux.Router {
 	m.Path("/endpoints/{ENDPOINTID}").Methods("GET").Name("get:endpoint")
 	m.Path("/endpoints/{ENDPOINTID}").Methods("POST").Name("update:endpoint")
 
+	m.Path("/access").Methods("PUT").Name("create:access")
+	m.Path("/access/{RESOURCEID}").Methods("GET").Name("get:access:byresource")
+	m.Path("/access/{RESOURCEID}").Methods("POST").Name("update:access")
+
+	m.Path("/{DOCSLUG}").Methods("GET").Name("get:docs")
+
 	// m.Path("/group/all").Methods("GET").Name("get:groupall")
 	// m.Path("/group/{GROUPID}/endpoint/all").Methods("GET").Name("get:endpointall")
 

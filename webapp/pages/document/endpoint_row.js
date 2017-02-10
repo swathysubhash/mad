@@ -9,21 +9,23 @@ class EndpointRow extends Component {
 		this.detail = this.detail.bind(this)
 	}
 
-	detail(event) {
+	detail(subgroupType, event) {
 		event.stopPropagation()
 		this.context.store.dispatch({ type: 'ENDPOINT_SELECT', data: this.props.eId})
-		this.context.router.push('/documents/' + this.props.apiId + '/editor/endpoint/' + this.props.eId)
+		this.context.router.push('/documents/' + this.props.apiId + '/editor/' + subgroupType + '/' + this.props.eId)
 	}
 
 	render() {
 		const state = this.context.store.getState()
 		const endpoint = state.entities.endpoints.byIds[this.props.eId]
-		return (
-			<li onClick={this.detail}>
-				<span>{endpoint.name}</span>
-				<span>{endpoint.method}</span>
-			</li>
-		);	
+		if (endpoint) {
+			return (
+				<li className={this.props.selected === this.props.eId ? 'selected': ''} onClick={this.detail.bind(this, endpoint.subgroupType)}>
+					<span>{endpoint.name}</span>
+					<span>{endpoint.method}</span>
+				</li>
+			);
+		}
 	}
 }
 

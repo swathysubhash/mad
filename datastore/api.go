@@ -80,6 +80,18 @@ func (a *apiStore) Get(orgName, apiId string) (*model.Api, error) {
 	return api, nil
 }
 
+func (a *apiStore) GetBySlug(orgName, slug string) (*model.Api, error) {
+	var api *model.Api
+	c := a.DB.C(orgName + "/APILIST")
+	err := c.Find(bson.M{"slug": slug}).One(&api)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return api, nil
+}
+
 func (a *apiStore) GetAll(orgName string) (*[]model.Api, error) {
 	var apiList = make([]model.Api, 0)
 

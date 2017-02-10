@@ -27,6 +27,21 @@ export default function entities(state = initialState, action) {
   			...state,
   			apis: apisReducer(state.apis, {type: 'ADD_APIS', data: data}),
   		}
+    case 'GET_ACCESS_RESPONSE':
+      return {
+        ...state,
+        apis: apisReducer(state.apis, {type: 'ADD_ACCESS', data: data}),
+      }
+    case 'UPDATE_ACCESS_RESPONSE':
+      return {
+        ...state,
+        apis: apisReducer(state.apis, {type: 'UPDATE_ACCESS', data: data}),
+      }
+    case 'CREATE_ACCESS_RESPONSE':
+      return {
+        ...state,
+        apis: apisReducer(state.apis, {type: 'CREATE_ACCESS', data: data}),
+      }
   	case 'GET_API_REQUEST': 
   		return state
   	case 'GET_API_RESPONSE':
@@ -34,6 +49,11 @@ export default function entities(state = initialState, action) {
   			...state,
   			apis: apisReducer(state.apis, {type: 'ADD_API', data: data})
   		}
+    case 'UPDATE_API_RESPONSE':
+      return {
+        ...state,
+        apis: apisReducer(state.apis, {type: 'ADD_API', data: data})
+      }
   	case 'GET_APISUMMARY_REQUEST': 
   		return {
   			...state,
@@ -55,6 +75,7 @@ export default function entities(state = initialState, action) {
   	case 'CREATE_GROUP_RESPONSE':
   		return {
   			...state,
+        ui: uiReducer(state.ui, {type: 'FETCH_DATA'}),
   			groups: groupsReducer(state.groups, {type: 'ADD_GROUP', data: data})
   		}
   	case 'UPDATE_GROUP_RESPONSE':
@@ -70,6 +91,7 @@ export default function entities(state = initialState, action) {
   	case 'CREATE_ENDPOINT_RESPONSE':
   		return {
   			...state,
+        ui: uiReducer(state.ui, {type: 'FETCH_DATA'}),
   			endpoints: endpointsReducer(state.endpoints, {type: 'ADD_ENDPOINT', data: data})
   		}
   	case 'UPDATE_ENDPOINT_RESPONSE':
@@ -114,10 +136,10 @@ function apisById(state = {}, action) {
     switch(action.type) {
         case 'UPDATE_API' :
 	        return { 
-	        	...state, 
+	        	...state,
 	        	[data.apiId] : {
 	        		...state[data.apiId], 
-	        		...{ groupIds: data.groupIds, currentRevision: data.currentRevision }
+	        		...{ id: data.apiId, groupIds: data.groupIds, currentRevision: data.currentRevision }
 	        	}
 	        }
 	      case 'ADD_APIS' :
@@ -132,11 +154,36 @@ function apisById(state = {}, action) {
 	      case 'ADD_API' :
 	      	return {
 	      		...state,
-	      		[data.apiId] : {
-	      			...state[data.apiId],
+	      		[data.id] : {
+	      			...state[data.id],
 	      			...data
 	      		}
 	      	}
+        case 'ADD_ACCESS' :
+          return {
+            ...state,
+            [data.id] : {
+              ...state[data.id],
+              ...{ users: data.data }
+            }
+          }
+        case 'UPDATE_ACCESS' :
+          return {
+            ...state,
+            [data.resourceId] : {
+              ...state[data.resourceId],
+              ...{ users: state[data.resourceId].users.map( r => r.actorId === data.actorId ? data: r) }
+            }
+          }
+        case 'CREATE_ACCESS' :
+          return {
+            ...state,
+            [data.resourceId] : {
+              ...state[data.resourceId],
+              ...{ users: [ ...state[data.resourceId].users, data ]
+            }
+          }
+        }
         default : 
         return state;
     }
@@ -149,7 +196,11 @@ function groupsById(state = {}, action) {
 					data.groups.forEach( group => {
 						state = {
 							...state,
-							[group.id]: Object.assign({}, state[group.id], group)
+              [group.id] : {
+                ...state[group.id], 
+                ...group
+              },
+							// [group.id]: Object.assign({}, state[group.id], group)
 						}
 					})
         return state
@@ -174,7 +225,11 @@ function endpointsById(state = {}, action) {
 					data.endpoints.forEach( endpoint => {
 						state = {
 							...state,
-							[endpoint.id]: Object.assign({}, state[endpoint.id], endpoint)
+              [endpoint.id] : {
+                ...state[endpoint.id], 
+                ...endpoint
+              },
+							// [endpoint.id]: Object.assign({}, state[endpoint.id], endpoint)
 						}
 					})
         return state
@@ -191,32 +246,41 @@ function endpointsById(state = {}, action) {
     }
 }
 
-function apiSummary(state = { loading: false }, action) {
+function apiSummary(state = { loading: false, stale: false }, action) {
 	let data = action.data
 	switch(action.type) {
+    case 'FETCH_DATA':
+      return {
+        ...state,
+        stale: true,
+      }
 		case 'GROUP_SELECT':
 			return {
 				...state,
 				createGroup: false,
+        selected: data,
 				selectedGroup: data
 			}
 		case 'GROUP_CREATE':
 			return {
 				...state,
 				createGroup: true,
-				selectedGroup: ''
+        selected: '',
+				selectedGroup: '',
 			}
 		case 'ENDPOINT_SELECT':
 			return {
 				...state,
 				createEndpoint: false,
+        selected: data,
 				selectedEndpoint: data
 			}
 		case 'ENDPOINT_CREATE':
 			return {
 				...state,
 				createEndpoint: true,
-				selectedEndpoint: ''
+				selectedEndpoint: '',
+        selected: '',
 			}
 		case 'START_LOADING':
 			return {
@@ -226,7 +290,8 @@ function apiSummary(state = { loading: false }, action) {
 		case 'STOP_LOADING':
 			return {
 				...state,
-				loading: false
+				loading: false,
+        stale: false,
 			}
 		default:
 			return state

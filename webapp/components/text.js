@@ -2,6 +2,7 @@ import './text.less'
 import Inferno, { linkEvent } from 'inferno'
 import Component from 'inferno-component'
 import CodeMirror from './codemirror'
+import MarkdownEditor from './markdown_editor'
 import * as validators from '../helpers/validators'
 import Dropdown from './dropdown'
 
@@ -35,15 +36,15 @@ class Text extends Component {
 
 	onCheckboxBlur(event) {
 		event.stopPropagation()
-		this.props.updateValue(this.props.name, event.target.checked)
+		this.props.updateValue(this.props.name, !!event.target.checked)
 	}
 
 	codemirrorBlur(value) {
 		this.props.updateValue(this.props.name, value)	
 	}
 
-	dropdownBlur({ value }) {
-		this.props.updateValue(this.props.name, value)	
+	dropdownBlur({ label, value }) {
+		this.props.updateValue(this.props.name, { label, value })	
 		this.onClick()
 	}
 
@@ -71,29 +72,29 @@ class Text extends Component {
 	}
 
 	render() {
-		let value = this.props.getValue(this.props.name)
+		let value = this.props.getValue && this.props.getValue(this.props.name)
 		return (
 			<div className="input-row">
 				{this.props.labels !== false ? <div><label>{this.props.label}</label></div> : ''}
 				<div>
 					{this.props.type === 'textarea' ?
-					<textarea 
-						type={this.props.type}
-						onClick={this.onClick}
-						placeholder={this.props.placeholder} 
-						onBlur={this.onBlur}
-						onInput={this.onChange} 
-						defaultValue={this.props.getValue(this.props.name)}>{this.props.getValue(this.props.name)}
-					</textarea>
+					<div>
+					<MarkdownEditor 
+							onChange={this.codemirrorBlur}
+							path={this.props.name}
+							options={this.props.options}
+							value={this.props.getValue(this.props.name)}
+							defaultValue={this.props.getValue(this.props.name)}
+						/></div>
 					: this.props.type === 'checkbox' ? 
 						<div className={"switch"}>
 							<input
-							id={this.props.name}
+							id={this.props.id + this.props.row}
 							className={"input"}
 							type={this.props.type}
 							onClick={this.onCheckboxBlur}
 							checked={this.props.getValue(this.props.name)}/>
-							<label for={this.props.name} className={"slider"} />
+							<label for={this.props.id + this.props.row} className={"slider"} />
 						</div>
 					: this.props.type === 'codemirror' ? 
 						<CodeMirror 
@@ -107,7 +108,7 @@ class Text extends Component {
 							options={this.props.options}
 							placeholder={this.props.placeholder}
 							onChange={this.dropdownBlur}
-							value={value ? {label: value, value} : undefined}
+							value={value ? value : undefined}
 							defaultValue={this.props.defaultOption}
 						/>
 					:<input 
@@ -125,5 +126,12 @@ class Text extends Component {
 	}
 }
 
-
+/*<textarea 
+						type={this.props.type}
+						onClick={this.onClick}
+						placeholder={this.props.placeholder} 
+						onBlur={this.onBlur}
+						onInput={this.onChange} 
+						defaultValue={this.props.getValue(this.props.name)}>{this.props.getValue(this.props.name)}
+					</textarea>*/
 export default Text

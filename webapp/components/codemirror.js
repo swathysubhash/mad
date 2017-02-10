@@ -27,9 +27,9 @@ class CodeMirror extends Component {
 	}
 	componentWillReceiveProps (nextProps) {
 		if (this.codeMirror 
-			&& nextProps.value !== undefined 
-			&& normalizeLineEndings(this.codeMirror.getValue()) !== normalizeLineEndings(nextProps.value)) {
-			this.codeMirror.setValue(nextProps.value);
+			&& nextProps.defaultValue !== undefined 
+			&& normalizeLineEndings(this.codeMirror.getValue()) !== normalizeLineEndings(nextProps.defaultValue)) {
+			this.codeMirror.setValue(nextProps.defaultValue);
 		}
 	}
 	componentWillUnmount () {

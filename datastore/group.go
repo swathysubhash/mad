@@ -1,6 +1,7 @@
 package datastore
 
 import (
+	"fmt"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"mad/model"
@@ -12,6 +13,7 @@ type groupStore struct {
 }
 
 func (g *groupStore) EnsureIndex(orgName string) error {
+	fmt.Println("")
 	index := mgo.Index{
 		Key:    []string{"apiId", "revision", "name"},
 		Unique: true,

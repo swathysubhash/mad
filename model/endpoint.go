@@ -7,50 +7,57 @@ type Snippet struct {
 }
 
 type Endpoint struct {
-	Id               string       `json:"id,omitempty" bson:"_id,omitempty"`
-	EId              string       `json:"eid,omitempty" bson:"eid,omitempty"`
-	Name             string       `json:"name" bson:"name" validate:"nonzero"`
-	Object           string       `json:"object",omitempty" bson:"object,omitempty"`
-	Description      string       `json:"description" bson:"description" validate:"nonzero"`
-	ApiId            string       `json:"apiId" bson:"apiId" validate:"nonzero"`
-	GroupId          string       `json:"groupId" bson:"groupId" validate:"nonzero"`
-	Revision         int64        `json:"revision" bson:"revision"`
-	Url              string       `json:"url" bson:"url" validate:"nonzero"`
-	Method           string       `json:"method" bson:"method" validate:"nonzero"`
-	QueryParameters  []*Parameter `json:"queryParameters,omitempty" bson:"queryParameters"`
-	UrlParameters    []*Parameter `json:"urlParameters,omitempty" bson:"urlParameters"`
-	RequestHeaders   []*Header    `json:"requestHeaders,omitempty" bson:"requestHeaders"`
-	RequestBody      Body         `json:"requestBody,omitempty" bson:"requestBody"`
-	ResponseHeaders  []*Header    `json:"requestHeaders,omitempty" bson:"responseHeaders"`
-	ResponseBody     Body         `json:"requestBody,omitempty" bson:"responseBody"`
-	LanguageSnippets []*Snippet   `json:"languageSnippets, omitempty" bson:"languageSnippets"`
+	Id              string `json:"id,omitempty" bson:"_id,omitempty"`
+	EId             string `json:"eid,omitempty" bson:"eid,omitempty"`
+	Name            string `json:"name" bson:"name" validate:"nonzero"`
+	Slug            string `json:"slug" bson:"slug" validate:"nonzero"`
+	Object          string `json:"object",omitempty" bson:"object,omitempty"`
+	Description     string `json:"description" bson:"description"`
+	DescriptionHTML string `json:"descriptionHTML" bson:"descriptionHTML"`
+	ApiId           string `json:"apiId" bson:"apiId" validate:"nonzero"`
+	GroupId         string `json:"groupId" bson:"groupId" validate:"nonzero"`
+	Revision        int64  `json:"revision" bson:"revision"`
+	SubgroupType    string `json:"subgroupType" bson:"subgroupType"`
+
+	Schema           string       `json:"schema" bson:"schema"`
+	Url              string       `json:"url" bson:"url"`
+	Method           string       `json:"method" bson:"method"`
+	QueryParameters  *[]Parameter `json:"queryParameters,omitempty" bson:"queryParameters"`
+	UrlParameters    *[]Parameter `json:"urlParameters,omitempty" bson:"urlParameters"`
+	RequestHeaders   *[]Header    `json:"requestHeaders,omitempty" bson:"requestHeaders"`
+	RequestBody      *string      `json:"requestBody" bson:"requestBody"`
+	ResponseHeaders  *[]Header    `json:"responseHeaders,omitempty" bson:"responseHeaders"`
+	ResponseBody     *string      `json:"responseBody" bson:"responseBody"`
+	LanguageSnippets *[]Snippet   `json:"languageSnippets, omitempty" bson:"languageSnippets"`
+	UpdatedBy        string       `json:"updatedBy" bson:"updatedBy"`
+	CreatedBy        string       `json:"createdBy" bson:"createdBy"`
+	UpdatedAt        int64        `json:"updatedAt" bson:"updatedAt"`
+	CreatedAt        int64        `json:"createdAt" bson:"createdAt"`
 }
 
 type EndpointBrief struct {
-	Id      string `json:"id,omitempty" bson:"_id,omitempty"`
-	Name    string `json:"name" bson:"name" validate:"nonzero"`
-	GroupId string `json:"groupId" bson:"groupId" validate:"nonzero"`
-	Object  string `json:"object",omitempty" bson:"object,omitempty"`
-	Method  string `json:"method" bson:"method" validate:"nonzero"`
+	Id           string `json:"id,omitempty" bson:"_id,omitempty"`
+	Name         string `json:"name" bson:"name" validate:"nonzero"`
+	Slug         string `json:"slug" bson:"slug" validate:"nonzero"`
+	GroupId      string `json:"groupId" bson:"groupId" validate:"nonzero"`
+	Object       string `json:"object",omitempty" bson:"object,omitempty"`
+	Method       string `json:"method" bson:"method" validate:"nonzero"`
+	SubgroupType int64  `json:"subgroupType" bson:"subgroupType"`
 }
 
 type Parameter struct {
-	Name         string `json:"name" bson:"name" validate:"nonzero"`
-	Object       string `json:"object",omitempty" bson:"object,omitempty" validate:"nonzero"`
-	Value        string `json:"value" bson:"value" validate:"nonzero"`
-	DataType     string `json:"dataType" bson:"dataType"`
-	Minimum      string `json:"minimum,omitempty" bson:"minimum"`
-	Maximum      string `json:"maximum,omitempty" bson:"maximum"`
-	DefaultValue string `json:"defaultValue,omitempty" bson:"defaultValue"`
-	Required     bool   `json:"required,omitempty" bson:"required"`
+	Name            string `json:"name" bson:"name" validate:"nonzero"`
+	Object          string `json:"object",omitempty" bson:"object,omitempty" validate:"nonzero"`
+	Description     string `json:"description" bson:"description" validate:"nonzero"`
+	DescriptionHTML string `json:"descriptionHTML" bson:"descriptionHTML" validate:"nonzero"`
+	DefaultValue    string `json:"defaultValue,omitempty" bson:"defaultValue"`
+	Required        bool   `json:"required,omitempty" bson:"required"`
 }
 
 type Header struct {
-	Name     string `json:"name" bson:"name" validate:"nonzero"`
-	Object   string `json:"object",omitempty" bson:"object,omitempty"`
-	Value    string `json:"value" bson:"value" validate:"nonzero"`
-	DataType string `json:"dataType,omitempty" bson:"dataType"`
-	Example  string `json:"example,omitempty" bson:"example"`
+	Name   string `json:"name" bson:"name" validate:"nonzero"`
+	Value  string `json:"value" bson:"value" validate:"nonzero"`
+	Object string `json:"object",omitempty" bson:"object,omitempty"`
 }
 
 type Body struct {

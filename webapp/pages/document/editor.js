@@ -11,6 +11,7 @@ class DocumentsEditor extends Component {
 		super(props)
 		this.groupCreate = this.groupCreate.bind(this)
 		this.endpointCreate = this.endpointCreate.bind(this)
+		this.schemaCreate = this.schemaCreate.bind(this)
 	}
 
 	groupCreate() {
@@ -22,6 +23,12 @@ class DocumentsEditor extends Component {
 		this.context.store.dispatch({ type: 'ENDPOINT_CREATE' })
 		this.context.router.push(`/documents/${this.props.params.documentId}/editor/endpoint/create`)
 	}
+
+	schemaCreate() {
+		this.context.store.dispatch({ type: 'ENDPOINT_CREATE' })
+		this.context.router.push(`/documents/${this.props.params.documentId}/editor/schema/create`)
+	}
+
 	render() {
 		return (
 			<div>
@@ -36,6 +43,7 @@ class DocumentsEditor extends Component {
 				<ButtonMenu text="Create new">
 					<ButtonMenuItem onClick={this.groupCreate} text="Group"></ButtonMenuItem>
 					<ButtonMenuItem onClick={this.endpointCreate} text="Endpoint"></ButtonMenuItem>
+					<ButtonMenuItem onClick={this.schemaCreate} text="Schema"></ButtonMenuItem>
 				</ButtonMenu>
 				<div>
 					<div className="api-summary">

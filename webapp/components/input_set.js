@@ -6,8 +6,10 @@ class InputSet extends Component {
   constructor(props) {
     super(props)
     this.validations = []
-    let valueSet = this.props.getValue(this.props.name)
-    // valueSet.push(this.copyOf(valueSet[0]))
+    let valueSet = this.props.getValue(this.props.name) || []
+    // if (valueSet.length) {
+    //   valueSet.push(this.copyOf(valueSet[0]))
+    // }
     
     this.state = {
       valueSet,
@@ -21,15 +23,19 @@ class InputSet extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    let valueSet = nextProps.getValue(nextProps.name) || this.state.valueSet
+    // if (valueSet.length) {
+    //   valueSet.push(this.copyOf(valueSet[0]))
+    // }
     this.setState({
-      valueSet: nextProps.getValue(nextProps.name)
+      valueSet
     })
   }
 
   copyOf(obj) {
     let copy = {};
     for(var prop in obj){
-      copy[prop]= '';
+      copy[prop]= typeof prop === 'boolean' ? false: '';
     }
     return copy;
   }
@@ -73,11 +79,12 @@ class InputSet extends Component {
 
   render() {
     return (
-      <div class="input-set-group">
-        {this.props.label ? <div class="input-set-label">{this.props.label}</div>: ''}
+      <div className={"input-set-group"}>
+        {this.props.label ? <div className={"input-set-label"}>{this.props.label}</div>: ''}
         {this.state.valueSet.map((v, index) => (
-          <div class="input-set">
-            {this.props.children.map(child => Inferno.cloneVNode(child, { 
+          <div className={"input-set"}>
+            {this.props.children.map(child => Inferno.cloneVNode(child, {
+                                                                      row: index,
                                                                       labels: false,
                                                                       showErrors: false,
                                                                       updateErrors: this.updateErrors.bind(this, index),

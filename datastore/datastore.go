@@ -9,6 +9,7 @@ type Datastore struct {
 	Group    *groupStore
 	Endpoint *endpointStore
 	Revision *revisionStore
+	Access   *accessStore
 	Api      *apiStore
 	DB       *mgo.Database
 }
@@ -23,6 +24,7 @@ func NewDatastore(db *mgo.Database) *Datastore {
 	datastore.Group = &groupStore{datastore}
 	datastore.Endpoint = &endpointStore{datastore}
 	datastore.Revision = &revisionStore{datastore}
+	datastore.Access = &accessStore{datastore}
 	datastore.Api = &apiStore{datastore}
 
 	err := datastore.Api.EnsureIndex("Myntra")
@@ -38,6 +40,12 @@ func NewDatastore(db *mgo.Database) *Datastore {
 	}
 
 	err = datastore.Endpoint.EnsureIndex("Myntra")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = datastore.Access.EnsureIndex("Myntra")
 
 	if err != nil {
 		log.Fatal(err)

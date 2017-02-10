@@ -1,0 +1,150 @@
+a,abbr,acronym,address,applet,big,blockquote,body,caption,cite,code,dd,del,dfn,div,dl,dt,em,fieldset,form,h1,h2,h3,h4,h5,h6,html,iframe,img,ins,kbd,label,legend,li,object,ol,p,pre,q,s,samp,small,span,strike,strong,sub,sup,table,tbody,td,tfoot,th,thead,tr,tt,ul,var {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    font-weight: inherit;
+    font-style: inherit;
+    font-family: inherit;
+    font-size: 100%;
+    vertical-align: baseline
+}
+
+body {
+    line-height: 1;
+    color: #000;
+    background: #fff
+}
+
+ol,ul {
+    list-style: none
+}
+
+table {
+    border-collapse: separate;
+    border-spacing: 0
+}
+
+caption,table,td,th {
+    vertical-align: middle
+}
+
+caption,td,th {
+    text-align: left;
+    font-weight: 400
+}
+
+a img {
+    border: none
+}
+
+h1, h2, h3, h4, h5 {
+    margin: 0;
+    color: #292e31;
+    font-family: Whitney SSm A,Whitney SSm B,Helvetica,Arial,sans-serif
+}
+
+h1 {
+    font-weight: 400;
+    font-size: 24px;
+    line-height: 32px
+}
+
+h2 {
+    font-weight: 500;
+    font-size: 18px;
+    line-height: 26px
+}
+
+h3 {
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 22px
+}
+
+h4,h5 {
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 18px;
+    text-transform: uppercase
+}
+
+h4 {
+    color: #4c555a
+}
+
+h5 {
+    color: #939da3
+}
+
+p {
+    margin-bottom: 0;
+    margin-top: 20px
+}
+
+#sidebar {
+	bottom: 0;
+	left: 0;
+	position: absolute;
+	top: 0;
+	z-index: 75;
+	width: 220px;
+	background: #fafcfc;
+	border-right: 1px solid #f0f4f7;
+}
+
+#content {
+	bottom: 0;
+	right: 0;
+	position: absolute;
+	left: 221px;
+	top: 0;
+	z-index: 50;
+	box-sizing: border-box;
+	overflow-x: hidden;
+	overflow-y: scroll;
+	-webkit-overflow-scrolling: touch;
+}
+	
+.row {
+	position: relative;
+  z-index: 2;
+  display: block;
+  overflow: hidden;
+}
+
+.row-full {
+	overflow: hidden;
+}
+
+.col-left {
+	float: left;
+	padding: 0 0 50px;
+	width: 45%;
+}
+
+.col-right {
+	position: relative;
+	z-index: 2;
+	margin-left: 45%;
+	padding: 42px 0 50px;
+	color: #dde4e8;
+}
+
+#background {
+	bottom: 0;
+  left: 221px;
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: 1;
+}
+
+#background .background-actual {
+	bottom: 0;
+  left: 45%;
+  position: absolute;
+  right: 0;
+  top: 0;
+  background: #2d3134;
+}

@@ -1,0 +1,25 @@
+{{define "Sidebar"}}
+<div id="sidebar">
+  <nav role="navigation" class="sidebar-nav">
+    <ul>
+      <li>SIDEBAR</li>
+    </ul>
+		{{ range .ApiSummary.GroupIds }}
+		{{ $Group := index $.GroupsMap .}}
+			<ul>
+				{{ if eq (len $Group.Endpoints) 0 }}
+					<a class="sidebar-nav-item" href="#{{$Group.Name}}">{{$Group.Name}}</a>
+				{{ else }}
+					<a class="sidebar-nav-item expandable" href="#{{$Group.Name}}">{{$Group.Name}}</a>
+					<ul>
+						{{ range $Group.Endpoints }}
+						{{ $Endpoint := index $.EndpointsMap .}}
+						<a class="sidebar-nav-item" href="#{{$Endpoint.Name}}">{{$Endpoint.Name}}</a>
+						{{ end }}
+					</ul>
+				{{ end }}
+			</ul>
+		{{ end }}
+  </nav>
+</div>
+{{end}}

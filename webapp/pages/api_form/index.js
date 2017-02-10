@@ -24,21 +24,12 @@ class ApiForm extends Component {
 		}
 
 		this.isLoading = this.isLoading.bind(this)
-		this.submit = this.submit.bind(this)
+		this.onSubmit = this.onSubmit.bind(this)
 		this.cancel = this.cancel.bind(this)
 	}
 
-	submit(event) {
-		// /documents/:documentId/editor
-		// 	/documents/:documentId/editor/group/create
-		// 	/documents/:documentId/editor/group/:groupId
-		// 	/documents/:documentId/editor/endpoint/:create
-		// 	/documents/:documentId/editor/endpoint/:endpointId
-		// /documents/:documentId/style
-		// /documents/:documentId/access
-		// /documents/:documentId/revisions
-		// /documents/:documentId/settings
-
+	onSubmit(values) {
+		console.log(values)
 
 		// this.context.router.push('/editor')
 		event.preventDefault()
@@ -58,17 +49,18 @@ class ApiForm extends Component {
 		// const store = this.context.store
 		// const state = store.getState()
 
-		// this.setState({ loading: true })
-		// createApi(submitData)
-		// .then(res => {
-		// 	this.setState({ loading: false })
-		// 	this.context.router.push('/documents/'+ res.data.id +'/editor')
-		// 	// store.dispatch({ type: 'CREATE_API_SUCCESS', data: res.data})
-		// })
-		// .catch(err => {
-		// 	this.setState({ loading: false })
-		// 	// store.dispatch({ type: 'CREATE_API_FAILURE', data: err.response.data})
-		// })
+		this.setState({ loading: true })
+		createApi(values)
+		.then(res => {
+			this.setState({ loading: false })
+			// this.context.router.push('/documents/')
+			this.context.router.push('/documents/'+ res.data.id +'/editor')
+			// store.dispatch({ type: 'CREATE_API_SUCCESS', data: res.data})
+		})
+		.catch(err => {
+			this.setState({ loading: false })
+			// store.dispatch({ type: 'CREATE_API_FAILURE', data: err.response.data})
+		})
 
 
 

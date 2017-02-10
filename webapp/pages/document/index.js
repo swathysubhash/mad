@@ -4,7 +4,7 @@ import Inferno from 'inferno'
 import Component from 'inferno-component'
 import ApiForm from '../api_form/index'
 import Tab from '../../components/tab'
-
+import { getApi } from '../../actions/api'
 //<Tab 
 	//						children = {this.props.children.map(child => 
 	//							Inferno.cloneVNode(child, { link: currentLink + child.props.path }))}	/>
@@ -21,18 +21,18 @@ class Documents extends Component {
 	}
 
 	componentDidMount() {
-		// const store = this.context.store
-		// const state = store.getState()
+		const store = this.context.store
+		const state = store.getState()
 
 		// let apis = state.entities.apis.byIds
 		// let apiId = this.props.params.documentId
 		// let api = apis[apiId]
 
 		// if (api && !api.currentRevision) {
-		// 	store.dispatch({ type: 'GET_API_REQUEST'})
-		// 	getApi({ apiId })
-		// 	.then(res => store.dispatch({ type: 'GET_API_RESPONSE', data: res.data}))
-		// 	.catch(err => store.dispatch({ type: 'GET_API_FAILURE', data: err.response.data}))		
+			store.dispatch({ type: 'GET_API_REQUEST'})
+			getApi({ apiId: this.props.params.documentId })
+			.then(res => store.dispatch({ type: 'GET_API_RESPONSE', data: res.data}))
+			.catch(err => store.dispatch({ type: 'GET_API_FAILURE', data: err.response.data}))		
 		// }
 	}
 
@@ -55,8 +55,7 @@ class Documents extends Component {
 			<div>
 				<div>DocumentsIndex</div>
 				{
-					this.props.params.documentId === 'create' ? <ApiForm documentId={this.props.params.documentId}/> 
-				: <div>
+					<div>
 						<div class="tab-group">
 							{this.state.tabs.map(tab => 
 								<div 

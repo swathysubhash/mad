@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/extemporalgenome/slug"
 	"github.com/gorilla/mux"
@@ -12,6 +13,7 @@ import (
 	"mad/model"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 func createApi(w http.ResponseWriter, r *http.Request) error {
@@ -33,11 +35,19 @@ func createApi(w http.ResponseWriter, r *http.Request) error {
 		}
 	}
 
+	currentTime := time.Now().Unix()
+
 	api.Slug = slug.Slug(api.Name + "-" + api.Version)
 	api.Id = bson.NewObjectId().Hex()
 	api.Object = "api"
 	api.CurrentRevision = 0
 	api.PublishedRevision = -1
+	api.CreatedBy = "SwathySubhash"
+	api.UpdatedBy = "SwathySubhash"
+	api.CreatedAt = currentTime
+	api.UpdatedAt = currentTime
+	api.AnonymousAccessSlice = []int{0, 0, 0} // {r, w, a}
+	api.AnonymousAccess = "none"              // {r, w, a}
 
 	err = store.Api.Create("Myntra", &api)
 
@@ -98,6 +108,9 @@ func updateApi(w http.ResponseWriter, r *http.Request) error {
 	// No manual update for following fields
 	api.CurrentRevision = oldApi.CurrentRevision
 	api.PublishedRevision = oldApi.PublishedRevision
+	if len(api.AnonymousAccess) > 0 {
+		api.AnonymousAccessSlice, _ = convertPermission(api.AnonymousAccess)
+	}
 
 	mergo.Merge(&api, oldApi)
 	api.Slug = slug.Slug(api.Name + "-" + api.Version)
@@ -219,21 +232,44 @@ func summaryApi(w http.ResponseWriter, r *http.Request) error {
 	if err != nil {
 		return writeError(w, "A90002", &[]string{apiId})
 	}
+
+	apiSummary, err := GetApiSummary(api)
+
+	if err != nil {
+		return writeJSON(w, err)
+	}
+
+	return writeJSON(w, apiSummary)
+}
+
+func GetApiBySlug(slug string) (*model.Api, error) {
+	api, err := store.Api.GetBySlug("Myntra", slug)
+	if err != nil {
+		return nil, errors.New("Api not found with slug name" + slug)
+	}
+	return api, nil
+}
+
+func GetApiSummary(api *model.Api) (*model.ApiSummary, error) {
+	apiId := api.Id
 	currentRevision := api.CurrentRevision
 	s_currentRevision := strconv.FormatInt(currentRevision, 10)
 
 	revision, err := store.Revision.Get("Myntra", apiId+"_"+s_currentRevision)
 	if err != nil {
-		return writeError(w, "R20001", &[]string{apiId})
+		return nil, errors.New("Revision not found with API id" + apiId)
+		// return writeError(w, "R20001", &[]string{apiId})
 	}
 	groups, err := store.Group.GetByApi("Myntra", apiId, currentRevision)
 	if err != nil {
-		return writeError(w, "G80005", &[]string{apiId})
+		return nil, errors.New("Group not found with API id" + apiId)
+		// return writeError(w, "G80005", &[]string{apiId})
 	}
 
 	endpoints, err := store.Endpoint.GetByApi("Myntra", apiId, currentRevision)
 	if err != nil {
-		return writeError(w, "E30001", &[]string{apiId})
+		return nil, errors.New("Endpoints not found with API id" + apiId)
+		// return writeError(w, "E30001", &[]string{apiId})
 	}
 
 	groupBriefs := make([]model.GroupBrief, 0, 0)
@@ -259,12 +295,12 @@ func summaryApi(w http.ResponseWriter, r *http.Request) error {
 		})
 	}
 
-	return writeJSON(w, &model.ApiSummary{
+	return &model.ApiSummary{
 		ApiId:           apiId,
 		Object:          "summary",
 		CurrentRevision: currentRevision,
 		GroupIds:        revision.GroupList,
 		Groups:          &groupBriefs,
 		Endpoints:       &endpointBriefs,
-	})
+	}, nil
 }

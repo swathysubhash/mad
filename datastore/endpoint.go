@@ -12,8 +12,7 @@ type endpointStore struct {
 
 func (e *endpointStore) EnsureIndex(orgName string) error {
 	index := mgo.Index{
-		Key:    []string{"groupId", "revision"},
-		Unique: true,
+		Key: []string{"groupId", "revision", "subgroupType"},
 	}
 	err := e.DB.C(orgName + "/ENDPOINTLIST").EnsureIndex(index)
 
@@ -21,8 +20,7 @@ func (e *endpointStore) EnsureIndex(orgName string) error {
 		return err
 	}
 	index = mgo.Index{
-		Key:    []string{"apiId", "revision"},
-		Unique: true,
+		Key: []string{"apiId", "revision", "subgroupType"},
 	}
 	err = e.DB.C(orgName + "/ENDPOINTLIST").EnsureIndex(index)
 

@@ -9,10 +9,15 @@ class ApiList extends Component {
 	constructor(props){
 		super(props)
 		this.onApiRowClick = this.onApiRowClick.bind(this)
+		this.createApiOnClick = this.createApiOnClick.bind(this)
 	}
 
 	onApiRowClick(apiId, event) {
 		this.context.router.push('/documents/' + apiId + '/editor')
+	}
+
+	createApiOnClick(){
+		this.context.router.push('/documentlist/create')	
 	}
 
 	componentDidMount() {
@@ -32,6 +37,7 @@ class ApiList extends Component {
 				<div>ApiList</div>
 				<button onClick={ this.createApiOnClick }>New</button>
 				{apiIds.map(id => <div onClick={this.onApiRowClick.bind(this, id)}>{apis[id].name}</div>)}
+				{this.props.children}
 			</div>
 		);
 	}
