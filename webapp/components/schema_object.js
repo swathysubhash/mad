@@ -5,6 +5,8 @@ import SchemaArray from './schema_array'
 import SchemaNumber from './schema_number'
 import SchemaString from './schema_string'
 import SchemaBoolean from './schema_boolean'
+import { renderMarkdown } from '../helpers/util'
+import MarkdownEditor from './markdown_editor'
 
 class SchemaObject extends Component {
 	constructor(props) {
@@ -14,6 +16,7 @@ class SchemaObject extends Component {
 		this.add = this.add.bind(this)
 		this.changeItem = this.changeItem.bind(this)
 		this.onPropsChange = this.onPropsChange.bind(this)
+		this.descriptionChange = this.descriptionChange.bind(this)
 		// this.onChange = this.onChange.bind(this)
 		this.changeRequired = this.changeRequired.bind(this)
 		this.deleteItem = this.deleteItem.bind(this)
@@ -21,13 +24,13 @@ class SchemaObject extends Component {
 
 	propsToState(props) {
 		let data = props.data
-		data.properties = data.properties || {}
-		data.required = data.required || []
-		data.propertyNames = []
-		data.properties = Object.keys(data.properties).map(name => {
-			data.propertyNames.push(name)
-			return data.properties[name]
-		})
+		data.properties = data.properties || []
+		// data.required = data.required || []
+		// data.propertyNames = []
+		// data.properties = Object.keys(data.properties).map(name => {
+		// 	data.propertyNames.push(name)
+		// 	return data.properties[name]
+		// })
 		return data
 	}
 
@@ -50,30 +53,33 @@ class SchemaObject extends Component {
 		if (event.target.name == 'type') {
 			this.state.properties[i].type = event.target.value
 		} else if (event.target.name == 'field') {
-			this.state.propertyNames[i] = event.target.value
+			// this.state.propertyNames[i] = event.target.value
+			this.state.properties[i].name = event.target.value
 		}
 		this.setStateSync(this.state)
 		this.props.onChange && this.props.onChange(this.state)
 	}
 
-	deleteItem() {
-		let i = event.target.parentElement.dataset.index
-		let requiredIndex = this.state.required.indexOf(this.state.propertyNames[i])
-		if (requiredIndex !== -1) {
-			this.state.required.splice(requiredIndex, 1)
-		}
-		this.state.properties.splice(i, 1)
-		this.state.propertyNames.splice(i, 1)
+	deleteItem(index) {
+		// let i = event.target.parentElement.dataset.index
+		// let requiredIndex = this.state.required.indexOf(this.state.propertyNames[i])
+		// if (index !== -1) {
+			this.state.properties.splice(index, 1)
+		// }
+		// this.state.properties.splice(i, 1)
+		// this.state.propertyNames.splice(i, 1)
 		this.setStateSync(this.state)
 		this.props.onChange && this.props.onChange(this.state)
 	}
 
-	changeRequired() {
+	changeRequired(index) {
 		if (event.target.checked)
-			this.state.required.push(event.target.name);
+			// this.state.required.push(event.target.name);
+		this.state.properties[index].required = true
 		else {
-			var i = this.state.required.indexOf(event.target.name)
-			this.state.required.splice(i, 1)
+			// var i = this.state.required.indexOf(event.target.name)
+			// this.state.required.splice(i, 1)
+			this.state.properties[index].required = false
 		}
 		this.setStateSync(this.state)
 		this.props.onChange && this.props.onChange(this.state)
@@ -82,6 +88,14 @@ class SchemaObject extends Component {
 	onPropsChange(index, state) {
 		this.state.properties[index] = { ...this.state.properties[index], ...state }
 		this.setStateSync(this.state)
+		this.props.onChange && this.props.onChange(this.state)
+	}
+
+
+	descriptionChange(value) {
+		this.state['description'] = value
+		this.state['descriptionHTML'] = renderMarkdown(value)
+		this.setState(this.state)
 		this.props.onChange && this.props.onChange(this.state)
 	}
 
@@ -100,17 +114,19 @@ class SchemaObject extends Component {
 	}
 
 	export() {
-		var properties = {};
-		Object.keys(this.state.properties).forEach(index => {
-			let name = this.state.propertyNames[index];
-			if (name && typeof this.sref['item'+index] != 'undefined' && name.length > 0)
-				properties[name] = this.sref['item'+index].export();
-		});
+		// var properties = {};
+		// Object.keys(this.state.properties.forEach(index => {
+		// 	let name = this.state.propertyNames[index];
+		// 	if (name && typeof this.sref['item'+index] != 'undefined' && name.length > 0)
+		// 		properties[name] = this.sref['item'+index].export();
+		// });
 		return {
 			type: 'object',
 			format: this.state.format,
-			properties: properties,
-			required: this.state.required.length ? this.state.required : undefined
+			description: this.state.description,
+			descriptionHTML: this.state.descriptionHTML,
+			properties: this.state.properties,
+			// required: this.state.required.length ? this.state.required : undefined
 		}
 	}
 
@@ -130,45 +146,34 @@ class SchemaObject extends Component {
 		var fieldStyle = {
 			paddingBottom: '10px',
 		}
-		var objectStyle = {
-			borderLeft: '2px dotted gray',
-			paddingLeft: '8px',
-			paddingTop: '10px',
-		}
 		var typeSelectStyle = {
 			marginLeft: '5px'
 		}
-		var deletePropStyle = {
-			border: '1px solid black',
-			padding: '0px 4px 0px 4px',
-			pointer: 'cursor',
-		}
-
 		return (
-			<div style={objectStyle}>
+			<div className={"schema-object"}>
+				<div><span className={"label description"}>Description: </span><MarkdownEditor onChange={this.descriptionChange} path={this.props.name} options={{toolbar: false, status: false}} value={this.state.description} defaultValue={this.state.description}/></div>
 				{
-					this.state.properties.map((value, index) => {
-						let name = this.state.propertyNames[index]
-						let copiedState = JSON.parse(JSON.stringify(this.state.properties[index]))
-						let optionForm = this.mapping('item' + index, copiedState, this.onPropsChange.bind(this, index));
+					this.state.properties.map((property, index) => {
+						let name = property.name
+						let optionForm = this.mapping('item' + index, property, this.onPropsChange.bind(this, index));
 						return <div data-index={index} style={fieldStyle} key={index}>
-							<input name="field" type="string" onInput={this.changeItem} value={name} />
-							<select style={typeSelectStyle} name="type" onChange={this.changeItem} value={value.type}>
-								<option value="string">string</option>
-								<option value="number">number</option>
-								<option value="array">array</option>
-								<option value="object">object</option>
-								<option value="boolean">boolean</option>
+							<input name={"field"} type={"string"} placeholder={"field name"} onInput={this.changeItem} value={name} />
+							<select style={typeSelectStyle} name={"type"} onChange={this.changeItem} value={property.type}>
+								<option value={"string"}>string</option>
+								<option value={"number"}>number</option>
+								<option value={"array"}>array</option>
+								<option value={"object"}>object</option>
+								<option value={"boolean"}>boolean</option>
 							</select>
-							<span style={requiredIcon}>*</span><input name={name} type="checkbox" onClick={this.changeRequired} checked={this.state.required.indexOf(name) != -1} />
-							<span onClick={this.deleteItem} style={deletePropStyle}>x</span>
+							<span style={requiredIcon}>*</span><input name={name} type="checkbox" onClick={this.changeRequired.bind(this,index)} checked={!!property.required} />
+							<span onClick={this.deleteItem.bind(this, index)} className={"delete"}>Delete</span>
 							<div style={optionFormStyle}>
 								{optionForm}
 							</div>
 						</div>
 					})
 				}
-				<button onClick={this.add}>Add another field</button>
+				<button onClick={this.add} className={"add-another"}>Add another field</button>
 			</div>
 		)
 	}

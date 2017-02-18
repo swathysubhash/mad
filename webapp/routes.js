@@ -6,15 +6,12 @@ import { Router, Route, IndexRoute } from 'inferno-router'
 export const routes = (
 	<Route component={Page}>
 		<IndexRoute component={Pages.ApiList}/>
-		<Route path="/documentlist" component={Pages.ApiList} >
-			<IndexRoute component={()=>{}}/>
-			<Route path="/create" component={Pages.ApiForm} />
-			<Route path="/:documentId/edit" component={Pages.ApiForm} />	
-		</Route>
+		<Route path="/documentlist" component={Pages.ApiList} />
+		<Route path="/documentlist/create" component={Pages.ApiForm} />
 		<Route path="/account" component={Pages.UserProfile} />
 		<Route path="/documents/:documentId" component={Pages.Documents} >
 			<Route title="Editor" path="/editor" component={Pages.DocumentsEditor}>
-				<IndexRoute component={Pages.DocumentsEditorOverview}/>
+				<IndexRoute path="/" component={Pages.DocumentsEditorOverview}/>
 				<Route path="/group/:groupId" name="group" component={Pages.DocumentsGroupCreate} />
 				<Route path="/endpoint/:endpointId" subgroupType="endpoint" component={Pages.DocumentsEndpointCreate} />	
 				<Route path="/schema/:endpointId" subgroupType="schema" component={Pages.DocumentsEndpointCreate} />

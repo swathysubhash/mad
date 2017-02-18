@@ -46,25 +46,52 @@ type Api struct {
 }
 
 type Revision struct {
-	Id          string    `json:"id,omitempty" bson:"_id,omitempty"`
-	ApiId       string    `json:"apiId" bson:"apiId" validate:"nonzero"`
-	Object      string    `json:"object",omitempty" bson:"object,omitempty"`
-	Number      int64     `json:"number" bson:"number" validate:"nonzero"`
-	GroupList   *[]string `json:"groupList" bson:"groupList" validate:"nonzero"`
-	CustomStyle *Style    `json:"customStyle,omitempty" bson:"customStyle,omitempty" validate:"nonzero"`
+	Id          string   `json:"id,omitempty" bson:"_id,omitempty"`
+	ApiId       string   `json:"apiId" bson:"apiId" validate:"nonzero"`
+	Object      string   `json:"object",omitempty" bson:"object,omitempty"`
+	Number      int64    `json:"number" bson:"number" validate:"nonzero"`
+	GroupList   []string `json:"groupList" bson:"groupList" validate:"nonzero"`
+	CustomStyle *Style   `json:"customStyle,omitempty" bson:"customStyle,omitempty" validate:"nonzero"`
 }
 
 type ApiListResponse struct {
 	Count  int    `json:"count"`
 	Object string `json:"object"`
-	Data   *[]Api `json:"data"`
+	Data   []Api  `json:"data"`
 }
 
 type ApiSummary struct {
-	ApiId           string           `json:"apiId"`
-	Object          string           `json:"object"`
-	CurrentRevision int64            `json:"currentRevision" bson:"currentRevision"`
-	GroupIds        *[]string        `json:"groupIds" bson:"groupIds" validate:"nonzero"`
-	Groups          *[]GroupBrief    `json:"groups" bson:"groups" validate:"nonzero"`
-	Endpoints       *[]EndpointBrief `json:"endpoints" bson:"endpoints" validate:"nonzero"`
+	ApiId           string          `json:"apiId"`
+	Object          string          `json:"object"`
+	CurrentRevision int64           `json:"currentRevision" bson:"currentRevision"`
+	GroupIds        []string        `json:"groupIds" bson:"groupIds" validate:"nonzero"`
+	Groups          []GroupBrief    `json:"groups" bson:"groups" validate:"nonzero"`
+	Endpoints       []EndpointBrief `json:"endpoints" bson:"endpoints" validate:"nonzero"`
+}
+
+func GetDefaultStyle() *Style {
+	return &Style{
+		Column:                            3,
+		Object:                            "style",
+		LinkColor:                         "#131313",
+		FontSize:                          14,
+		HeaderBackgroundColor:             "#F7F7F7",
+		HeaderFontColor:                   "#44492A",
+		SidePanelBackgroundColor:          "#FAFCFC",
+		SidePanelFontColor:                "#676F73",
+		SidePanelLightFontColor:           "#9AA4AA",
+		SidePanelSecondaryFontColor:       "#11A0E7",
+		LeftPanelBackgroundColor:          "#FFFFFF",
+		LeftPanelFontColor:                "#4C555A",
+		LeftPanelLightFontColor:           "#959FA5",
+		LeftPanelHighlightFontColor:       "#BC4671",
+		LeftPanelHighlightBackgroundColor: "#FAFCFC",
+		RightPanelBackgroundColor:         "#2D3134",
+		RightPanelFontColor:               "#CACFD1",
+		CodeFontColor:                     "#B7B8B8",
+		CodeHighlightColor:                "#9DC158",
+		CodeBackgroundColor:               "#272B2D",
+		OrgNameFontColor:                  "#32325D",
+		OrgApiStringFontColor:             "#0199E5",
+	}
 }

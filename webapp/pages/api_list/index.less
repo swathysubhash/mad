@@ -1,0 +1,72 @@
+@import "../../variables";
+.api-row {
+	border-bottom: 1px solid @color-border;
+	cursor: pointer;
+	> div {
+		display: inline-block;
+		padding: 10px 20px;
+	}
+	&:hover {
+		color: @color-primary;
+    box-shadow: 0 0 8px 4px #F8F8F8;
+    .sub-detail {
+    	color: @color-primary;
+    }
+	}
+}
+
+.heading {
+	font-size: 18px;
+	padding: 18px 0;
+	text-transform: uppercase;
+}
+
+.api-row-header {
+	font-weight: 600;
+	background: #F7F7F7;
+	> div {
+		display: inline-block;
+		padding: 10px 20px;
+	}
+}
+.api-list {
+	position: relative;
+	.file {
+		font-size: 20px;
+		padding: 18px 21px;
+    padding-right: 0;
+    vertical-align: top;
+	}
+	.sub-detail {
+		color: #999;
+    font-size: 12px;
+	}
+	.left, .right {
+		display: inline-block;
+		vertical-align: top;
+		width: 100%;
+		box-sizing: border-box;
+	}
+	.left {
+		width: 20%;
+		padding-top: 77px;
+    box-sizing: border-box;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    .fa {
+    	padding-right: 6px;
+    }
+		button {
+			background: none;
+	    border: none;
+	    text-decoration: underline;
+	    color: #3853D8;
+	    cursor: pointer;
+		}
+	}
+	.right {
+		padding-left: 20%;
+	}
+}

@@ -50,7 +50,7 @@ func (g *groupStore) Create(orgName string, group *model.Group) error {
 	return nil
 }
 
-func (g *groupStore) GetAll(orgName, apiId string, revision int64) (*[]model.Group, error) {
+func (g *groupStore) GetAll(orgName, apiId string, revision int64) ([]model.Group, error) {
 	var groupList = make([]model.Group, 0)
 
 	c := g.DB.C(orgName + "/GROUPLIST")
@@ -59,7 +59,7 @@ func (g *groupStore) GetAll(orgName, apiId string, revision int64) (*[]model.Gro
 		return nil, err
 	}
 
-	return &groupList, nil
+	return groupList, nil
 }
 
 func (g *groupStore) Get(orgName, groupId string) (*model.Group, error) {
@@ -74,7 +74,7 @@ func (g *groupStore) Get(orgName, groupId string) (*model.Group, error) {
 	return group, nil
 }
 
-func (g *groupStore) GetByApi(orgName, apiId string, revision int64) (*[]model.Group, error) {
+func (g *groupStore) GetByApi(orgName, apiId string, revision int64) ([]model.Group, error) {
 	var groupList = make([]model.Group, 0)
 
 	c := g.DB.C(orgName + "/GROUPLIST")
@@ -84,7 +84,7 @@ func (g *groupStore) GetByApi(orgName, apiId string, revision int64) (*[]model.G
 		return nil, err
 	}
 
-	return &groupList, nil
+	return groupList, nil
 }
 
 func (g *groupStore) Update(orgName, groupId string, group *model.Group) error {
@@ -99,10 +99,10 @@ func (g *groupStore) Update(orgName, groupId string, group *model.Group) error {
 	return nil
 }
 
-func (g *groupStore) UpsertMany(orgName string, groups *[]model.Group) error {
+func (g *groupStore) UpsertMany(orgName string, groups []model.Group) error {
 	c := g.DB.C(orgName + "/GROUPLIST")
 
-	for _, g := range *groups {
+	for _, g := range groups {
 		_, err := c.Upsert(bson.M{"_id": g.Id}, g)
 		if err != nil {
 			return err

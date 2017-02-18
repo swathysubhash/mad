@@ -1,0 +1,49 @@
+@import "../variables";
+
+
+.header {
+	background: @color-primary;
+}
+
+.middle {
+	margin: auto;
+	max-width: 990px;
+}
+
+.header-sub {
+	padding: 12px 30px;
+	color: white;
+	> div {
+		display: inline-block;
+	}
+	.logo {
+		cursor: pointer;
+		color: white;
+	}
+	.userimage {
+	  position: relative;
+    bottom: 4px;
+    border-radius: 28px;
+	}
+	.brand {
+		font-weight: 700;
+		text-transform: uppercase;
+	}
+
+	.right {
+		float: right;
+		text-align: right;
+		>div, >img, >button {
+			display: inline-block;
+			vertical-align: top;
+			margin-right: 5px;
+		}
+		.logout {
+			position: relative;
+	    bottom: 4px;
+	    background: inherit;
+	    color: inherit;
+	    cursor: pointer;
+		}
+	}
+}

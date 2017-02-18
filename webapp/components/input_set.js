@@ -7,10 +7,7 @@ class InputSet extends Component {
     super(props)
     this.validations = []
     let valueSet = this.props.getValue(this.props.name) || []
-    // if (valueSet.length) {
-    //   valueSet.push(this.copyOf(valueSet[0]))
-    // }
-    
+    valueSet.length && (valueSet = valueSet.concat(this.copyOf(valueSet[0])))
     this.state = {
       valueSet,
       errors: []
@@ -24,6 +21,7 @@ class InputSet extends Component {
 
   componentWillReceiveProps(nextProps) {
     let valueSet = nextProps.getValue(nextProps.name) || this.state.valueSet
+    // valueSet.length && (valueSet = valueSet.concat(this.copyOf(valueSet[0])))
     // if (valueSet.length) {
     //   valueSet.push(this.copyOf(valueSet[0]))
     // }
@@ -35,7 +33,7 @@ class InputSet extends Component {
   copyOf(obj) {
     let copy = {};
     for(var prop in obj){
-      copy[prop]= typeof prop === 'boolean' ? false: '';
+      copy[prop]= typeof obj[prop] === 'boolean' ? false: '';
     }
     return copy;
   }
@@ -94,7 +92,7 @@ class InputSet extends Component {
                                                                     }
                                                                   ))}
             {this.state.valueSet.length - 1 !== index 
-                ? <button onClick={this.deleteClick.bind(this, index)}>Delete</button> 
+                ? <button className={"secondary-btn"} onClick={this.deleteClick.bind(this, index)}>Delete</button> 
                 : ''}
           </div>
         ))}

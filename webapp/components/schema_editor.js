@@ -1,4 +1,5 @@
 
+import './schema_editor.less'
 import Inferno from 'inferno'
 import Component from 'inferno-component'
 import SchemaObject from './schema_object'
@@ -22,7 +23,8 @@ class SchemaEditor extends Component {
 			console.log("Error while parsing schema json")
 		}
 		return (
-			<div>
+			<div className={"schema-editor"}>
+			<label>Edit schema</label>
 			<SchemaObject ref={(sref) => { this.sref = sref }} onChange={this.onChange} data={data} />
 			</div>
 		)

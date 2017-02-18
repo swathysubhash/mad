@@ -1,3 +1,4 @@
+import './button.less'
 import Inferno from 'inferno'
 import Component from 'inferno-component'
 
@@ -18,9 +19,9 @@ class Button extends Component {
 	render() {
 			return (
 					<div>
-						<button className={this.props.action} onClick={this.onClick}>
+						<button className={"btn-primary"} onClick={this.onClick}>
 							<span>{this.props.text}</span>
-							{this.props.loading ? <span>...</span> : <span></span>}
+							{this.props.loading ? <span className={"loader"}><i className={"fa fa-spinner fa-spin"} aria-hidden="true"></i></span> : <span className={"loader-placeholder"}></span>}
 						</button>
 					</div>
 				)

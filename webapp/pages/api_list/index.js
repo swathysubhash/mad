@@ -1,7 +1,11 @@
+import './index.less'
+
 import Inferno from 'inferno'
 import Component from 'inferno-component'
+import { Link } from 'inferno-router'
 import { getApiList } from '../../actions/api'
 import ApiForm from '../api_form'
+import { convertEpoch } from '../../helpers/util'
 import { connect } from 'inferno-redux'
 
 
@@ -34,13 +38,47 @@ class ApiList extends Component {
 		const apiIds = Object.keys(apis)
 		return (
 			<div>
-				<div>ApiList</div>
-				<button onClick={ this.createApiOnClick }>New</button>
-				{apiIds.map(id => <div onClick={this.onApiRowClick.bind(this, id)}>{apis[id].name}</div>)}
+				<div class="context">
+					<div class="middle">
+						<div>
+							<Link className="bread-el" to={"/"}>
+							<span>Api Document List</span>
+							</Link>
+						</div>
+					</div>
+				</div>
+				<div className={"middle api-list"} >
+					<div className={"left"}>
+						<button onClick={ this.createApiOnClick }><i class="fa fa-plus" aria-hidden="true"></i>Create Api Document</button>
+					</div>
+					<div className={"right"}>
+						<div className={"form-header"}>Api Document List</div>
+						<div className={"api-list"}>
+							<div className={"api-row-header"}>
+								<div></div>
+								<div className={"col7"}>Name</div>
+								<div className={"col2"}>Updated At</div>
+								<div className={"col3"}>Updated By</div>
+							</div>
+							{apiIds.map(id => <div className={"api-row"} onClick={this.onApiRowClick.bind(this, id)}>
+								<div className={"file"}><i class="fa fa-file-text-o" aria-hidden="true"></i></div><div className={"col7"}><div>{apis[id].name}</div><div className={"sub-detail"}>Version: <span>{apis[id].version}</span>  Revision: <span>{apis[id].currentRevision}</span></div></div>
+								<div className={"col2"}>{convertEpoch(apis[id].updatedAt)}</div>
+								<div className={"col2"}>{apis[id].updatedBy}</div>
+								</div>)}
+						</div>
+					</div>
+				</div>
 				{this.props.children}
 			</div>
 		);
 	}
 }
 
-export default connect(() => {})(ApiList)
+function mapStateToProps(state, ownProps) {
+	return {
+		...state,
+		...ownProps
+	}
+}
+
+export default connect(mapStateToProps)(ApiList)

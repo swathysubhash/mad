@@ -74,7 +74,7 @@ class Text extends Component {
 	render() {
 		let value = this.props.getValue && this.props.getValue(this.props.name)
 		return (
-			<div className="input-row">
+			<div className={this.props.className ? this.props.className + " input-row" : "input-row"}>
 				{this.props.labels !== false ? <div><label>{this.props.label}</label></div> : ''}
 				<div>
 					{this.props.type === 'textarea' ?
@@ -111,6 +111,14 @@ class Text extends Component {
 							value={value ? value : undefined}
 							defaultValue={this.props.defaultOption}
 						/>
+					: this.props.type === 'color' ? 
+						<div><input 
+						type={"text"} 
+						onClick={this.onClick}
+						placeholder={this.props.placeholder} 
+						onBlur={this.onBlur} 
+						onInput={this.onChange}
+						value={this.props.getValue(this.props.name)} /><span className={"color-box"} style={{"background": this.props.getValue(this.props.name)}}></span></div>
 					:<input 
 						type={this.props.type} 
 						onClick={this.onClick}
@@ -120,7 +128,7 @@ class Text extends Component {
 						value={this.props.getValue(this.props.name)} />
 					}
 				</div>
-				<div>{this.state.errors.length && this.props.showErrors !== false ? this.state.errors[0] : ''}</div>
+				<div className={"error-label"}>{this.state.errors.length && this.props.showErrors !== false ? this.state.errors[0] : ''}</div>
 			</div>
 		)
 	}

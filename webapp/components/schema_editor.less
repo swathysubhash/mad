@@ -1,0 +1,65 @@
+@import "../variables";
+
+.schema-field {
+	> div {
+		display: inline-block;
+		vertical-align: top;
+		margin-right: 5px;
+	}
+}
+
+.schema-editor {
+	label {
+		font-weight: 600;
+	}
+	.delete {
+		cursor: pointer;
+		color: @color-primary;
+		text-decoration: underline;
+		font-size: 13px;
+		padding-left: 6px;
+	}
+	.add-another {
+		border: 1px solid @color-primary;
+		color: @color-primary;
+		background: white;
+		font-size: 13px;
+	}
+	.markdown-editor {
+		display: inline-block;
+	}
+	span.label {
+		text-transform: uppercase;
+		font-size: 11px;
+		&.description {
+			vertical-align: top;
+	    margin-top: 6px;
+	    display: inline-block;
+		}
+	}
+	.CodeMirror, .CodeMirror-scroll {
+	    min-height: 40px;
+	    background: white;
+	    padding-top: 0px;
+	    width: 190px;
+	    font-size: 13px;
+	}
+}
+
+input, select {
+	font-size: 13px;
+	padding: 4px 6px;
+	border: 1px solid @color-border;
+	color: inherit;
+	background: white;
+}
+
+
+.schema-object {
+	padding: 12px;
+  background: #F8F8F8;
+  border: 1px solid #f1ebeb;
+	border-left: 6px solid #FFB407;
+}
+
+

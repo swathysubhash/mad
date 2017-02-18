@@ -124,6 +124,26 @@ export default function entities(state = initialState, action) {
   			...state,
   			ui: uiReducer(state.ui, {type: 'ENDPOINT_CREATE'})
   		}
+    case 'SCHEMA_CREATE':
+      return {
+        ...state,
+        ui: uiReducer(state.ui, {type: 'SCHEMA_CREATE'})
+      }
+    case 'SET_NOTIFICATION':
+      return {
+        ...state,
+        ui: uiReducer(state.ui, {type: 'SET_NOTIFICATION', data: data})
+      }
+    case 'DISMISS_NOTIFICATION':
+      return {
+        ...state,
+        ui: uiReducer(state.ui, {type: 'DISMISS_NOTIFICATION', data: data})
+      }
+    case 'API_READ_PERMISSION_FAIL':
+      return {
+        ...state,
+        ui: uiReducer(state.ui, {type: 'DISMISS_NOTIFICATION', data: data})
+      }
   	default:
       return state
   }
@@ -258,6 +278,8 @@ function apiSummary(state = { loading: false, stale: false }, action) {
 			return {
 				...state,
 				createGroup: false,
+        createSchema: false,
+        createEndpoint: false,
         selected: data,
 				selectedGroup: data
 			}
@@ -265,6 +287,8 @@ function apiSummary(state = { loading: false, stale: false }, action) {
 			return {
 				...state,
 				createGroup: true,
+        createSchema: false,
+        createEndpoint: false,
         selected: '',
 				selectedGroup: '',
 			}
@@ -272,6 +296,8 @@ function apiSummary(state = { loading: false, stale: false }, action) {
 			return {
 				...state,
 				createEndpoint: false,
+        createGroup: false,
+        createSchema: false,
         selected: data,
 				selectedEndpoint: data
 			}
@@ -279,9 +305,20 @@ function apiSummary(state = { loading: false, stale: false }, action) {
 			return {
 				...state,
 				createEndpoint: true,
+        createGroup: false,
+        createSchema: false,
 				selectedEndpoint: '',
         selected: '',
 			}
+    case 'SCHEMA_CREATE':
+      return {
+        ...state,
+        createSchema: true,
+        createEndpoint: false,
+        selectedSchema: '',
+        createGroup: false,
+        selected: '',
+      }
 		case 'START_LOADING':
 			return {
 				...state,
@@ -297,6 +334,18 @@ function apiSummary(state = { loading: false, stale: false }, action) {
 			return state
 	}
 }
+function notifications(state = [], action) {
+  let data = action.data
+  switch(action.type) {
+    case 'SET_NOTIFICATION':
+      return [...state.concat(data)]
+    case 'DISMISS_NOTIFICATION':
+      let index = state.indexOf(data)
+      return [...state.slice(0,index).concat(state.slice(index + 1))]
+    default:
+      return state
+  }
+}
 const apisReducer = combineReducers({
     byIds : apisById,
 });
@@ -308,5 +357,6 @@ const endpointsReducer = combineReducers({
 });
 
 const uiReducer = combineReducers({
-	apiSummary: apiSummary
+	apiSummary: apiSummary,
+  notifications: notifications
 })

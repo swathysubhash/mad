@@ -22,6 +22,7 @@ class MarkdownEditor extends Component {
 			...{ 
 				element: this.textArea, 
 				hideIcons: ['guide'], 
+				status: false,
 				placeholder: "Type here...", 
 				showIcons: ["code", "table"],
 			},

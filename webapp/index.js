@@ -1,5 +1,4 @@
 /*eslint-disable */
-
 import './index.less'
 import {routes} from './routes'
 
@@ -13,8 +12,8 @@ import createBrowserHistory from 'history/createBrowserHistory'
 
 /*eslint-enable */
 
-const browserHistory = createBrowserHistory()
-const store = createStore(rootReducer)
+let browserHistory = createBrowserHistory()
+let store = createStore(rootReducer)
 
 class App extends Component {
 	render() {

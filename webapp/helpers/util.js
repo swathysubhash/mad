@@ -21,3 +21,7 @@ export function renderMarkdown(md) {
 	})
 	return marked(md)
 }
+
+export function convertEpoch(e) {
+	return new Date(e * 1000).toLocaleDateString()
+}

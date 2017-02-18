@@ -2,8 +2,8 @@
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var CopyWebpackPlugin = require('copy-webpack-plugin');
 var path = require('path');
+var ManifestPlugin = require('webpack-manifest-plugin');
 var webpack = require('webpack');
-
 module.exports = {
   entry: {
     app: [
@@ -12,11 +12,11 @@ module.exports = {
     ]
   },
   output: {
-    filename: 'static/app.js',
+    filename: 'static/app.[chunkhash:8].js',
     path: path.resolve(__dirname, 'dist'),
     publicPath: '/'
   },
-  devtool: 'source-map',
+  devtool: '#source-map',
   module: {
     loaders: [
       {
@@ -25,6 +25,7 @@ module.exports = {
         loader: 'babel',
         query: {
           presets: ['es2015'],
+          // presets: [require.resolve('babel-preset-inferno-app')],
           plugins: ['inferno', 'transform-object-rest-spread']
         }
       },
@@ -52,28 +53,32 @@ module.exports = {
     extensions: ['', '.js', '.jsx']
   },
   plugins: [
-    new ExtractTextPlugin('static/app.css'),
+    new ExtractTextPlugin('static/app.[chunkhash:8].css'),
+    new webpack.optimize.UglifyJsPlugin({
+      compress: {
+        screw_ie8: true, // Inferno doesn't support IE8
+        warnings: false
+      },
+      mangle: {
+        screw_ie8: true
+      },
+      output: {
+        comments: false,
+        semicolons: false,
+        screw_ie8: true
+      }
+    }),
     new CopyWebpackPlugin([
         { from: 'images', to: 'static' }
     ]),
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
-    })
-  ]
-};
-
-
-if (process.env.NODE_ENV === 'production') {
-  module.exports.devtool = '#source-map';
-  module.exports.plugins = (module.exports.plugins || []).concat([
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        warnings: false
-      },
-      output: {
-        semicolons: false
+      'process.env': {
+        'NODE_ENV': JSON.stringify('production')
       }
     }),
+    new ManifestPlugin({
+      fileName: 'asset-manifest.json'
+    }),
     new webpack.optimize.OccurenceOrderPlugin()
-  ]);
-}
+  ]
+};

@@ -56,7 +56,7 @@ func (e *endpointStore) Create(orgName string, endpoint *model.Endpoint) error {
 	return nil
 }
 
-func (e *endpointStore) GetAll(orgName, groupId string) (*[]model.Endpoint, error) {
+func (e *endpointStore) GetAll(orgName, groupId string) ([]model.Endpoint, error) {
 	var endpointList = make([]model.Endpoint, 0)
 
 	c := e.DB.C(orgName + "/ENDPOINTLIST")
@@ -65,10 +65,10 @@ func (e *endpointStore) GetAll(orgName, groupId string) (*[]model.Endpoint, erro
 		return nil, err
 	}
 
-	return &endpointList, nil
+	return endpointList, nil
 }
 
-func (e *endpointStore) GetByApi(orgName, apiId string, revision int64) (*[]model.Endpoint, error) {
+func (e *endpointStore) GetByApi(orgName, apiId string, revision int64) ([]model.Endpoint, error) {
 	var endpointList = make([]model.Endpoint, 0)
 
 	c := e.DB.C(orgName + "/ENDPOINTLIST")
@@ -77,7 +77,7 @@ func (e *endpointStore) GetByApi(orgName, apiId string, revision int64) (*[]mode
 		return nil, err
 	}
 
-	return &endpointList, nil
+	return endpointList, nil
 }
 
 func (e *endpointStore) Get(orgName, endpointId string) (*model.Endpoint, error) {
@@ -104,10 +104,10 @@ func (e *endpointStore) Update(orgName, endpointId string, endpoint *model.Endpo
 	return nil
 }
 
-func (e *endpointStore) UpsertMany(orgName string, endpoints *[]model.Endpoint) error {
+func (e *endpointStore) UpsertMany(orgName string, endpoints []model.Endpoint) error {
 	c := e.DB.C(orgName + "/ENDPOINTLIST")
 
-	for _, e := range *endpoints {
+	for _, e := range endpoints {
 
 		_, err := c.Upsert(bson.M{"_id": e.Id}, e)
 		if err != nil {

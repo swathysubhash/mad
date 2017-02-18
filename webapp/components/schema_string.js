@@ -1,5 +1,7 @@
 import Inferno from 'inferno'
 import Component from 'inferno-component'
+import { renderMarkdown } from '../helpers/util'
+import MarkdownEditor from './markdown_editor'
 
 class SchemaString extends Component {
 	constructor(props) {
@@ -8,6 +10,7 @@ class SchemaString extends Component {
 		this.change = this.change.bind(this)
 		this.changeBool = this.changeBool.bind(this)
 		this.changeEnum = this.changeEnum.bind(this)
+		this.descriptionChange = this.descriptionChange.bind(this)
 	}
 
 	componentWillReceiveProps(nextProps) {
@@ -45,6 +48,14 @@ class SchemaString extends Component {
 		this.props.onChange && this.props.onChange(this.state)
 	}
 
+	descriptionChange(value) {
+	this.state['description'] = value
+	this.state['descriptionHTML'] = renderMarkdown(value)
+	this.setState(this.state)
+	this.props.onChange && this.props.onChange(this.state)
+}
+
+
 	render() {
 		var settings;
 		if (this.state.hasEnum) {
@@ -59,7 +70,10 @@ class SchemaString extends Component {
 		}
 		return (
 			<div>
-				{settings}
+				<div className={"schema-field"}>
+					<div><span className={"label description"}>Description: </span><MarkdownEditor onChange={this.descriptionChange} path={this.props.name} options={{toolbar: false, status: false}} value={this.state.description} defaultValue={this.state.description}/></div>
+					{settings}
+				</div>
 			</div>
 		);
 	}

@@ -1,20 +1,26 @@
 @import "variables";
 @import "mixins";
 
-ul, li, div, body {
+div, span, body {
   margin: 0;
   padding: 0;
 }
 
-body {
-  font-family: @font-family;
-  .font-normal();
-  font-weight: 300;
+a img {
+    border: none
 }
 
-#app {
-  max-width: 990px;
-  margin: 0 auto;
+a {
+  text-decoration: none;
+  color: @color-primary;
+}
+
+body {
+  font-family: @font-family-base;
+  font-size: @font-size-base;
+  color: @text-color;
+  //-webkit-font-smoothing: antialiased;
+  //text-rendering: optimizeLegibility;
 }
 
 hr {
@@ -42,6 +48,11 @@ input, textarea, keygen, select, button {
     box-sizing: border-box;
 }
 
+input:focus, textarea:focus, keygen:focus, select:focus {
+		outline: none;
+    border: 1px solid @color-primary;
+}
+
 ::-webkit-input-placeholder {
   .placeholder()
 }
@@ -63,10 +74,74 @@ input, textarea, keygen, select, button {
 }
 
 .form-input textarea {
-	.placeholder()
+  .placeholder()
 }
 
-input:focus, textarea:focus, keygen:focus, select:focus {
-		outline: none;
-    border-color: @color-blue;
+.placeholder() {
+  color: @gray-light;
 }
+
+.col {
+  width: 1%;
+}
+
+.col1 {
+  width: 5%;
+}
+.col2 {
+  width: 10%;
+}
+.col3 {
+  width: 15%;
+}
+.col4 {
+  width: 20%;
+}
+.col5 {
+  width: 25%;
+}
+.col6 {
+  width: 30%;
+}
+.col7 {
+  width: 35%;
+}
+
+
+
+/*** FIXED HEADERS **/
+
+.header {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: 5;
+}
+
+.content {
+  margin-top: 86px;
+}
+
+.context {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 42px;
+  z-index: 5;
+}
+
+.tab-group {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 87px;
+  z-index: 5;
+  background: white;
+}
+
+.tabs {
+  margin-top: 126px;
+}
+
+/**************/

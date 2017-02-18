@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"golang.org/x/oauth2"
 	"io/ioutil"
@@ -26,10 +27,16 @@ type Credentials struct {
 
 var cred Credentials
 
+type Assets struct {
+	Js  string `json:"app.js"`
+	Css string `json:"app.css"`
+}
+
 type Page struct {
 	Title          string
 	GoogleLoginUrl string
 	State          string
+	Assets         Assets
 }
 
 type User struct {
@@ -47,7 +54,7 @@ func init() {
 		os.Exit(1)
 	}
 	json.Unmarshal(file, &cred)
-
+	fmt.Println(")))", cred)
 	conf = &oauth2.Config{
 		ClientID:     cred.Cid,
 		ClientSecret: cred.Csecret,
@@ -112,5 +119,5 @@ func auth(w http.ResponseWriter, r *http.Request) {
 	signedToken, _ := token.SignedString([]byte("1##DIEANOTHERDAY##1"))
 	cookie := http.Cookie{Name: "at", Value: signedToken, Expires: expireCookie, HttpOnly: true}
 	http.SetCookie(w, &cookie)
-	http.Redirect(w, r, "/apiList", 307)
+	http.Redirect(w, r, "/documentlist", 307)
 }

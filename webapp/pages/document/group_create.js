@@ -19,7 +19,7 @@ class DocumentsGroupCreate extends Component {
 		this.state = {
 			loading: false,
 			groupId: this.props.params.groupId,
-			mode: this.props.params.groupId == 'create' ? 'create' : 'edit'
+			mode: this.props.params.groupId == 'create' ? 'Create' : 'Edit'
 		}
 
 		this.isLoading = this.isLoading.bind(this)
@@ -30,21 +30,29 @@ class DocumentsGroupCreate extends Component {
 	fetchGroupDetails(groupId) {
 		const store = this.context.store
 		store.dispatch({ type: 'GET_GROUP_REQUEST'})
+		this.setState({ loading: true })
 		getGroup({ groupId:  groupId })
 		.then(res => {
+			this.setState({ loading: false })
 			store.dispatch({ type: 'GET_GROUP_RESPONSE', data: res.data})
-		}).catch(err => store.dispatch({ type: 'GET_GROUP_FAILURE', data: err.response.data}))		
+		}).catch(err => {
+			this.setState({ loading: false })
+			store.dispatch({ type: 'GET_GROUP_FAILURE', data: err.response.data})
+		})		
 	}
 
 	componentWillMount() {
 		if (this.props.params.groupId !== 'create') {
 			this.context.store.dispatch({ type: 'GROUP_SELECT', data: this.props.params.groupId})
+			this.setState({ mode: 'Edit' })
+		} else {
+			this.setState({ mode: 'Create' })
 		}
 	}
 
 	componentDidMount() {	
 		if (this.props.params.groupId === 'create') {
-			this.context.store.dispatch({ type: 'GROUP_CREATE'})	
+			this.context.store.dispatch({ type: 'GROUP_CREATE'})
 		} else {
 			this.fetchGroupDetails(this.props.params.groupId)	
 		}
@@ -55,7 +63,10 @@ class DocumentsGroupCreate extends Component {
 		if (this.props.group.id === nextProps.group.id) return
 
 		if (nextProps.group.id) { //Group will be empty in create group
-			this.fetchGroupDetails(nextProps.group.id)	
+			this.fetchGroupDetails(nextProps.group.id)
+			this.setState({ mode: 'Edit' })
+		} else {
+			this.setState({ mode: 'Create' })
 		}
 	}
 
@@ -80,11 +91,12 @@ class DocumentsGroupCreate extends Component {
 			createGroup(values)
 			.then(res => {
 				this.setState({ loading: false })
+				store.dispatch({ type: 'SET_NOTIFICATION', data: { type: 'success', message: 'Group created successfully.' }	})
 				store.dispatch({ type: 'CREATE_GROUP_RESPONSE', data: res.data})
 			})
 			.catch(err => {
 				this.setState({ loading: false })
-				store.dispatch({ type: 'CREATE_GROUP_FAILURE', data: err.response.data})
+				store.dispatch({ type: 'SET_NOTIFICATION', data: { type: 'danger', message: err.response.data }	})
 			})
 		} else {
 			values.groupId = this.props.params.groupId
@@ -92,11 +104,12 @@ class DocumentsGroupCreate extends Component {
 			updateGroup(values)
 			.then(res => {
 				this.setState({ loading: false })
+				store.dispatch({ type: 'SET_NOTIFICATION', data: { type: 'success', message: 'Group updated successfully.' }	})
 				store.dispatch({ type: 'UPDATE_GROUP_RESPONSE', data: res.data})
 			})
 			.catch(err => {
 				this.setState({ loading: false })
-				store.dispatch({ type: 'UPDATE_GROUP_FAILURE', data: err.response.data})
+				store.dispatch({ type: 'SET_NOTIFICATION', data: { type: 'danger', message: err.response.data }	})
 			})
 		}
 
@@ -110,35 +123,18 @@ class DocumentsGroupCreate extends Component {
 		console.log('Click cancel')
 	}
 	render() {
-		// if (this.props.params.groupId !== 'create') {
-		// 	const state = this.context.store.getState()
-		// 	const group = state.entities.groups.byIds[this.props.params.groupId]
-		// 	this.state.formData.name.value = group.name
-		// 	this.state.formData.separator.value = group.separator	
-		// }
-		// <CodeMirror defaultValue={""} value={"valuecm"} options={cmOptions}/>
-		// let cmOptions = {
-		// 	lineNumbers: true,
-		// 	mode: 'javascript'
-		// }
-		// <Text name={"responseHeader"} label={"Response json?"} type={"codemirror"}/>
-		// <Text name={"method"} label={"What is the http method?"} type={"dropdown"}
-		// 				options={[{ value: "GET", label: "GET"}, { value: "POST", label: "POST"}, { value: "PUT", label: "PUT"}]}/>
-		// <InputSet valueSet={[{name: '', method: ''}]}>
-		// <Text name={"name"} placeholder={"Group Name"} label={"What is the name of your group?"}  validate={['required', 'name']}/>
-		// <Text name={"method"} label={"What is the http method?"} type={"dropdown"}
-		// 				options={[{ value: "GET", label: "GET"}, { value: "POST", label: "POST"}, { value: "PUT", label: "PUT"}]}/>
-		// </InputSet>
 		return (
 			<div>
-				<div>{this.state.mode} Group</div>
+				<div className={"form-header-loader"}>
+					<div className={"form-header"}><span>{this.state.mode} Group</span></div>
+					<div className={"loader"}>{this.state.loading ? <i class="fa fa-spinner fa-spin" aria-hidden="true"></i> : ""}</div>
+				</div>
 				<div>
 					<Form values={this.props.group} onSubmit={this.onSubmit}>
 						<Text name={"name"} placeholder={"Group Name"} label={"What is the name of your group?"}  validate={['required', 'name']}/>
 						<Text name={"description"} placeholder={"Group Description"} label={"Provide some description of your group?"} type={"textarea"}/>
 						<Text name={"separator"} label={"Is this just a separator?"} type={"checkbox"}/>
-						<Button action={"submit"} loading={this.state.isLoading} text="create"/>
-						<Button onClick={this.cancel} action={"secondary"} loading={() => false} text="cancel"/>
+						<Button action={"submit"} loading={this.state.isLoading} text="save"/>
 					</Form>
 				</div>
 			</div>
@@ -156,7 +152,6 @@ function mapStateToProps(state, ownProps) {
 				separator: false
 			},
 			selectedGroup: ''
-
 		}
 	}
 	return {

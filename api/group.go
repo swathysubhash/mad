@@ -29,7 +29,7 @@ func createGroup(w http.ResponseWriter, r *http.Request) error {
 	group.Id = group.GId + "_" + strconv.FormatInt(group.Revision, 10)
 	group.Object = "group"
 	group.Slug = slug.Slug(group.Name)
-	group.Endpoints = &[]string{}
+	group.Endpoints = []string{}
 
 	group.CreatedBy = "SwathySubhash"
 	group.UpdatedBy = "SwathySubhash"
@@ -95,7 +95,7 @@ func getAllGroup(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	return writeJSON(w, &model.GroupListResponse{
-		Count:  len(*groupList),
+		Count:  len(groupList),
 		Object: "list",
 		Data:   groupList,
 	})

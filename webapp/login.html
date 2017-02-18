@@ -1,10 +1,82 @@
 <!DOCTYPE html>
 <html>
 	<head>
+		<link href="https://fonts.googleapis.com/css?family=Lato:300,400,700" rel="stylesheet">
 		<meta charset="UTF-8">
 		<title>{{.Title}}</title>
+		<style>
+		a,abbr,acronym,address,applet,big,blockquote,body,caption,cite,code,dd,del,dfn,div,dl,dt,em,fieldset,form,h1,h2,h3,h4,h5,h6,html,iframe,img,ins,kbd,label,legend,li,object,ol,p,pre,q,s,samp,small,span,strike,strong,sub,sup,table,tbody,td,tfoot,th,thead,tr,tt,ul,var {
+		    margin: 0;
+		    padding: 0;
+		    border: 0;
+		    outline: 0;
+		    font-weight: inherit;
+		    font-style: inherit;
+		    font-family: inherit;
+		    font-size: 100%;
+		    vertical-align: baseline
+		}
+
+		body {
+		    line-height: 1;
+		    color: #000;
+		    background: #fff;
+		    font-family: 'Lato';
+		}
+
+		ol,ul {
+		    list-style: none
+		}
+
+		table {
+		    border-collapse: separate;
+		    border-spacing: 0
+		}
+
+		caption,table,td,th {
+		    vertical-align: middle
+		}
+
+		caption,td,th {
+		    text-align: left;
+		    font-weight: 400
+		}
+		#container {
+			text-align: center;
+    	padding: 86px;
+		}
+		a img {
+		    border: none
+		}
+		.brand {
+			font-weight: 300;
+	    font-size: 36	px;
+	    margin-bottom: 10px;
+		}
+		.login {
+		  width: 194px;
+	    height: 44px;
+	    font-size: inherit;
+	    font-family: inherit;
+	    border-radius: 3px;
+	    box-shadow: none;
+	    border: none;
+	    cursor: pointer;
+	    background: #5D91F7;
+	    color: white;
+	    margin-top: 75px;
+		}
+		</style>
 	</head>
 	<body>
-		<a href={{.GoogleLoginUrl}}><button>Login with Google!</button> </a>
+		<div id="container">
+				<div class="brand">
+					MAD
+				</div>
+				<div>
+					Clean, Easy Api Documentation
+				</div>
+				<a href={{.GoogleLoginUrl}}><button class="login" >Log in</button> </a>
+		</div>
 	</body>
 </html>

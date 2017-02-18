@@ -15,9 +15,9 @@ type Access struct {
 }
 
 type AccessListResponse struct {
-	Count  int       `json:"count"`
-	Object string    `json:"object"`
-	Data   *[]Access `json:"data"`
+	Count  int      `json:"count"`
+	Object string   `json:"object"`
+	Data   []Access `json:"data"`
 }
 
 type AccessResponse struct {

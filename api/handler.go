@@ -20,6 +20,8 @@ func Handler() *mux.Router {
 	m.Get("update:api").Handler(handler(updateApi))
 	m.Get("publish:api").Handler(handler(publishApi))
 	m.Get("summary:api").Handler(handler(summaryApi))
+	m.Get("get:api:style").Handler(handler(getApiStyle))
+	m.Get("update:api:style").Handler(handler(updateApiStyle))
 
 	m.Get("create:group").Handler(handler(createGroup))
 	m.Get("get:group:byapi").Handler(handler(getAllGroup))

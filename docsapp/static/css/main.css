@@ -12,8 +12,12 @@ a,abbr,acronym,address,applet,big,blockquote,body,caption,cite,code,dd,del,dfn,d
 
 body {
     line-height: 1;
-    color: #000;
-    background: #fff
+    color: #4c555a;
+    background: #fff;
+    font-family: "Open Sans";
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
 }
 
 ol,ul {
@@ -34,6 +38,10 @@ caption,td,th {
     font-weight: 400
 }
 
+a {
+  color: #0099e5;
+  text-decoration: inherit;
+}
 a img {
     border: none
 }
@@ -41,40 +49,40 @@ a img {
 h1, h2, h3, h4, h5 {
     margin: 0;
     color: #292e31;
-    font-family: Whitney SSm A,Whitney SSm B,Helvetica,Arial,sans-serif
+    text-transform: capitalize;
 }
 
 h1 {
     font-weight: 400;
     font-size: 24px;
-    line-height: 32px
+    line-height: 32px;
 }
 
 h2 {
     font-weight: 500;
     font-size: 18px;
-    line-height: 26px
+    line-height: 26px;
 }
 
 h3 {
     font-weight: 500;
     font-size: 16px;
-    line-height: 22px
+    line-height: 22px;
 }
 
 h4,h5 {
     font-size: 12px;
     font-weight: 500;
     line-height: 18px;
-    text-transform: uppercase
+    text-transform: uppercase;
 }
 
 h4 {
-    color: #4c555a
+    color: #4c555a;
 }
 
 h5 {
-    color: #939da3
+    color: #939da3;
 }
 
 p {
@@ -91,6 +99,202 @@ p {
 	width: 220px;
 	background: #fafcfc;
 	border-right: 1px solid #f0f4f7;
+}
+
+#sidebar .sidebar-nav-item{
+  display: block;
+  margin: 0;
+  padding: 6px 12px;
+  color: #4c555a;
+  cursor: pointer;
+  font-size: 14px;
+  list-style-type: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: capitalize;
+  box-sizing: border-box;
+}
+
+header {
+  z-index: 5555;
+  height: 45px;
+  width: 220px;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+#sidebar nav {
+  padding: 45px 0px 45px 18px;
+}
+
+#sidebar ul ul .sidebar-nav-item {
+  padding: 6px 40px;
+  box-sizing: border-box;
+  font-size: 13px;
+}
+
+#sidebar .sidebar-nav-item:hover {
+  text-decoration: underline;
+}
+
+#sidebar .group {
+  box-sizing: border-box;
+}
+
+#sidebar .group ul {
+  height: 0;
+  overflow: hidden;
+}
+
+#sidebar .subgroup.highlight {
+  color: red;
+}
+
+#sidebar .group.expand {
+  border-left: 2px solid red;
+}
+#sidebar .group.expand > a{
+  color: red;
+}
+
+#sidebar .group.expand ul {
+  height: auto;
+  
+}
+
+.close-try-out {
+  border: none;
+  background: none;
+  outline: none;
+  font: inherit;
+  font-weight: 600;
+  padding: 18px 10px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+#try-out {
+  font-size: 13px;
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 45%;
+  background: white;
+  bottom: 0;
+  box-sizing: border-box;
+  display: none;
+}
+
+#sidebar.try-out #try-out {
+  display: block;
+}
+
+#try-http-meta {
+  width: 100%;
+  border-bottom: 1px solid;
+}
+
+#try-http-meta select {
+  background: white;
+  border: none;
+  outline: 0;
+  font: inherit;
+  height: 45px;
+  width: 15%;
+}
+
+#try-http-meta input {
+  padding: 10px 20px;
+  width: 60%;
+  font: inherit;
+  border: none;
+  outline: 0;
+  background: #F8F8F8;
+}
+
+#try-http-meta button {
+  width: 15%;
+  margin: 0;
+  border: 0;
+  height: 42px;
+  font: inherit;
+  border-radius: 3px;
+}
+
+
+.tab-menu {
+  display: inline-block;
+  border-bottom: 1px solid;
+  width: 100%;
+}
+
+.input-row {
+  margin-bottom: 6px;
+}
+
+.input-row input {
+  width: 35%;
+  border: none;
+  outline: 0;
+  padding: 8px 16px;
+  font: inherit;
+  background: #F8F8F8;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+.input-row button {
+  width: 5%;
+  border: none;
+  background: white;
+  text-decoration: underline;
+  padding: 0;
+  margin: 0;
+  outline: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+.tab-menu-item {
+  float: left;
+  padding: 18px;
+  cursor: pointer;
+}
+
+.tab-menu-item.selected {
+  border-bottom: 1px solid;
+}
+
+.tab .headers-tab, .tab .body-tab{
+  display: none;
+}
+
+.tab.headers .headers-tab {
+  display: block;
+  padding: 6px;
+}
+.tab.body .body-tab {
+  display: block;
+  padding: 6px;
+}
+
+.body-tab textarea {
+  min-height: 120px;
+  min-width: 70%;
+  border: none;
+  background: #F8F8F8;
+  border-radius: 3px;
+  outline: 0;
+  font: inherit;
+  padding: 12px;
+}
+
+#try-request-data .tabs{
+  max-height: 170px;
+  border-bottom: 1px solid;
+  overflow: auto;
 }
 
 #content {
@@ -119,8 +323,9 @@ p {
 
 .col-left {
 	float: left;
-	padding: 0 0 50px;
+	padding: 40px;
 	width: 45%;
+  box-sizing: border-box;
 }
 
 .col-right {
@@ -130,6 +335,15 @@ p {
 	padding: 42px 0 50px;
 	color: #dde4e8;
 }
+
+.xhr-detail {
+  padding: 40px;
+}
+
+.hl-code pre {
+  border-radius: 3px;
+}
+
 
 #background {
 	bottom: 0;
@@ -147,4 +361,13 @@ p {
   right: 0;
   top: 0;
   background: #2d3134;
+}
+
+.attr-label, .attr-description {
+  display: inline-block;
+  width: 49%;
+  vertical-align: top;
+}
+.attr-label {
+  text-align: right;
 }

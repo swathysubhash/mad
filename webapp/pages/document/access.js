@@ -1,3 +1,4 @@
+import './access.less'
 import Inferno from 'inferno'
 import Component from 'inferno-component'
 import Text from '../../components/text'
@@ -69,15 +70,15 @@ class DocumentsAccess extends Component {
 
 	render() {
 		return (
-			<div>
-				<div>Documentation Access</div>
+			<div className={"doc-access"}>
+				<div className={"form-header"}>Documentation Access</div>
 				<div>
-					<div>Anonymous Access</div>
-					<div>
-						<div>Only you have access now (Private)</div>
+					<div className={"sub-header"}>Anonymous Access</div>
+					<div className={"anon-form"}>
+						<div>Only you have access now (Private).</div>
 						<Form values={this.props.anonymousAccess} onSubmit={this.updateAnonymous}>
 							<Text 
-							name={"access"} type={"dropdown"} 
+							name={"access"} type={"dropdown"} label={"What anonymous users can do?"}
 							options={
 								[{ value: "none", label: "none"},
 								{ value: "read", label: "read"},
@@ -89,7 +90,7 @@ class DocumentsAccess extends Component {
 					</div>
 				</div>
 				<div>
-					<div>Users</div>
+					<div className={"sub-header"}>Users</div>
 					{this.props.users.map(u => (
 						<Form values={u} onSubmit={this.updateUser.bind(this, u)}>
 							<Text name={"actorId"} />
@@ -100,8 +101,8 @@ class DocumentsAccess extends Component {
 								{ value: "write", label: "write"},
 								{ value: "admin", label: "admin"}]
 							}/>
-							<Button onClick={this.removeUser.bind(this, u)} loading={this.state.isLoading} text="remove"/>
 							<Button action={"submit"} loading={this.state.isLoading} text="save"/>
+							<button onClick={this.removeUser.bind(this, u)} className={"remove"} loading={this.state.isLoading}>remove</button>
 						</Form>
 					))}
 					<Form values={this.props.newUser} onSubmit={this.updateUser.bind(this, this.props.newUser)}>

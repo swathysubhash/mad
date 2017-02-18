@@ -1,5 +1,7 @@
+import './index.less'
 import Inferno from 'inferno'
 import Component from 'inferno-component'
+import { Link } from 'inferno-router'
 import { createApi } from '../../actions/api'
 import FormInput from '../../components/form_input'
 import FormButton from '../../components/form_button'
@@ -13,7 +15,6 @@ class ApiForm extends Component {
 		super(props)
 		this.state = {
 			loading: false,
-			mode: this.props.documentId == 'create' ? 'create' : 'edit',
 			values: {
 				name: '',
 				description: '',
@@ -25,7 +26,6 @@ class ApiForm extends Component {
 
 		this.isLoading = this.isLoading.bind(this)
 		this.onSubmit = this.onSubmit.bind(this)
-		this.cancel = this.cancel.bind(this)
 	}
 
 	onSubmit(values) {
@@ -66,11 +66,6 @@ class ApiForm extends Component {
 
 	}
 
-	cancel() {
-		console.log("Canceling")
-		return true
-	}
-
 
 	isLoading() {
 		return this.state.loading
@@ -80,19 +75,29 @@ class ApiForm extends Component {
 		console.log("APIFORM")
 		return (
 			<div>
-				<div>Create API</div>
-				<div>
-					<div>{this.state.mode} API</div>
+				<div class="context">
+					<div class="middle">
+						<div>
+							<Link className="bread-el" to={"/"}>
+							<span>Api Document List</span>
+							<span><i class="fa fa-angle-right" aria-hidden="true"></i></span>
+							</Link>
+							<span>Create Api Document</span></div>	
+					</div>
+				</div>
+				<div class="middle">
+					<div className={"form-header"}>Create API Document</div>
 					<div>
-						<Form values={this.state.values} onSubmit={this.onSubmit}>
-							<Text name={"name"} placeholder={"Api Name"} label={"What is the name of your Api?"}  validate={['required', 'name']}/>
-							<Text name={"description"} placeholder={"Group Description"} label={"Provide some description of your api?"} type={"textarea"}/>
-							<Text name={"version"} placeholder={"Api Version"} label={"What is the version of your Api?"}  validate={['required', 'version']}/>
-							<Text name={"protocol"} placeholder={"Api Protocol"} label={"What is the protocol of your Api?"}  validate={['required']}/>
-							<Text name={"host"} placeholder={"api.myntra.com"} label={"What is the hostname of your Api?"}  validate={['required']}/>
-							<Button action={"submit"} loading={this.state.isLoading} text="create"/>
-							<Button onClick={this.cancel} action={"secondary"} loading={() => false} text="cancel"/>
-						</Form>
+						<div>
+							<Form values={this.state.values} onSubmit={this.onSubmit}>
+								<Text name={"name"} placeholder={"Api Name"} label={"What is the name of your Api?"}  validate={['required', 'name']}/>
+								<Text name={"description"} placeholder={"Group Description"} label={"Provide some description of your api?"} type={"textarea"}/>
+								<Text name={"version"} placeholder={"Api Version"} label={"What is the version of your Api?"}  validate={['required', 'version']}/>
+								<Text name={"protocol"} placeholder={"Api Protocol"} label={"What is the protocol of your Api?"}  validate={['required']}/>
+								<Text name={"host"} placeholder={"api.myntra.com"} label={"What is the hostname of your Api?"}  validate={['required']}/>
+								<Button className={"btn-primary"} action={"submit"} loading={this.state.isLoading} text="create"/>
+							</Form>
+						</div>
 					</div>
 				</div>
 			</div>

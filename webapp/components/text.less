@@ -1,10 +1,74 @@
+@import "../variables";
+
+.input-row {
+	margin-bottom: 35px;
+	.error-label {
+		color: @color-danger;
+		position: absolute;
+	}	
+}
+
+.input-row label {
+	color: @text-color;
+	//font-weight: 600;
+}
+
+.input-row input {
+	border: 1px solid @color-border;
+	padding: 5px;
+	font-size: 13px;
+	width: 260px;
+	position: relative;
+	color: inherit;
+	&:focus {
+		border-color: @color-primary;
+	}
+} 
+
+
+.markdown-editor .editor-toolbar {
+	border: 1px solid @color-border;
+	border-bottom: none;
+	background: #F8F8F8;
+	border-radius: 0;
+}
+
+.markdown-editor .CodeMirror {
+	//background: @input-bg;
+	//border-radius: 3px;
+	border-radius: 0;
+	border: 1px solid @color-border;
+	//border: none;	
+	font-size: 13px;
+	color: inherit;
+}
+
+.dropdown-root {
+	max-width: 260px;
+	font-size: 13px;
+	.dropdown-control {
+		padding: 5px;
+    //background: @input-bg;
+    border: 1px solid @color-border;
+    //border: none;
+    border-radius: 0;
+	}
+	.dropdown-menu {
+		//border-radius: 2px;
+    border: none;
+    box-shadow: 0 0 1px 1px rgba(128, 128, 128, 0.4);
+    margin-top: -29px;
+	}
+}
+
 .switch {
+	padding-left: 10px;
 	.input {
 		display: none;
 		&:checked ~ .slider {
-			background: #fc5d9b;
+			background: #576eda;
 			&:after {
-				background: #ef0460;
+				background: @color-primary;
 				left: 16px;
 			}
 		}
@@ -34,4 +98,11 @@
 	    transition: all 0.2s ease;
     }
 	}
+}
+
+.color-box {
+	height: 30px;
+  width: 30px;
+  display: inline-block;
+  vertical-align: top;
 }

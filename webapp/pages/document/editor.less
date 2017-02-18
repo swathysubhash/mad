@@ -1,84 +1,92 @@
-.api-summary, .forms-placeholder {
-	vertical-align: top;
-	display: inline-block;
-	width: 70%;
-}
-
-.api-summary {
-	width: 30%;
+@import "../../variables";
+.api-editor {
+	position: relative;
+	.fixed-wrapper {
+		position: fixed;
+    top: 126px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+	}
+	.left, .right {
+		display: inline-block;
+		vertical-align: top;
+		width: 100%;
+		box-sizing: border-box;
+	}
+	.left {
+		width: 25%;
+		overflow: auto;
+    box-sizing: border-box;
+    border-right: 1px solid @color-border;
+    border-left: 1px solid @color-border;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+		button {
+			background: none;
+			display: block;
+	    border: none;
+	    cursor: pointer;
+		}
+	}
+	.right {
+		padding-left: 25%;
+	}
 }
 
 .api-summary .selected {
-	text-decoration: underline;
-	font-weight: 700;
+	//text-decoration: underline;
+	font-weight: 600;
+	color: @color-primary;
+}
+
+.add-actions {
+	border-bottom: 1px solid @color-border;
+	padding: 12px;
+	button.selected {
+		font-weight: 700;
+		color: @color-primary;
+	}
+}
+
+.forms-placeholder {
+	padding-left: 24px;
+	padding-top: 0px;
+	position: relative;
+}
+
+.form-header-loader {
+	> div {
+		display: inline-block;
+	}
 }
 
 .loader {
+  font-size: 24px;
+  color: #3853D8;
   position: relative;
-  height: 1px;
-  width: 1px;
-  z-index: 100;
+  margin-left: 12px;
+  top: 5px;
 }
 
-.loader-bubble {
-	position: absolute;
-  top: 50%;
-  left: 50%;
-  border-radius: 50%;
-  width: 2rem;
-  height: 2rem;
-}
-
-.loader-bubble-1 {
-	background-color: rgba(60, 175, 218, 0.15);
-  -webkit-animation: lb1-pulse 1s infinite ease-in-out;
-  animation: lb1-pulse 1s infinite ease-in-out;
-  -webkit-animation-delay: -0.25s;
-  animation-delay: -0.25s;
-}
-
-.loader-bubble-2 {
-	background-color: rgba(60, 175, 218, 0.15);
-  -webkit-animation: lb2-pulse 1s infinite ease-in-out;
-  animation: lb2-pulse 1s infinite ease-in-out;
-  -webkit-animation-delay: -0.333s;
-  animation-delay: -0.333s;
-}
-
-.loader-bubble-3 {
-	background-color: #3CAFDA;
-  -webkit-animation: lb3-pulse 1s infinite ease-in-out;
-  animation: lb3-pulse 1s infinite ease-in-out;
-}
-
-@keyframes lb2-pulse {
-	0%, 100% {
-	  -webkit-transform: translate(-50%, -50%) scale(1.75);
-	  transform: translate(-50%, -50%) scale(1.75);
+.api-summary {
+	.name {
+		text-tranform: capitalize;
 	}
-	50% {
-	  -webkit-transform: translate(-50%, -50%) scale(1.25);
-	  transform: translate(-50%, -50%) scale(1.25);
-	}
-}
-@keyframes lb1-pulse {
-	0%, 100% {
-	  -webkit-transform: translate(-50%, -50%) scale(2.5);
-	  transform: translate(-50%, -50%) scale(2.5);
-	}
-	50% {
-	  -webkit-transform: translate(-50%, -50%) scale(1.5);
-	  transform: translate(-50%, -50%) scale(1.5);
-	}
-}
-
-@keyframes lb3-pulse {
-	0%, 100% {
-	  -webkit-transform: translate(-50%, -50%) scale(1);
-	  transform: translate(-50%, -50%) scale(1);
-	}
-	50% {
-	  -webkit-transform: translate(-50%, -50%) scale(0.75);
-	  transform: translate(-50%, -50%) scale(0.75);
+	.method {
+		text-decoration: none !important;
+    font-size: 12px;
+    padding-right: 6px;
+    &.POST {
+    	color: @color-warning;
+    }
+    &.GET {
+    	color: @color-success;
+    }
+    &.PUT {
+    	color: @color-danger;
+    }
 	}
 }

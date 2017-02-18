@@ -1,102 +1,185 @@
+{{define "Attributes"}}
+		{{range .}}
+			{{ $Name := index . "name" }}
+			{{ $Type := index . "type" }}
+			{{ $Properties := index . "properties" }}
+			<li class="attr-list-item">
+				<div class="attr-label">
+					<div>{{$Name}}</div>
+					{{if eq $Type "array"}}
+						<div>List of {{index . "items"  "type"}}</div>
+					{{ else }}
+						<div>{{$Type}}</div>
+					{{ end }}
+					{{if index . "required"}}
+						<div>required</div>
+					{{ end }}
+				</div>
+				<div class="attr-description">
+					"Test description"
+				</div>
+				{{if eq $Type "object"}}
+					<div>Show Child Properties</div>
+					<ul class="child-attr-list">
+						{{template "Attributes" $Properties}}
+					</ul>
+				{{end}}
+				{{if eq $Type "array"}}
+					{{ $ArrayProps := index . "items" "properties"}}
+						{{ if $ArrayProps }}
+							<div>Show Child Properties</div>
+							<ul class="child-attr-list">
+								{{template "Attributes" $ArrayProps}}
+							</ul>
+						{{ end }}
+				{{end}}
+			</li>
+		{{end}}
+{{end}}
+
+{{define "EndpointSection"}}
+	<div class="row-full">
+		{{if eq .SubgroupType "endpoint"}}
+			<div class="col-left">
+				<h1>{{.Name}}</h1>
+				<div class="description">{{html .DescriptionHTML}}</div>
+				{{ if gt (len .UrlParameters) 0 }}
+					<div>
+						<h5>Url Parameters</h5>
+						{{ range .UrlParameters }}
+							<div>{{ .Name }}</div>
+							<div>{{ html .DescriptionHTML }}</div>
+						{{ end }}
+					</div>
+				{{ end }}
+				{{ if gt (len .QueryParameters) 0 }}
+					<div>
+						<h5>Query Parameters</h5>
+						{{ range .QueryParameters }}
+							<div>{{ .Name }}</div>
+							<div>{{ html .DescriptionHTML }}</div>
+						{{ end }}
+					</div>
+				{{ end }}
+			</div>
+			<div class="col-right">
+				<div class="xhr-detail">
+					<div>
+						<div>Example Request</div>
+						<div class="hl-code"><pre><code class="language-json">{{.Url}}</code></pre><button class="try-btn">Try it out</button></div>
+					</div>
+					{{ if gt (len .RequestHeaders) 0 }}
+						<div>
+							<h5>Request Headers</h5>
+							{{ range .RequestHeaders }}
+								<div>Key : {{ .Name }}</div>
+								<div>Value : {{ .Value }}</div>
+							{{ end }}
+						</div>
+					{{ end }}
+					{{ if gt (len .RequestBody) 0 }}
+						<div>
+							<div>Example Request Body</div>
+							<div class="hl-code"><pre><code class="language-json">{{.RequestBody}}</code></pre></div>
+						</div>
+					{{ end }}
+					{{ if gt (len .ResponseHeaders) 0 }}
+						<div>
+							<h5>Response Headers</h5>
+							<div class="hl-code"><pre><code class="language-json">
+								{{ range .ResponseHeaders }}
+									{
+										"Key":{{ .Name }},
+										"Value": {{ .Value }}
+									}
+								{{ end }}
+							</code></pre></div>
+						</div>
+					{{ end }}
+					{{ if gt (len .ResponseBody) 0 }}
+						<div>
+							<div>Example Response Body</div>
+							<div class="hl-code"><pre><code class="language-json">{{.ResponseBody}}</code></pre></div>
+						</div>
+					{{ end }}
+				</div>
+			</div>
+		{{else if eq .SubgroupType "schema"}}
+			<div class="col-left">
+				<h1>{{.Name}}</h1>
+				<div>
+					Attributes
+				</div>
+					{{range $key, $value := .SchemaMap}}
+						{{ if eq $key "properties" }}
+							<ul class="attr-list">
+								{{ template "Attributes" $value }}
+							</ul>	
+						{{ end }}
+					{{end}}
+			</div>
+			<div class="col-right">
+			</div>
+		{{end}}
+		<script>
+			window.__ENDPOINTS[{{ .Id }}] = { "method": "{{.Method}}", "url" : "{{.Url}}", "requestHeaders": {{.RequestHeaders}}, "urlParameters": {{.UrlParameters}}, "queryParameters": {{.QueryParameters}} }
+		</script>
+	</div>
+{{end}}
+
+{{define "GroupSection"}}
+	<div class="row-full">
+			<div class="col-left">
+				<h1>{{.Name}}</h1>
+				<div class="description">{{html .DescriptionHTML}}</div>
+			</div>
+			<div class="col-right"></div>
+	</div>
+{{end}}
+
+
 {{define "Content"}}
 <div id="background">
-	<div class="background-actual"></div>
+	<div class="background-actual">
+	</div>
 </div>
 <div id="content">
   {{ range .ApiSummary.GroupIds }}
 	{{ $Group := index $.GroupsMap .}}
 	{{ $FullGroup := index $.FullGroupsMap .}}
-		<section class="row first" id="{{$Group.Name}}">
 			{{if $FullGroup}}
-				<div class="row-full">
-						<div class="col-left">
-							<h1>{{$Group.Name}}</h1>
-							<div class="description">{{html $FullGroup.DescriptionHTML}}</div>
-						</div>
-						<div class="col-right"></div>
-				</div>
+				<section class="row first" data-type="group" data-id={{$Group.Id}} id="{{$Group.Slug}}">
+					{{ template "GroupSection" $FullGroup}}
+				</section>
 			{{else}}
-				<div class="row-full">
-						<div class="col-left">
-							<h1>{{$Group.Name}}</h1>
-						</div>
-						<div class="col-right"></div>
-				</div>
-			{{end}}
-		</section>
-		{{ if gt (len $Group.Endpoints) 0 }}
-			{{ range $Group.Endpoints }}
-			{{ $Endpoint := index $.EndpointsMap .}}
-			{{ $FullEndpoint := index $.FullEndpointsMap .}}
-				<section class="row" id="{{$Endpoint.Name}}">
-					{{if $FullEndpoint}}
-						<div class="row-full">
+				<section class="row first not-fetched" data-type="group" data-id={{$Group.Id}} id="{{$Group.Slug}}">
+					<div class="row-full">
 							<div class="col-left">
-								<h1>{{$FullEndpoint.Name}}</h1>
-								<div class="description">{{html $FullEndpoint.DescriptionHTML}}</div>
-								{{ if gt (len $FullEndpoint.UrlParameters) 0 }}
-									<div>
-										<h5>Url Parameters</h5>
-										{{ range $FullEndpoint.UrlParameters }}
-											<div>{{ .Name }}</div>
-											<div>{{ html .DescriptionHTML }}</div>
-										{{ end }}
-									</div>
-								{{ end }}
-								{{ if gt (len $FullEndpoint.QueryParameters) 0 }}
-									<div>
-										<h5>Query Parameters</h5>
-										{{ range $FullEndpoint.QueryParameters }}
-											<div>{{ .Name }}</div>
-											<div>{{ html .DescriptionHTML }}</div>
-										{{ end }}
-									</div>
-								{{ end }}
-							</div>
-							<div class="col-right">
-								<div>
-									<div>Example Request</div>
-									<div>{{$FullEndpoint.Url}}</div>	
-								</div>
-								{{ if gt (len $FullEndpoint.RequestHeaders) 0 }}
-									<div>
-										<h5>Request Headers</h5>
-										{{ range $FullEndpoint.RequestHeaders }}
-											<div>Key : {{ .Name }}</div>
-											<div>Value : {{ .Value }}</div>
-										{{ end }}
-									</div>
-								{{ end }}
-								<div>
-									<div>Example Request Body</div>
-									<div>{{$FullEndpoint.RequestBody}}</div>	
-								</div>
-								{{ if gt (len $FullEndpoint.ResponseHeaders) 0 }}
-									<div>
-										<h5>Response Headers</h5>
-										{{ range $FullEndpoint.ResponseHeaders }}
-											<div>Key: {{ .Name }}</div>
-											<div>Value: {{ .Value }}</div>
-										{{ end }}
-									</div>
-								{{ end }}
-								{{ if $FullEndpoint.ResponseBody }}
-									<div>
-										<div>Example Response Body</div>
-										<div>{{$FullEndpoint.ResponseBody}}</div>	
-									</div>
-								{{ end }}
-							</div>
-						</div>
-					{{else}}
-						<div class="row-full">
-							<div class="col-left">
-								<h1>{{$Endpoint.Name}}</h1>
+								<h1>{{$Group.Name}}</h1>
 							</div>
 							<div class="col-right"></div>
-						</div>
-					{{end}}
+					</div>
 				</section>
+			{{end}}
+		{{ if gt (len $Group.Endpoints) 0 }}
+			{{ range $Group.Endpoints }}
+				{{ $Endpoint := index $.EndpointsMap .}}
+					{{ $FullEndpoint := index $.FullEndpointsMap .}}
+					{{if $FullEndpoint}}
+						<section class="row" data-type="subgroup" data-id={{$Endpoint.Id}} id="{{$Group.Slug}}_{{$Endpoint.Slug}}">
+							{{ template "EndpointSection" $FullEndpoint }}
+						</section>
+					{{else}}
+						<section class="row not-fetched" data-type="subgroup" data-id={{$Endpoint.Id}} id="{{$Group.Slug}}_{{$Endpoint.Slug}}">
+							<div class="row-full">
+								<div class="col-left">
+									<h1>{{$Endpoint.Name}}</h1>
+									<h5>Loading...</h5>
+								</div>
+								<div class="col-right"></div>
+							</div>
+						</section>
+					{{end}}
 			{{ end }}
 		{{end}}
 	{{end}}

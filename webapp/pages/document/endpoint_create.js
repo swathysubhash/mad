@@ -11,26 +11,50 @@ import { renderMarkdown, removeEmptyObjects } from '../../helpers/util'
 import Form from '../../components/form'
 import Text from '../../components/text'
 
+const EMPTY_SUBGROUP = {
+	name: '',
+	description: '',
+	url: '',
+	method: '',
+	groupName: { label: 'Select Group', value: '' },
+	queryParameters: [{name: '', defaultValue: '', description: '', required: true}],
+	urlParameters: [{name: '', defaultValue: '', description: '', required: true}],
+	requestHeaders: [{name: '', value: ''}],
+	requestBody: '',
+	responseHeaders: [{name: '', value: ''}],
+	responseBody: '',
+	languageSnippets: [],
+	schema: '{}',
+}
+
 class DocumentsEndpointCreate extends Component {
 	constructor(props){
 		super(props)
 		this.state = {
 			loading: false,
-			mode: this.props.params.endpointId == 'create' ? 'create' : 'edit'
+			mode: this.props.params.endpointId == 'create' ? 'Create' : 'Edit',
+			values: this.props.endpoint
 		}
-
 		this.isLoading = this.isLoading.bind(this)
 		this.onSubmit = this.onSubmit.bind(this)
 		this.cancel = this.cancel.bind(this)
 	}
 
+	toState(data) {
+
+	}
+
 	fetchEndpointDetails(endpointId) {
 		const store = this.context.store
-		store.dispatch({ type: 'GET_ENDPOINT_REQUEST'})
+		this.setState({ loading : true})
 		getEndpoint({ endpointId })
 		.then(res => {
-			store.dispatch({ type: 'GET_ENDPOINT_RESPONSE', data: res.data})
-		}).catch(err => store.dispatch({ type: 'GET_ENDPOINT_FAILURE', data: err.response.data}))		
+			this.setState({ loading : false })
+			//store.dispatch({ type: 'GET_ENDPOINT_RESPONSE', data: res.data})
+		}).catch(err => {
+			this.setState({ loading : false })
+			store.dispatch({ type: 'SET_NOTIFICATION', data: { type: 'danger', message: err.response.data }	})
+		})		
 	}
 
 	componentWillMount() {
@@ -44,16 +68,26 @@ class DocumentsEndpointCreate extends Component {
 			this.fetchEndpointDetails(this.props.params.endpointId)	
 			// this.context.store.dispatch({ type: 'ENDPOINT_SELECT', data: this.props.params.endpointId})
 		} else {
-			this.context.store.dispatch({ type: 'ENDPOINT_CREATE'})	
-		}
+			if (this.props.subgroupType === 'schema') 
+				this.context.store.dispatch({ type: 'SCHEMA_CREATE'})	
+			else 
+				this.context.store.dispatch({ type: 'ENDPOINT_CREATE'})	
+		}	
 	}
 
 	componentWillReceiveProps(nextProps) {
-		if (this.props.endpoint.id === nextProps.endpoint.id) return
-
-		if (nextProps.endpoint.id) { //Group will be empty in create group
-			this.fetchEndpointDetails(nextProps.endpoint.id)	
+		if (this.props.endpoint.id === nextProps.endpoint.id) {
+			return
 		}
+
+		
+			if (nextProps.endpoint.id) { //Group will be empty in create group
+				this.fetchEndpointDetails(nextProps.endpoint.id)
+				this.setState({ mode: 'Edit', values: nextProps.endpoint })
+			} else {
+				this.setState({ mode: 'Create' })
+			}	
+		
 	}
 
 	onSubmit(values) {
@@ -95,10 +129,11 @@ class DocumentsEndpointCreate extends Component {
 			.then(res => {
 				this.setState({ loading: false })
 				store.dispatch({ type: 'CREATE_ENDPOINT_RESPONSE', data: res.data})
+				store.dispatch({ type: 'SET_NOTIFICATION', data: { type: 'success', message: 'Endpoint created successfully.' }})
 			})
 			.catch(err => {
 				this.setState({ loading: false })
-				store.dispatch({ type: 'CREATE_ENDPOINT_FAILURE', data: err.response.data})
+				store.dispatch({ type: 'SET_NOTIFICATION', data: { type: 'danger', message: err.response.data }	})
 			})
 		} else {
 			values.endpointId = this.props.endpoint.id
@@ -107,6 +142,7 @@ class DocumentsEndpointCreate extends Component {
 			.then(res => {
 				this.setState({ loading: false })
 				store.dispatch({ type: 'UPDATE_ENDPOINT_RESPONSE', data: res.data})
+				store.dispatch({ type: 'SET_NOTIFICATION', data: { type: 'success', message: 'Endpoint updated successfully.' }})
 			})
 			.catch(err => {
 				this.setState({ loading: false })
@@ -123,25 +159,6 @@ class DocumentsEndpointCreate extends Component {
 		console.log('Click cancel')
 	}
 	render() {
-		// if (this.props.params.groupId !== 'create') {
-		// 	const state = this.context.store.getState()
-		// 	const group = state.entities.groups.byIds[this.props.params.groupId]
-		// 	this.state.formData.name.value = group.name
-		// 	this.state.formData.separator.value = group.separator	
-		// }
-		// <CodeMirror defaultValue={""} value={"valuecm"} options={cmOptions}/>
-		// let cmOptions = {
-		// 	lineNumbers: true,
-		// 	mode: 'javascript'
-		// }
-		// <Text name={"responseHeader"} label={"Response json?"} type={"codemirror"}/>
-		// <Text name={"method"} label={"What is the http method?"} type={"dropdown"}
-		// 				options={[{ value: "GET", label: "GET"}, { value: "POST", label: "POST"}, { value: "PUT", label: "PUT"}]}/>
-		// <InputSet valueSet={[{name: '', method: ''}]}>
-		// <Text name={"name"} placeholder={"Group Name"} label={"What is the name of your group?"}  validate={['required', 'name']}/>
-		// <Text name={"method"} label={"What is the http method?"} type={"dropdown"}
-		// 				options={[{ value: "GET", label: "GET"}, { value: "POST", label: "POST"}, { value: "PUT", label: "PUT"}]}/>
-		// </InputSet>
 		const state = this.context.store.getState()
 		let groups = state.entities.groups.byIds
 		let groupOptions = this.props.groups.map(g => ({ label: groups[g].name, value: g}))
@@ -149,9 +166,12 @@ class DocumentsEndpointCreate extends Component {
 		if (this.props.subgroupType === 'endpoint') {
 			return (
 				<div>
-					<div>{this.state.mode} Endpoint</div>
+					<div className={"form-header-loader"}>
+						<div className={"form-header"}><span>{this.state.mode} Endpoint</span></div>
+						<div className={"loader"}>{this.state.loading ? <i class="fa fa-spinner fa-spin" aria-hidden="true"></i> : ""}</div>
+					</div>
 					<div>
-						<Form values={this.props.endpoint} onSubmit={this.onSubmit}>
+						<Form values={this.state.values} onSubmit={this.onSubmit}>
 							<Text name={"groupName"} type={"dropdown"} label={"What is the group of your endpoint?"}  validate={['required']}
 								options={groupOptions}/>
 							<Text name={"name"} placeholder={"Endpoint Name"} label={"What is the name of your endpoint?"}  validate={['required', 'name']}/>
@@ -160,29 +180,28 @@ class DocumentsEndpointCreate extends Component {
 							<Text name={"method"} type={"dropdown"} label={"What is the http method of your endpoint?"}  validate={['required']}
 								options={[{ value: "GET", label: "GET"}, { value: "POST", label: "POST"}, { value: "PUT", label: "PUT"}]}/>
 							<InputSet name={"queryParameters"} label={"Query Parameters"}>
-								<Text name={"name"} placeholder={"Name"}/>
-								<Text name={"description"} placeholder={"Description"} options={{toolbar: false, status: false}} label={"Provide some description of your endpoint?"} type={"textarea"}/>
-								<Text name={"default"} placeholder={"Default Value"}/>
-								<Text name={"required"} id={"qpr"} type={"checkbox"}/>
+								<Text className={"col3"} name={"name"} placeholder={"Name"}/>
+								<Text className={"col5"} name={"description"} placeholder={"Description"} options={{toolbar: false, status: false}} label={"Provide some description of your endpoint?"} type={"textarea"}/>
+								<Text className={"col3"} name={"default"} placeholder={"Default Value"}/>
+								<Text className={"col3"} name={"required"} id={"qpr"} type={"checkbox"}/>
 							</InputSet>
 							<InputSet name={"urlParameters"} label={"Url Parameters"}>
-								<Text name={"name"} placeholder={"Name"}/>
-								<Text name={"description"} placeholder={"Description"} options={{toolbar: false, status: false}} label={"Provide some description of your endpoint?"} type={"textarea"}/>
-								<Text name={"default"} placeholder={"Default Value"}/>
-								<Text name={"required"} id={"upr"} type={"checkbox"}/>
+								<Text className={"col3"} name={"name"} placeholder={"Name"}/>
+								<Text className={"col5"} name={"description"} placeholder={"Description"} options={{toolbar: false, status: false}} label={"Provide some description of your endpoint?"} type={"textarea"}/>
+								<Text className={"col3"} name={"default"} placeholder={"Default Value"}/>
+								<Text className={"col3"} name={"required"} id={"upr"} type={"checkbox"}/>
 							</InputSet>
 							<InputSet name={"requestHeaders"} label={"Request Headers"}>
-								<Text name={"name"} placeholder={"Name"}/>
-								<Text name={"value"} placeholder={"value"}/>
+								<Text className={"col5"} name={"name"} placeholder={"Name"}/>
+								<Text className={"col5"} name={"value"} placeholder={"value"}/>
 							</InputSet>
 							<Text name={"requestBody"} label={"Request json?"} type={"codemirror"}/>
 							<InputSet name={"responseHeaders"} label={"Response Headers"}>
-								<Text name={"name"} placeholder={"Name"} />
-								<Text name={"value"} placeholder={"value"} />
+								<Text className={"col5"} name={"name"} placeholder={"Name"} />
+								<Text className={"col5"} name={"value"} placeholder={"value"} />
 							</InputSet>
 							<Text name={"responseBody"} label={"Response json?"} type={"codemirror"}/>
-							<Button action={"submit"} loading={this.state.isLoading} text="create"/>
-							<Button onClick={this.cancel} action={"secondary"} loading={() => false} text="cancel"/>
+							<Button action={"submit"} loading={this.state.loading} text="save"/>
 						</Form>
 					</div>
 				</div>
@@ -190,13 +209,16 @@ class DocumentsEndpointCreate extends Component {
 		} else if (this.props.subgroupType === 'schema') {
 			return (
 				<div>
-				<div>Create Schema</div>
-				<Form values={this.props.endpoint} onSubmit={this.onSubmit}>
+				<div className={"form-header-loader"}>
+					<div className={"form-header"}><span>{this.state.mode} Schema</span></div>
+					<div className={"loader"}>{this.state.loading ? <i class="fa fa-spinner fa-spin" aria-hidden="true"></i> : ""}</div>
+				</div>
+				<Form values={this.state.values} onSubmit={this.onSubmit}>
 				<Text name={"groupName"} type={"dropdown"} label={"What is the group of your schema?"}  validate={['required']}
 								options={groupOptions}/>
 				<Text name={"name"} placeholder={"Endpoint Name"} label={"What is the name of your schema?"}  validate={['required', 'name']}/>
 				<SchemaEditor name={"schema"} />
-				<Button action={"submit"} loading={this.state.isLoading} text="create"/>
+				<Button action={"submit"} loading={this.state.loading} text="save"/>
 				</Form>
 				</div>
 			)
@@ -209,7 +231,8 @@ function mapStateToProps(state, ownProps) {
 	let selectedEndpoint = state.entities.ui.apiSummary.selectedEndpoint
 	let api = state.entities.apis.byIds[ownProps.params.documentId] || {}
 	let subgroupType = ownProps.subgroupType
-	if (state.entities.ui.apiSummary.createEndpoint) {
+	if (subgroupType === 'endpoint' && state.entities.ui.apiSummary.createEndpoint 
+		|| subgroupType === 'schema' && state.entities.ui.apiSummary.createSchema) {
 		return {
 			endpoint:  {
 				name: '',

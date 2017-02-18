@@ -106,7 +106,7 @@ func getAllEndpoint(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	return writeJSON(w, &model.EndpointListResponse{
-		Count:  len(*endpointList),
+		Count:  len(endpointList),
 		Object: "list",
 		Data:   endpointList,
 	})

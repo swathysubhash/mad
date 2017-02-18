@@ -112,7 +112,7 @@ func getAllAccess(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	return writeJSON(w, &model.AccessListResponse{
-		Count:  len(*accessList),
+		Count:  len(accessList),
 		Object: "list",
 		Data:   accessList,
 	})

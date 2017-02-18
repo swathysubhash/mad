@@ -19,6 +19,11 @@ import (
 func createApi(w http.ResponseWriter, r *http.Request) error {
 	var api model.Api
 	err := json.NewDecoder(r.Body).Decode(&api)
+	user := r.Context().Value("userid").(string)
+
+	if len(user) == 0 {
+		return writeError(w, "C10001", &[]string{})
+	}
 
 	if err != nil {
 		return writeError(w, "C10001", &[]string{})
@@ -42,8 +47,8 @@ func createApi(w http.ResponseWriter, r *http.Request) error {
 	api.Object = "api"
 	api.CurrentRevision = 0
 	api.PublishedRevision = -1
-	api.CreatedBy = "SwathySubhash"
-	api.UpdatedBy = "SwathySubhash"
+	api.CreatedBy = user
+	api.UpdatedBy = user
 	api.CreatedAt = currentTime
 	api.UpdatedAt = currentTime
 	api.AnonymousAccessSlice = []int{0, 0, 0} // {r, w, a}
@@ -66,6 +71,12 @@ func getApi(w http.ResponseWriter, r *http.Request) error {
 	apiId := vars["APIID"]
 	api, err := store.Api.Get("Myntra", apiId)
 
+	user := r.Context().Value("userid").(string)
+	if CheckAccess(apiId, user, "read") == false {
+		w.WriteHeader(http.StatusForbidden)
+		return writeJSON(w, errors.New("Read permission denied. Please contact the owner."))
+	}
+
 	if err != nil {
 		return writeError(w, "A90002", &[]string{apiId})
 	}
@@ -76,13 +87,13 @@ func getApi(w http.ResponseWriter, r *http.Request) error {
 
 func getAllApi(w http.ResponseWriter, r *http.Request) error {
 	apiList, err := store.Api.GetAll("Myntra")
-
+	fmt.Println("req.Context().Valu", r.Context().Value("userid"))
 	if err != nil {
 		return writeError(w, "A90003", &[]string{})
 	}
 
 	return writeJSON(w, &model.ApiListResponse{
-		Count:  len(*apiList),
+		Count:  len(apiList),
 		Object: "list",
 		Data:   apiList,
 	})
@@ -91,6 +102,12 @@ func getAllApi(w http.ResponseWriter, r *http.Request) error {
 func updateApi(w http.ResponseWriter, r *http.Request) error {
 	vars := mux.Vars(r)
 	apiId := vars["APIID"]
+
+	user := r.Context().Value("userid").(string)
+	if CheckAccess(apiId, user, "write") == false {
+		w.WriteHeader(http.StatusForbidden)
+		return writeJSON(w, errors.New("Write permission denied. Please contact the owner."))
+	}
 
 	var api model.Api
 	err := json.NewDecoder(r.Body).Decode(&api)
@@ -141,6 +158,12 @@ func publishApi(w http.ResponseWriter, r *http.Request) error {
 	vars := mux.Vars(r)
 	apiId := vars["APIID"]
 
+	user := r.Context().Value("userid").(string)
+	if CheckAccess(apiId, user, "admin") == false {
+		w.WriteHeader(http.StatusForbidden)
+		return writeJSON(w, errors.New("Publish permission denied. You will need admin permission for publishing the document. Please contact the owner."))
+	}
+
 	api, err := store.Api.Get("Myntra", apiId)
 
 	currentRevision := api.CurrentRevision
@@ -162,18 +185,18 @@ func publishApi(w http.ResponseWriter, r *http.Request) error {
 		return writeError(w, "C10005", &[]string{})
 	}
 
-	for _, group := range *groups {
+	for _, group := range groups {
 		group.Id = group.GId + "_" + s_newRevision
 		group.Revision = newRevision
 		eps := make([]string, 0, 0)
-		for _, ep := range *group.Endpoints {
+		for _, ep := range group.Endpoints {
 			eps = append(eps, getSplitId(ep)+"_"+s_newRevision)
 		}
-		group.Endpoints = &eps
+		group.Endpoints = eps
 		newGroups = append(newGroups, group)
 	}
 
-	for _, endpoint := range *endpoints {
+	for _, endpoint := range endpoints {
 		endpoint.Id = endpoint.EId + "_" + s_newRevision
 		endpoint.GroupId = getSplitId(endpoint.GroupId) + "_" + s_newRevision
 		endpoint.Revision = newRevision
@@ -186,11 +209,10 @@ func publishApi(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	gIds := make([]string, 0, 0)
-	for _, gId := range *revision.GroupList {
+	for _, gId := range revision.GroupList {
 		gIds = append(gIds, getSplitId(gId)+"_"+s_newRevision)
 	}
-	revision.GroupList = &gIds
-
+	revision.GroupList = gIds
 	revision.Id = getSplitId(revision.Id) + "_" + s_newRevision
 	revision.Number = newRevision
 
@@ -199,12 +221,12 @@ func publishApi(w http.ResponseWriter, r *http.Request) error {
 		return writeError(w, "C10005", &[]string{})
 	}
 
-	err = store.Group.UpsertMany("Myntra", &newGroups)
+	err = store.Group.UpsertMany("Myntra", newGroups)
 	if err != nil {
 		return writeError(w, "C10005", &[]string{})
 	}
 
-	err = store.Endpoint.UpsertMany("Myntra", &newEndpoints)
+	err = store.Endpoint.UpsertMany("Myntra", newEndpoints)
 	if err != nil {
 		return writeError(w, "C10005", &[]string{})
 	}
@@ -228,6 +250,12 @@ func summaryApi(w http.ResponseWriter, r *http.Request) error {
 	vars := mux.Vars(r)
 	apiId := vars["APIID"]
 
+	user := r.Context().Value("userid").(string)
+	if CheckAccess(apiId, user, "read") == false {
+		w.WriteHeader(http.StatusForbidden)
+		return writeJSON(w, errors.New("Read permission denied. Please contact the owner."))
+	}
+
 	api, err := store.Api.Get("Myntra", apiId)
 	if err != nil {
 		return writeError(w, "A90002", &[]string{apiId})
@@ -245,7 +273,15 @@ func summaryApi(w http.ResponseWriter, r *http.Request) error {
 func GetApiBySlug(slug string) (*model.Api, error) {
 	api, err := store.Api.GetBySlug("Myntra", slug)
 	if err != nil {
-		return nil, errors.New("Api not found with slug name" + slug)
+		return nil, errors.New("Api not found with slug name " + slug)
+	}
+	return api, nil
+}
+
+func GetApiById(apiId string) (*model.Api, error) {
+	api, err := store.Api.Get("Myntra", apiId)
+	if err != nil {
+		return nil, errors.New("Api not found with api id " + apiId)
 	}
 	return api, nil
 }
@@ -275,23 +311,26 @@ func GetApiSummary(api *model.Api) (*model.ApiSummary, error) {
 	groupBriefs := make([]model.GroupBrief, 0, 0)
 	endpointBriefs := make([]model.EndpointBrief, 0, 0)
 
-	for _, group := range *groups {
+	for _, group := range groups {
 		groupBriefs = append(groupBriefs, model.GroupBrief{
 			Id:        group.Id,
 			Name:      group.Name,
+			Slug:      group.Slug,
 			Object:    group.Object,
 			Separator: group.Separator,
 			Endpoints: group.Endpoints,
 		})
 	}
 
-	for _, endpoint := range *endpoints {
+	for _, endpoint := range endpoints {
 		endpointBriefs = append(endpointBriefs, model.EndpointBrief{
-			Id:      endpoint.Id,
-			Name:    endpoint.Name,
-			GroupId: endpoint.GroupId,
-			Method:  endpoint.Method,
-			Object:  endpoint.Object,
+			Id:           endpoint.Id,
+			Name:         endpoint.Name,
+			GroupId:      endpoint.GroupId,
+			Slug:         endpoint.Slug,
+			Method:       endpoint.Method,
+			Object:       endpoint.Object,
+			SubgroupType: endpoint.SubgroupType,
 		})
 	}
 
@@ -300,7 +339,7 @@ func GetApiSummary(api *model.Api) (*model.ApiSummary, error) {
 		Object:          "summary",
 		CurrentRevision: currentRevision,
 		GroupIds:        revision.GroupList,
-		Groups:          &groupBriefs,
-		Endpoints:       &endpointBriefs,
+		Groups:          groupBriefs,
+		Endpoints:       endpointBriefs,
 	}, nil
 }

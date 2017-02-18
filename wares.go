@@ -1,10 +1,15 @@
 package main
 
 import (
+	"compress/gzip"
+	"context"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
+	"io"
 	"log"
 	"net/http"
+	"runtime/debug"
+	"strings"
 	"time"
 )
 
@@ -14,10 +19,34 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
+type gzipResponseWriter struct {
+	io.Writer
+	http.ResponseWriter
+}
+
+func (w gzipResponseWriter) Write(b []byte) (int, error) {
+	return w.Writer.Write(b)
+}
+
+func gzipHandler(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
+			next.ServeHTTP(w, r)
+			return
+		}
+		w.Header().Set("Content-Encoding", "gzip")
+		gz := gzip.NewWriter(w)
+		defer gz.Close()
+		gzw := gzipResponseWriter{Writer: gz, ResponseWriter: w}
+		next.ServeHTTP(gzw, r)
+	})
+}
+
 func recoverHandler(next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if err := recover(); err != nil {
+				debug.PrintStack()
 				log.Printf("panic: %+v", err)
 				http.Error(w, http.StatusText(500), 500)
 			}
@@ -64,9 +93,11 @@ func userHandler(next http.Handler) http.Handler {
 
 		if claims, ok := token.Claims.(*Claims); ok && token.Valid {
 			fmt.Println("CLAIMS", claims)
+			ctx := context.WithValue(r.Context(), "userid", claims.Username)
+			r = r.WithContext(ctx)
+			ctx = context.WithValue(r.Context(), "userimage", claims.Picture)
+			r = r.WithContext(ctx)
 			next.ServeHTTP(w, r)
-			// ctx := context.WithValue(req.Context(), MyKey, *claims)
-			// page(res, req.WithContext(ctx))
 		} else {
 			fmt.Println(err)
 			http.Redirect(w, r, "/login", 307)

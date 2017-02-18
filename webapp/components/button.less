@@ -1,0 +1,30 @@
+@import "../variables";
+
+button {
+	cursor: pointer;
+}
+.btn-primary {
+	margin-top: 30px;
+	.loader {
+		color: white;
+		vertical-align: top;
+	}
+	&:active {
+		outline: 0;
+    box-shadow: inset 1px 11px 8px rgba(0,0,0,.2);
+	}
+}
+
+.loader-placeholder {
+	display: inline-block;
+  height: 36px;
+  width: 0px;
+  vertical-align: middle;
+}
+
+.secondary-btn {
+	color: @color-primary;
+	border: none;
+	background: white;
+	text-decoration: underline;
+}

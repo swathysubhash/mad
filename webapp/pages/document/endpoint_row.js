@@ -20,9 +20,9 @@ class EndpointRow extends Component {
 		const endpoint = state.entities.endpoints.byIds[this.props.eId]
 		if (endpoint) {
 			return (
-				<li className={this.props.selected === this.props.eId ? 'selected': ''} onClick={this.detail.bind(this, endpoint.subgroupType)}>
-					<span>{endpoint.name}</span>
-					<span>{endpoint.method}</span>
+				<li id={this.props.eId} className={this.props.selected === this.props.eId ? 'subgroup-select selected': 'subgroup-select'} onClick={this.detail.bind(this, endpoint.subgroupType)}>
+					{endpoint.method ? <span className={"method " + endpoint.method}>{endpoint.method}</span> : ""}
+					<span className={"name"}>{endpoint.name}</span>
 				</li>
 			);
 		}

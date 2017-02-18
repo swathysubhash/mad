@@ -4,8 +4,9 @@
 
 const argv = require('yargs').argv;
 const webpack = require('webpack');
-const webpackConfig = require('./webpack.config.js');
+const webpackConfig = require('./webpack.config.dev.js');
 const WebpackDevServer = require('webpack-dev-server');
+var path = require('path');
 
 const port = 9000;
 const mad = {
@@ -17,7 +18,7 @@ const mad = {
 };
 
 console.log(mad)
-const config = require('./webpack.config.js');
+const config = require('./webpack.config.dev.js');
 config.entry.app.unshift(`webpack-dev-server/client?http://localhost:${port}/`, 'webpack/hot/dev-server');
 config.plugins.unshift(new webpack.HotModuleReplacementPlugin());
 const compiler = webpack(webpackConfig);

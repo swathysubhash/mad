@@ -68,7 +68,7 @@ func (a *accessStore) Get(orgName, resourceId, actorId string) (*model.Access, e
 	return access, nil
 }
 
-func (a *accessStore) GetAllByResourceId(orgName, resourceId string) (*[]model.Access, error) {
+func (a *accessStore) GetAllByResourceId(orgName, resourceId string) ([]model.Access, error) {
 	var accessList = make([]model.Access, 0)
 	c := a.DB.C(orgName + "/ACCESSLIST")
 	err := c.Find(bson.M{
@@ -79,5 +79,5 @@ func (a *accessStore) GetAllByResourceId(orgName, resourceId string) (*[]model.A
 		return nil, err
 	}
 
-	return &accessList, nil
+	return accessList, nil
 }

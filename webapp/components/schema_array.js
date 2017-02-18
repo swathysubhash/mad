@@ -4,12 +4,15 @@ import SchemaObject from './schema_object'
 import SchemaNumber from './schema_number'
 import SchemaString from './schema_string'
 import SchemaBoolean from './schema_boolean'
+import { renderMarkdown } from '../helpers/util'
+import MarkdownEditor from './markdown_editor'
 
 class SchemaArray extends Component {
 	constructor(props) {
 		super(props)
 		this.state = this.props.data
 		this.change = this.change.bind(this)
+		this.descriptionChange = this.descriptionChange.bind(this)
 		this.onPropsChange = this.onPropsChange.bind(this)
 	}
 
@@ -26,6 +29,14 @@ class SchemaArray extends Component {
 			this.state[event.target.name] = event.target.value;
 		}
 		this.setStateSync(this.state);
+		this.props.onChange && this.props.onChange(this.state)
+	}
+
+
+	descriptionChange(value) {
+		this.state['description'] = value
+		this.state['descriptionHTML'] = renderMarkdown(value)
+		this.setState(this.state)
 		this.props.onChange && this.props.onChange(this.state)
 	}
 
@@ -60,13 +71,19 @@ class SchemaArray extends Component {
 			width: '50px'
 		}
 		var optionFormStyle = {
-			paddingLeft: '25px',
 			paddingTop: '4px',
+			display: 'inline-block',
 		};
 		this.state.items = this.state.items || {type: 'string'};
 		var optionForm = this.mapping('items', this.state.items, this.onPropsChange);
 		return (
 			<div>
+				<div class={"schema-field"}>
+					<div><span className={"label description"}>Description: </span><MarkdownEditor onChange={this.descriptionChange} path={this.props.name} options={{toolbar: false, status: false}} value={this.state.description} defaultValue={this.state.description}/></div>
+					<div><span className={"label"}>minItems:  </span><input name="minItems" style={shortNumberStyle} type="number" onInput={this.change} value={this.state.minItems}  /></div>
+					<div><span className={"label"}>maxItems:  </span><input name="maxItems" style={shortNumberStyle} type="number" onInput={this.change} value={this.state.maxItems}  /></div>
+					<div><span className={"label"}>uniqueItems:  </span><input name="uniqueItems" type="checkbox" onInput={this.change} checked={this.state.uniqueItems}  /></div>
+				</div>
 				Items Type:
 				<select name="itemtype" onChange={this.change} value={this.state.items.type}>
 						<option value="string">string</option>
@@ -75,9 +92,6 @@ class SchemaArray extends Component {
 						<option value="object">object</option>
 						<option value="boolean">boolean</option>
 					</select>
-				minItems:  <input name="minItems" style={shortNumberStyle} type="number" onInput={this.change} value={this.state.minItems}  />
-				maxItems:  <input name="maxItems" style={shortNumberStyle} type="number" onInput={this.change} value={this.state.maxItems}  />
-				uniqueItems:  <input name="uniqueItems" type="checkbox" onInput={this.change} checked={this.state.uniqueItems}  />
 				<div style={optionFormStyle}>
 					{optionForm}
 				</div>

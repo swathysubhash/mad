@@ -5,6 +5,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 	"mad/model"
 	"strconv"
+	"time"
 )
 
 type apiStore struct {
@@ -36,11 +37,30 @@ func (a *apiStore) Create(orgName string, api *model.Api) error {
 		ApiId:       api.Id,
 		Object:      "revision",
 		Number:      api.CurrentRevision,
-		GroupList:   &[]string{},
-		CustomStyle: nil,
+		GroupList:   []string{},
+		CustomStyle: model.GetDefaultStyle(),
 	}
 
 	err := a.DB.C(orgName + "/REVISIONLIST").Insert(revision)
+
+	if err != nil {
+		return err
+	}
+
+	now := time.Now().Unix()
+	err = a.DB.C(orgName + "/ACCESSLIST").Insert(&model.Access{
+		Object:          "access",
+		ResourceId:      api.Id,
+		ResourceType:    "api",
+		ActorId:         api.CreatedBy,
+		ActorType:       "user",
+		PermissionSlice: []int{1, 1, 1},
+		Permission:      "admin",
+		UpdatedBy:       api.CreatedBy,
+		UpdatedAt:       now,
+		CreatedBy:       api.CreatedBy,
+		CreatedAt:       now,
+	})
 
 	if err != nil {
 		return err
@@ -52,19 +72,6 @@ func (a *apiStore) Create(orgName string, api *model.Api) error {
 		return err
 	}
 
-	// runner := txn.NewRunner(c)
-	// ops := []txn.Op{{
-	// 	C:      orgName + "/APILIST",
-	// 	Id:     api.Id,
-	// 	Insert: &api,
-	// }, {
-	// 	C:      orgName + "/REVISIONLIST",
-	// 	Id:     revisionId,
-	// 	Insert: revision,
-	// }}
-
-	// tid := bson.NewObjectId()
-	// err := runner.Run(ops, tid, nil)
 	return nil
 }
 
@@ -92,7 +99,7 @@ func (a *apiStore) GetBySlug(orgName, slug string) (*model.Api, error) {
 	return api, nil
 }
 
-func (a *apiStore) GetAll(orgName string) (*[]model.Api, error) {
+func (a *apiStore) GetAll(orgName string) ([]model.Api, error) {
 	var apiList = make([]model.Api, 0)
 
 	c := a.DB.C(orgName + "/APILIST")
@@ -102,7 +109,7 @@ func (a *apiStore) GetAll(orgName string) (*[]model.Api, error) {
 		return nil, err
 	}
 
-	return &apiList, nil
+	return apiList, nil
 }
 
 func (a *apiStore) Update(orgName, apiId string, api *model.Api) error {
