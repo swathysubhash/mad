@@ -4,7 +4,7 @@ import Inferno from 'inferno'
 import Component from 'inferno-component'
 import { Link } from 'inferno-router'
 import { getApiList } from '../../actions/api'
-import ApiForm from '../api_form'
+import ApiForm from '../api_form/index'
 import { convertEpoch } from '../../helpers/util'
 import { connect } from 'inferno-redux'
 

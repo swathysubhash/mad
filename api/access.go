@@ -118,9 +118,19 @@ func getAllAccess(w http.ResponseWriter, r *http.Request) error {
 	})
 }
 
-func CheckAccess(resourceId, actorId, permission string) bool {
-	access, err := store.Access.Get("Myntra", resourceId, actorId)
+func CheckAccess(resourceId, resourceType, actorId, permission string) bool {
+	if resourceType == "api" {
+		api, err := store.Api.Get("Myntra", resourceId)
+		if err != nil {
+			fmt.Println(err)
+			return false
+		}
+		if getPermission(api.AnonymousAccessSlice, permission) {
+			return true
+		}
+	}
 
+	access, err := store.Access.Get("Myntra", resourceId, actorId)
 	if err != nil {
 		fmt.Println(err)
 		return false

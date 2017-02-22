@@ -5,18 +5,83 @@ import { connect } from 'inferno-redux'
 import Form from '../../components/form'
 import Button from '../../components/button'
 import Text from '../../components/text'
+import { getStyle, updateStyle } from '../../actions/style'
 
+const DEFAULT_STYLE = {
+	brandImageLink: '',
+	brandImageUrl: '',
+	column: '',
+	object: '',
+	linkColor: '',
+	fontSize: '',
+	headerBackgroundColor: '',
+	headerFontColor: '',
+	sidePanelBackgroundColor: '',
+	sidePanelFontColor: '',
+	sidePanelLightFontColor: '',
+	sidePanelSecondaryFontColor: '',
+	leftPanelBackgroundColor: '',
+	leftPanelFontColor: '',
+	leftPanelLightFontColor: '',
+	leftPanelHighlightFontColor: '',
+	leftPanelHighlightBackgroundColor: '',
+	rightPanelBackgroundColor: '',
+	rightPanelFontColor: '',
+	codeFontColor: '',
+	codeHighlightColor: '',
+	codeBackgroundColor: '',
+}
 
 class DocumentsStyle extends Component {
 	constructor(props){
 		super(props)
+		this.state = {
+			loading: false,
+			values: DEFAULT_STYLE,
+		}
+		this.onSubmit = this.onSubmit.bind(this)
+	}
+
+	fetchStyle(documentId) {
+		this.setState({ loading: true })
+		getStyle({ documentId })
+		.then(res => {
+			this.setState({ loading: false, values: res.data })
+		})
+		.catch(err => {
+			this.setState({ loading: false })
+			this.context.store.dispatch({ type: 'SET_NOTIFICATION', data: { type: 'danger', message: err.response.data }	})
+		})
+	}
+
+	componentDidMount() {
+		this.fetchStyle(this.props.documentId)
+	}
+
+	componentWillReceiveProps(nextProps) {
+		this.fetchStyle(nextProps.documentId)
+	}
+
+	onSubmit(values) {
+		this.setState({ loading: true })
+		updateStyle({documentId: this.props.documentId, ...values})
+		.then(res => {
+			this.setState({ loading: false, values: res.data })
+			this.context.store.dispatch({ type: 'SET_NOTIFICATION', data: { type: 'success', message: 'Styles updated successfully.' }})
+		})
+		.catch(err => {
+			this.setState({ loading: false })
+			this.context.store.dispatch({ type: 'SET_NOTIFICATION', data: { type: 'danger', message: err.response.data }	})
+		})
 	}
 
 	render() {
 		return (
 			<div className={"docs-style"}>
 				<div className={"form-header"}>Documentation Style</div>
-				<Form values={this.props.style} onSubmit={this.onSubmit}>
+				<Form values={this.state.values} onSubmit={this.onSubmit}>
+						<Text name={"brandImageUrl"} label={"Url of brand image"} />
+						<Text name={"brandImageLink"} label={"Link for the brand image"} />
 						<Text name={"column"} label={"No of columns? 2 or 3"} />
 						<Text type={"color"} name={"linkColor"} label={"Color of the links"} />
 						<Text name={"fontSize"} label={"Size of the font"} />
@@ -36,8 +101,6 @@ class DocumentsStyle extends Component {
 						<Text type={"color"} name={"codeFontColor"} label={"Font color for code text"} />
 						<Text type={"color"} name={"codeHighlightColor"} label={"Highlight color of code text"} />
 						<Text type={"color"} name={"codeBackgroundColor"} label={"Backgroudn color of code text"} />
-						<Text type={"color"} name={"orgNameFontColor"} label={"Font color for ORG name"} />
-						<Text type={"color"} name={"orgApiStringFontColor"} label={"Font color for rest of ORG name section"} />
 						<Button action={"submit"} loading={this.state.isLoading} text="save"/>
 					</Form>
 			</div>
@@ -46,36 +109,8 @@ class DocumentsStyle extends Component {
 }
 
 function mapStateToProps(state, ownProps) {
-	let api = state.entities.apis.byIds[ownProps.params.documentId]
-	let style = {
-		column: 3,
-		object: "style",
-		linkColor: "#131313",
-		fontSize: 14,
-		headerBackgroundColor: "#F7F7F7",
-		headerFontColor: "#44492A",
-		sidePanelBackgroundColor: "#FAFCFC",
-		sidePanelFontColor: "#676F73",
-		sidePanelLightFontColor: "#9AA4AA",
-		sidePanelSecondaryFontColor: "#11A0E7",
-		leftPanelBackgroundColor: "#FFFFFF",
-		leftPanelFontColor: "#4C555A",
-		leftPanelLightFontColor: "#959FA5",
-		leftPanelHighlightFontColor: "#BC4671",
-		leftPanelHighlightBackgroundColor: "#FAFCFC",
-		rightPanelBackgroundColor: "#2D3134",
-		rightPanelFontColor: "#CACFD1",
-		codeFontColor: "#B7B8B8",
-		codeHighlightColor: "#9DC158",
-		codeBackgroundColor: "#272B2D",
-		orgNameFontColor: "#32325D",
-		orgApiStringFontColor: "#0199E5"
-	}
-	if (api && api.style) {
-		style = api.style
-	}
 	return {
-		style
+		documentId: ownProps.params.documentId
 	}
 } 
 

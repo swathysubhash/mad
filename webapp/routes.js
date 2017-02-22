@@ -15,12 +15,14 @@ export const routes = (
 				<Route path="/group/:groupId" name="group" component={Pages.DocumentsGroupCreate} />
 				<Route path="/endpoint/:endpointId" subgroupType="endpoint" component={Pages.DocumentsEndpointCreate} />	
 				<Route path="/schema/:endpointId" subgroupType="schema" component={Pages.DocumentsEndpointCreate} />
+				<Route path="/textdocument/:endpointId" subgroupType="textdocument" component={Pages.DocumentsEndpointCreate} />
 			</Route>
 			<Route title="Style" path="/style" component={Pages.DocumentsStyle} />
 			<Route title="Access" path="/access" component={Pages.DocumentsAccess} />
 			<Route title="Revision" path="/revision" component={Pages.DocumentsRevision} />
 			<Route title="Settings" path="/settings" component={Pages.DocumentsSettings} />
 		</Route>
+		<Route path="/login" component={Pages.LoginRedirect} />
 	</Route>
 )
 /*

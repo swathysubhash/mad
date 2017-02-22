@@ -1,6 +1,7 @@
 package datastore
 
 import (
+	"fmt"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"mad/model"
@@ -37,7 +38,8 @@ func (r *revisionStore) Create(orgName string, revision *model.Revision) error {
 }
 
 func (r *revisionStore) Upsert(orgName string, revision *model.Revision) error {
-	_, err := r.DB.C(orgName+"/REVISIONLIST").Upsert(bson.M{"_id": revision.Id}, &revision)
+	fmt.Println("####", revision)
+	err := r.DB.C(orgName+"/REVISIONLIST").Update(bson.M{"_id": revision.Id}, bson.M{"$set": revision})
 
 	if err != nil {
 		return err

@@ -1,5 +1,8 @@
+import axios from '../vendor/axios'
 
-import {get, put, post} from 'axios'
+const get = axios.get
+const post = axios.post
+const put = axios.put
 
 export function getApiList() {
 	return get('/madapi/apis')

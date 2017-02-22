@@ -32,16 +32,30 @@ class DocumentsEndpointCreate extends Component {
 		super(props)
 		this.state = {
 			loading: false,
-			mode: this.props.params.endpointId == 'create' ? 'Create' : 'Edit',
-			values: this.props.endpoint
+			values: EMPTY_SUBGROUP
 		}
 		this.isLoading = this.isLoading.bind(this)
 		this.onSubmit = this.onSubmit.bind(this)
-		this.cancel = this.cancel.bind(this)
 	}
 
 	toState(data) {
+		let groups = this.props.groups
+		let selectedGroup = {}
+		if (data && groups && groups[data.groupId]) {
+			selectedGroup = { 
+				groupName: { label: groups[data.groupId].name, value: groups[data.groupId].id }
+			}
+		}
+		if (data.queryParameters && !data.queryParameters.length) data.queryParameters = ''
+		if (data.urlParameters && !data.urlParameters.length) data.urlParameters = ''	
+		if (data.requestHeaders && !data.requestHeaders.length) data.requestHeaders = ''
+		if (data.responseHeaders && !data.responseHeaders.length) data.responseHeaders = ''
 
+		return {
+			...EMPTY_SUBGROUP,
+			...data,
+			...selectedGroup,
+		}
 	}
 
 	fetchEndpointDetails(endpointId) {
@@ -49,7 +63,7 @@ class DocumentsEndpointCreate extends Component {
 		this.setState({ loading : true})
 		getEndpoint({ endpointId })
 		.then(res => {
-			this.setState({ loading : false })
+			this.setState({ loading : false, values: this.toState(res.data) })
 			//store.dispatch({ type: 'GET_ENDPOINT_RESPONSE', data: res.data})
 		}).catch(err => {
 			this.setState({ loading : false })
@@ -58,7 +72,7 @@ class DocumentsEndpointCreate extends Component {
 	}
 
 	componentWillMount() {
-		if (!this.props.params.endpointId !== 'create') {
+		if (this.props.params.endpointId !== 'create') {
 			this.context.store.dispatch({ type: 'ENDPOINT_SELECT', data: this.props.params.endpointId})
 		}
 	}
@@ -68,25 +82,26 @@ class DocumentsEndpointCreate extends Component {
 			this.fetchEndpointDetails(this.props.params.endpointId)	
 			// this.context.store.dispatch({ type: 'ENDPOINT_SELECT', data: this.props.params.endpointId})
 		} else {
-			if (this.props.subgroupType === 'schema') 
+			if (this.props.subgroupType === 'schema') {
 				this.context.store.dispatch({ type: 'SCHEMA_CREATE'})	
-			else 
+			} else if (this.props.subgroupType === 'textdocument'){
+				this.context.store.dispatch({ type: 'TEXTDOCUMENT_CREATE'})	
+			} else {
 				this.context.store.dispatch({ type: 'ENDPOINT_CREATE'})	
+			}
 		}	
 	}
 
 	componentWillReceiveProps(nextProps) {
-		if (this.props.endpoint.id === nextProps.endpoint.id) {
-			return
-		}
-
+		// if (this.props.endpoint.id === nextProps.endpoint.id) {
+		// 	return
+		// }
 		
-			if (nextProps.endpoint.id) { //Group will be empty in create group
-				this.fetchEndpointDetails(nextProps.endpoint.id)
-				this.setState({ mode: 'Edit', values: nextProps.endpoint })
-			} else {
-				this.setState({ mode: 'Create' })
-			}	
+		if (nextProps.selected) { //Group will be empty in create group
+			this.fetchEndpointDetails(nextProps.selected)
+		} else {
+			this.setState({ values:  EMPTY_SUBGROUP })
+		}	
 		
 	}
 
@@ -121,10 +136,9 @@ class DocumentsEndpointCreate extends Component {
 				responseHeaders: removeEmptyObjects(values.responseHeaders, ['name'])
 			}
 		}
-		console.log(values)
 
 		if (this.props.params.endpointId === 'create') {
-			this.setState({ loading: true })
+			this.setState({ loading: true, values  })
 			createEndpoint(values)
 			.then(res => {
 				this.setState({ loading: false })
@@ -136,8 +150,8 @@ class DocumentsEndpointCreate extends Component {
 				store.dispatch({ type: 'SET_NOTIFICATION', data: { type: 'danger', message: err.response.data }	})
 			})
 		} else {
-			values.endpointId = this.props.endpoint.id
-			this.setState({ loading: true })
+			// values.endpointId = this.state.values.id
+			this.setState({ loading: true, values })
 			updateEndpoint(values)
 			.then(res => {
 				this.setState({ loading: false })
@@ -155,19 +169,14 @@ class DocumentsEndpointCreate extends Component {
 		return this.state.loading
 	}
 
-	cancel() {
-		console.log('Click cancel')
-	}
 	render() {
-		const state = this.context.store.getState()
-		let groups = state.entities.groups.byIds
-		let groupOptions = this.props.groups.map(g => ({ label: groups[g].name, value: g}))
+		let groupOptions = Object.values(this.props.groups).map(g => ({ label: g.name, value: g.id }))
 
 		if (this.props.subgroupType === 'endpoint') {
 			return (
 				<div>
 					<div className={"form-header-loader"}>
-						<div className={"form-header"}><span>{this.state.mode} Endpoint</span></div>
+						<div className={"form-header"}><span>{this.props.mode} Endpoint</span></div>
 						<div className={"loader"}>{this.state.loading ? <i class="fa fa-spinner fa-spin" aria-hidden="true"></i> : ""}</div>
 					</div>
 					<div>
@@ -216,8 +225,24 @@ class DocumentsEndpointCreate extends Component {
 				<Form values={this.state.values} onSubmit={this.onSubmit}>
 				<Text name={"groupName"} type={"dropdown"} label={"What is the group of your schema?"}  validate={['required']}
 								options={groupOptions}/>
-				<Text name={"name"} placeholder={"Endpoint Name"} label={"What is the name of your schema?"}  validate={['required', 'name']}/>
+				<Text name={"name"} placeholder={"Schema Name"} label={"What is the name of your schema?"}  validate={['required', 'name']}/>
 				<SchemaEditor name={"schema"} />
+				<Button action={"submit"} loading={this.state.loading} text="save"/>
+				</Form>
+				</div>
+			)
+		} else if (this.props.subgroupType === 'textdocument') {
+			return (
+				<div>
+				<div className={"form-header-loader"}>
+					<div className={"form-header"}><span>{this.state.mode} Text Document</span></div>
+					<div className={"loader"}>{this.state.loading ? <i class="fa fa-spinner fa-spin" aria-hidden="true"></i> : ""}</div>
+				</div>
+				<Form values={this.state.values} onSubmit={this.onSubmit}>
+				<Text name={"groupName"} type={"dropdown"} label={"What is the group of your text document?"}  validate={['required']}
+								options={groupOptions}/>
+				<Text name={"name"} placeholder={"Text Document Name"} label={"What is the name of your text document?"}  validate={['required', 'name']}/>
+				<Text name={"description"} placeholder={"Type here..."} label={"Describe your document here"} type={"textarea"}/>
 				<Button action={"submit"} loading={this.state.loading} text="save"/>
 				</Form>
 				</div>
@@ -228,73 +253,29 @@ class DocumentsEndpointCreate extends Component {
 }
 
 function mapStateToProps(state, ownProps) {
-	let selectedEndpoint = state.entities.ui.apiSummary.selectedEndpoint
-	let api = state.entities.apis.byIds[ownProps.params.documentId] || {}
+	let selected = state.entities.ui.apiSummary.selectedEndpoint
 	let subgroupType = ownProps.subgroupType
-	if (subgroupType === 'endpoint' && state.entities.ui.apiSummary.createEndpoint 
-		|| subgroupType === 'schema' && state.entities.ui.apiSummary.createSchema) {
-		return {
-			endpoint:  {
-				name: '',
-				description: '',
-				url: '',
-				method: '',
-				groupName: { label: 'Select Group', value: '' },
-				queryParameters: [{name: '', defaultValue: '', description: '', required: true}],
-				urlParameters: [{name: '', defaultValue: '', description: '', required: true}],
-				requestHeaders: [{name: '', value: ''}],
-				requestBody: '',
-				responseHeaders: [{name: '', value: ''}],
-				responseBody: '',
-				languageSnippets: [],
-				schema: '{}',
-			},
-			groups: api.groupIds || [],
-			selectedEndpoint: '',
-			subgroupType
-		}
-	}
-	let endpoint = (selectedEndpoint && state.entities.endpoints.byIds[selectedEndpoint])
 	let groups = state.entities.groups.byIds
-	let selectedGroup = endpoint && groups && groups[endpoint.groupId]
-
-	// TODO
-	if(endpoint && endpoint.queryParameters && !endpoint.queryParameters.length) {
-		endpoint.queryParameters = [{name: '', defaultValue: '', description: '', required: true}]
-	}
-	if(endpoint && endpoint.urlParameters && !endpoint.urlParameters.length) {
-		endpoint.urlParameters = [{name: '', defaultValue: '', description: '', required: true}]
-	}
-	if(endpoint && endpoint.requestHeaders && !endpoint.requestHeaders.length) {
-		endpoint.requestHeaders = [{name: '', value: ''}]
-	}
-	if(endpoint && endpoint.responseHeaders && !endpoint.responseHeaders.length) {
-		endpoint.responseHeaders = [{name: '', value: ''}]
-	}
-
 	return {
-		endpoint: {
-			...{
-				name: '',
-				description: '',
-				url: '',
-				groupName: (selectedGroup && { label: selectedGroup.name, value: selectedGroup.id }) || { label: 'Select Group', value: '' },
-				method: '',
-				queryParameters: [{name: '', defaultValue: '', description: '', required: true}],
-				urlParameters: [{name: '', defaultValue: '', description: '', required: true}],
-				requestHeaders: [{name: '', value: ''}],
-				requestBody: '',
-				responseHeaders: [{name: '', value: ''}],
-				responseBody: '',
-				languageSnippets: [],
-				schema: '{}',
-			},
-			...endpoint
-		},
-		groups: api.groupIds || [],
-		selectedEndpoint,
-		subgroupType
+		mode: selected ? 'Edit' : 'Create',
+		selected,
+		subgroupType,
+		groups
 	}
+	// let selectedEndpoint = state.entities.ui.apiSummary.selectedEndpoint
+	// let subgroupType = ownProps.subgroupType
+	// if (subgroupType === 'endpoint' && state.entities.ui.apiSummary.createEndpoint 
+	// 	|| subgroupType === 'schema' && state.entities.ui.apiSummary.createSchema) {
+	// 	return {
+	// 		endpoint: {},
+	// 		subgroupType
+	// 	}
+	// }
+	// let endpoint = (selectedEndpoint && state.entities.endpoints.byIds[selectedEndpoint])
+	// return {
+	// 	endpoint,
+	// 	subgroupType
+	// }
 }
 
 export default connect(mapStateToProps)(DocumentsEndpointCreate)

@@ -129,6 +129,11 @@ export default function entities(state = initialState, action) {
         ...state,
         ui: uiReducer(state.ui, {type: 'SCHEMA_CREATE'})
       }
+    case 'TEXTDOCUMENT_CREATE':
+      return {
+        ...state,
+        ui: uiReducer(state.ui, {type: 'TEXTDOCUMENT_CREATE'})
+      }
     case 'SET_NOTIFICATION':
       return {
         ...state,
@@ -280,6 +285,7 @@ function apiSummary(state = { loading: false, stale: false }, action) {
 				createGroup: false,
         createSchema: false,
         createEndpoint: false,
+        createTextDocument: false,
         selected: data,
 				selectedGroup: data
 			}
@@ -289,6 +295,7 @@ function apiSummary(state = { loading: false, stale: false }, action) {
 				createGroup: true,
         createSchema: false,
         createEndpoint: false,
+        createTextDocument: false,
         selected: '',
 				selectedGroup: '',
 			}
@@ -298,6 +305,7 @@ function apiSummary(state = { loading: false, stale: false }, action) {
 				createEndpoint: false,
         createGroup: false,
         createSchema: false,
+        createTextDocument: false,
         selected: data,
 				selectedEndpoint: data
 			}
@@ -307,6 +315,7 @@ function apiSummary(state = { loading: false, stale: false }, action) {
 				createEndpoint: true,
         createGroup: false,
         createSchema: false,
+        createTextDocument: false,
 				selectedEndpoint: '',
         selected: '',
 			}
@@ -317,6 +326,17 @@ function apiSummary(state = { loading: false, stale: false }, action) {
         createEndpoint: false,
         selectedSchema: '',
         createGroup: false,
+        createTextDocument: false,
+        selected: '',
+      }
+    case 'TEXTDOCUMENT_CREATE':
+      return {
+        ...state,
+        createSchema: false,
+        createEndpoint: false,
+        selectedSchema: '',
+        createGroup: false,
+        createTextDocument: true,
         selected: '',
       }
 		case 'START_LOADING':

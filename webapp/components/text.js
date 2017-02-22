@@ -1,5 +1,5 @@
 import './text.less'
-import Inferno, { linkEvent } from 'inferno'
+import Inferno from 'inferno'
 import Component from 'inferno-component'
 import CodeMirror from './codemirror'
 import MarkdownEditor from './markdown_editor'

@@ -1,3 +1,7 @@
+import '../less/main.less'
+import Prism from './prism.js'
+import Waypoints from './waypoints.js'
+
 (function() {
 
   var breaker = {};
@@ -347,11 +351,11 @@ function waypointHandler() {
   }
 }
 
-function insertTryOutHeaders(num) {
-  var headers = tryOut.querySelector('.headers-tab')
+function insertTryOutHeaders(num, tabSection, tabTemplate) {
+  var headers = tryOut.querySelector('.' + tabSection)
   while(num > 0) {
     var div = document.createElement('div')
-    div.innerHTML = tryOut.querySelector('#row-template').innerHTML
+    div.innerHTML = tryOut.querySelector('#' + tabTemplate).innerHTML
     headers.appendChild(div.querySelector('.input-row'))
     num--
   }
@@ -360,6 +364,12 @@ function insertTryOutHeaders(num) {
 function removeTryOutHeaders() {
   var headers = tryOut.querySelector('.headers-tab')
   var rows = headers.querySelectorAll('.input-row')
+  
+  for (var r = 1; r < rows.length; r++) {
+    headers.removeChild(rows[r])
+  }
+  headers = tryOut.querySelector('.parameters-tab')
+  rows = headers.querySelectorAll('.input-row')
   
   for (var r = 1; r < rows.length; r++) {
     headers.removeChild(rows[r])
@@ -374,20 +384,32 @@ function initTryout(data) {
   httpMeta.elements['url'].value = data.url
 
   if (data.requestHeaders.length > 1) {
-    insertTryOutHeaders(data.requestHeaders.length - 1)
+    insertTryOutHeaders(data.requestHeaders.length - 1, 'headers-tab', 'header-row-template')
     data.requestHeaders.forEach(function(h, index) {
-      requestData.elements['key'][index].value = data.requestHeaders[index]['name']
-      requestData.elements['value'][index].value = data.requestHeaders[index]['value']
+      requestData.elements['h-key'][index].value = data.requestHeaders[index]['name'] || ''
+      requestData.elements['h-value'][index].value = data.requestHeaders[index]['value'] || ''
     })
   } else if (data.requestHeaders.length === 1) {
-    requestData.elements['key'].value = data.requestHeaders[0]['name']
-    requestData.elements['value'].value = data.requestHeaders[0]['value']
+    requestData.elements['h-key'].value = data.requestHeaders[0]['name'] || ''
+    requestData.elements['h-value'].value = data.requestHeaders[0]['value'] || ''
   }
-  
+  data.parameters = data.queryParameters.concat(data.urlParameters)
+  if (data.parameters.length > 1) {
+    insertTryOutHeaders(data.parameters.length - 1, 'parameters-tab', 'parameter-row-template')
+    data.parameters.forEach(function(h, index) {
+      requestData.elements['p-key'][index].value = data.parameters[index]['name'] || ''
+      requestData.elements['p-value'][index].value = data.parameters[index]['value'] || ''
+    })
+  } else if (data.parameters.length === 1) {
+    requestData.elements['p-key'].value = data.parameters[0]['name'] || ''
+    requestData.elements['p-value'].value = data.parameters[0]['value'] || ''
+  } 
+
+  requestData.elements['req-body'].value = data.requestBody || ''
 }
 
-function getHeaders() {
-  var headers = tryOut.querySelector('.headers-tab')
+function getHeaders(tabSection) {
+  var headers = tryOut.querySelector('.' + tabSection)
   var rows = headers.querySelectorAll('.input-row')
   var values = []
 
@@ -430,7 +452,7 @@ window.onload = function () {
   highlightCode();
   sidebar.addEventListener('click', function(event) {
     event.stopPropagation()
-    event.preventDefault()
+   // event.preventDefault()
     var target = event.target
     var clist = target.classList
     if (clist.contains('sidebar-nav-item') && clist.contains('expandable')) {
@@ -445,9 +467,9 @@ window.onload = function () {
     } 
   })
 
-  window.addEventListener('hashchange', function(event) {
-    event.preventDefault();
-  }, false)
+  // window.addEventListener('hashchange', function(event) {
+  //   event.preventDefault();
+  // }, false)
 
   var rows = document.querySelectorAll('#content section.row')
   for (var t = 0; t < rows.length; t++) {
@@ -474,18 +496,18 @@ window.onload = function () {
       tab.classList.add(target.getAttribute('data-header'))
       target.classList.add('selected')
     } else if (clist.contains('add-row')) {
-      var headers = tryOut.querySelector('.headers-tab')
+      var tabSection = tryOut.querySelector('.' + target.getAttribute('data-parent'))
       var parentNode = target.parentNode
       var div = document.createElement('div')
-      div.innerHTML = tryOut.querySelector('#row-template').innerHTML
+      div.innerHTML = tryOut.querySelector('#' + target.getAttribute('data-template')).innerHTML
       if (parentNode.nextSibling)
-        headers.insertBefore(div.querySelector('.input-row'), parentNode.nextSibling)
+        tabSection.insertBefore(div.querySelector('.input-row'), parentNode.nextSibling)
       else
-        headers.appendChild(div.firstChild)
+        tabSection.appendChild(div.firstChild)
     } else if (clist.contains('del-row')) {
-      var headers = tryOut.querySelector('.headers-tab')
+      var tabSection = tryOut.querySelector('.' + target.getAttribute('data-parent'))
       var parentNode = target.parentNode
-      headers.removeChild(parentNode)
+      tabSection.removeChild(parentNode)
     } else if (clist.contains('close-try-out')) {
       sidebar.classList.remove('try-out')
       var httpMeta = document.getElementById("try-http-meta")
@@ -499,16 +521,27 @@ window.onload = function () {
       var httpMeta = document.getElementById("try-http-meta")
       var requestData = document.getElementById("try-request-data")
       var responseData = document.getElementById("try-response-data")
+      var parameters = getHeaders('parameters-tab')
+      var url = httpMeta.elements['url'].value
+      parameters.forEach(p => {
+        url = url.replace('{' + p.name + '}', p.value)
+      })
       var postData = {
         hostName: window.APIHOSTNAME, 
         protocol: window.APIPROTOCOL,
         method: httpMeta.elements['method'].value,
-        url: httpMeta.elements['url'].value,
-        requestHeaders: getHeaders()
+        url: url,
+        requestHeaders: getHeaders('headers-tab'),
       }
       ajax.post('/docs/tryout').send(postData) 
           .end(function(err, res) {
-            console.log(err, res)
+            if (!err && res.body) {
+              try {
+                responseData.elements["res-body"].value =  JSON.stringify(JSON.parse(res.body.data), 0 , 4)
+              } catch (e) {
+                responseData.elements["res-body"].value =  res.body.data
+              }
+            }
           })
     }
   })
@@ -524,6 +557,10 @@ window.onload = function () {
 
       initTryout(endpointData)
       sidebar.classList.add('try-out')
+    } else if (clist.contains('show-child-attr')) {
+      target.parentNode.classList.add('show-child')
+    } else if (clist.contains('hide-child-attr')) {
+      target.parentNode.classList.remove('show-child')
     }
   })
 }

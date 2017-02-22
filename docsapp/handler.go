@@ -12,6 +12,8 @@ import (
 	"mad/model"
 	"mad/router"
 	"net/http"
+	"os"
+	"path/filepath"
 	"time"
 )
 
@@ -23,6 +25,13 @@ type DocsPage struct {
 	FullEndpointsMap map[string]*model.Endpoint
 	Api              *model.Api
 	ApiSummary       *model.ApiSummary
+	Revision         *model.Revision
+	Assets           *Assets
+}
+
+type Assets struct {
+	Js  string `json:"bundle.js"`
+	Css string `json:"style.css"`
 }
 
 type GroupSection struct {
@@ -30,6 +39,19 @@ type GroupSection struct {
 }
 type EndpointSection struct {
 	Endpoint *model.Endpoint
+}
+
+var assets Assets
+var cwd, _ = os.Getwd()
+var BuildDir = filepath.Join(cwd, "docsapp", "static", "build")
+
+func init() {
+	file, err := ioutil.ReadFile(BuildDir + "/manifest.json")
+	if err != nil {
+		log.Printf("Not able to find asset file.Error: %v\n", err)
+		os.Exit(1)
+	}
+	json.Unmarshal(file, &assets)
 }
 
 func Handler() *mux.Router {
@@ -62,6 +84,12 @@ func getDocs(w http.ResponseWriter, r *http.Request) error {
 		return nil
 	}
 
+	revision, err := services.GetRevisionByApiId(api.Id, api.CurrentRevision)
+	if err != nil {
+		w.Write([]byte(err.Error()))
+		return nil
+	}
+
 	apiSummary, _ := services.GetApiSummary(api)
 	groupsMap := make(map[string]model.GroupBrief)
 	endpointsMap := make(map[string]model.EndpointBrief)
@@ -89,6 +117,8 @@ func getDocs(w http.ResponseWriter, r *http.Request) error {
 				schemaMap := make(map[string]interface{})
 				json.Unmarshal([]byte(fullEndpointsMap[endpointId].Schema), &schemaMap)
 				fullEndpointsMap[endpointId].SchemaMap = schemaMap
+			} else if fullEndpointsMap[endpointId].SubgroupType == "endpoint" {
+				fullEndpointsMap[endpointId].Url = api.Protocol + "://" + api.Host + fullEndpointsMap[endpointId].Url
 			}
 		}
 	}
@@ -101,6 +131,8 @@ func getDocs(w http.ResponseWriter, r *http.Request) error {
 		FullGroupsMap:    fullGroupsMap,
 		FullEndpointsMap: fullEndpointsMap,
 		ApiSummary:       apiSummary,
+		Revision:         revision,
+		Assets:           &assets,
 	})
 }
 
@@ -182,9 +214,11 @@ func tryOut(w http.ResponseWriter, r *http.Request) error {
 	var reqBody *bytes.Buffer
 	if len(treq.RequestBody) > 0 {
 		reqBody = bytes.NewBuffer(([]byte(treq.RequestBody)))
+	} else {
+		reqBody = bytes.NewBuffer(([]byte("{}")))
 	}
 
-	req, err := http.NewRequest(treq.Method, treq.Protocol+"://"+treq.Host+treq.Url, reqBody)
+	req, err := http.NewRequest(treq.Method, treq.Url, reqBody)
 
 	for _, header := range treq.RequestHeaders {
 		req.Header.Add(header.Name, header.Value)

@@ -1,9 +1,7 @@
 code[class*="language-"],
 pre[class*="language-"] {
-	//color: black;
 	color: white;
 	background: none;
-	//text-shadow: 0 1px white;
 	font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 	text-align: left;
 	white-space: pre;
@@ -11,11 +9,9 @@ pre[class*="language-"] {
 	word-break: normal;
 	word-wrap: normal;
 	line-height: 1.5;
-
 	-moz-tab-size: 4;
 	-o-tab-size: 4;
 	tab-size: 4;
-
 	-webkit-hyphens: none;
 	-moz-hyphens: none;
 	-ms-hyphens: none;
@@ -25,7 +21,6 @@ pre[class*="language-"] {
 pre[class*="language-"]::-moz-selection, pre[class*="language-"] ::-moz-selection,
 code[class*="language-"]::-moz-selection, code[class*="language-"] ::-moz-selection {
 	text-shadow: none;
-	//background: #b3d4fc;
 }
 
 pre[class*="language-"]::selection, pre[class*="language-"] ::selection,
@@ -50,7 +45,6 @@ pre[class*="language-"] {
 
 :not(pre) > code[class*="language-"],
 pre[class*="language-"] {
-	//background: #f5f2f0;
 	font-size: 12px;
 }
 
@@ -83,8 +77,6 @@ pre[class*="language-"] {
 .token.constant,
 .token.symbol,
 .token.deleted {
-	//color: #905;
-	//color: #690;
 	color: #88D3A1;
 }
 
@@ -94,7 +86,6 @@ pre[class*="language-"] {
 .token.char,
 .token.builtin,
 .token.inserted {
-	//color: #690;
 	color: #88D3A1;
 }
 
@@ -104,7 +95,6 @@ pre[class*="language-"] {
 .language-css .token.string,
 .style .token.string {
 	color: #a67f59;
-	//background: hsla(0, 0%, 100%, .5);
 }
 
 .token.atrule,
@@ -149,7 +139,6 @@ pre.line-numbers > code {
 	position: absolute;
 	pointer-events: none;
 	top: 0;
-	//font-size: 100%;
 	left: -3.8em;
 	width: 3em; /* works for line-numbers below 1000 lines */
 	letter-spacing: -1px;
@@ -162,16 +151,16 @@ pre.line-numbers > code {
 
 }
 
-	.line-numbers-rows > span {
-		pointer-events: none;
-		display: block;
-		counter-increment: linenumber;
-	}
+.line-numbers-rows > span {
+	pointer-events: none;
+	display: block;
+	counter-increment: linenumber;
+}
 
-		.line-numbers-rows > span:before {
-			content: counter(linenumber);
-			color: #999;
-			display: block;
-			padding-right: 0.8em;
-			text-align: right;
-		}
+.line-numbers-rows > span:before {
+	content: counter(linenumber);
+	color: #999;
+	display: block;
+	padding-right: 0.8em;
+	text-align: right;
+}

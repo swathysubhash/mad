@@ -22,6 +22,8 @@ class EndpointRow extends Component {
 			return (
 				<li id={this.props.eId} className={this.props.selected === this.props.eId ? 'subgroup-select selected': 'subgroup-select'} onClick={this.detail.bind(this, endpoint.subgroupType)}>
 					{endpoint.method ? <span className={"method " + endpoint.method}>{endpoint.method}</span> : ""}
+					{endpoint.subgroupType === "schema" ? <span className={"method " + endpoint.subgroupType}>schema</span> : ""}
+					{endpoint.subgroupType === "textdocument" ? <span className={"method " + endpoint.subgroupType}>text</span> : ""}
 					<span className={"name"}>{endpoint.name}</span>
 				</li>
 			);

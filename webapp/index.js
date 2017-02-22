@@ -5,13 +5,12 @@ import {routes} from './routes'
 import Inferno from 'inferno'
 import { Provider } from 'inferno-redux'
 import { createStore } from 'redux'
-import rootReducer from './reducers'
+import rootReducer from './reducers/index'
 import Component from 'inferno-component'
 import { Router, Route, IndexRoute } from 'inferno-router'
 import createBrowserHistory from 'history/createBrowserHistory'
 
 /*eslint-enable */
-
 let browserHistory = createBrowserHistory()
 let store = createStore(rootReducer)
 

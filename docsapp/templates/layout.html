@@ -8,8 +8,7 @@
 		<link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600" rel="stylesheet">
 
 		<!-- <link rel="shortcut icon" href="/static/img/favicon.png"> -->
-		<link rel="stylesheet" href="/public/css/main.css">
-		<link rel="stylesheet" href="/public/css/prism.css">
+		<link rel="stylesheet" href="/public/build/{{.Assets.Css}}">
 		<title>{{.Title}}</title>
 		<script>window.__ENDPOINTS={}</script>
 		{{template "Head" $}}
@@ -24,9 +23,7 @@
 			window.APIHOSTNAME={{.Api.Host}}
 			window.APIPROTOCOL={{.Api.Protocol}}
 		</script>
-		<script src="/public/js/waypoints.min.js"></script>
-		<script src="/public/js/prism.js"></script>
-		<script src="/public/js/main.js"></script>
+		<script src="/public/build/{{.Assets.Js}}"></script>
 	</body>
 </html>
 {{end}}

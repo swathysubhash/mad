@@ -13,6 +13,7 @@ class DocumentsEditor extends Component {
 		this.groupCreate = this.groupCreate.bind(this)
 		this.endpointCreate = this.endpointCreate.bind(this)
 		this.schemaCreate = this.schemaCreate.bind(this)
+		this.textDocumentCreate = this.textDocumentCreate.bind(this)
 	}
 
 	groupCreate() {
@@ -30,6 +31,11 @@ class DocumentsEditor extends Component {
 		this.context.router.push(`/documents/${this.props.params.documentId}/editor/schema/create`)
 	}
 
+	textDocumentCreate() {
+		this.context.store.dispatch({ type: 'TEXTDOCUMENT_CREATE' })
+		this.context.router.push(`/documents/${this.props.params.documentId}/editor/textdocument/create`)
+	}
+
 	render() {
 		return (
 			<div className={"api-editor"}>
@@ -39,6 +45,7 @@ class DocumentsEditor extends Component {
 							<button className={this.props.createGroup ? "selected": ""} onClick={this.groupCreate}>Add Group</button>
 							<button className={this.props.createEndpoint ? "selected": ""} onClick={this.endpointCreate}>Add Endpoint</button>
 							<button className={this.props.createSchema ? "selected": ""} onClick={this.schemaCreate}>Add Schema</button>
+							<button className={this.props.createTextDocument ? "selected": ""} onClick={this.textDocumentCreate}>Add Text Document</button>
 							{/*<ButtonMenu text="Add new">
 								<ButtonMenuItem onClick={this.groupCreate} text="Group"></ButtonMenuItem>
 								<ButtonMenuItem onClick={this.endpointCreate} text="Endpoint"></ButtonMenuItem>
@@ -69,6 +76,7 @@ function mapStateToProps(state, ownProps) {
 		createGroup: ui.createGroup,
 		createEndpoint: ui.createEndpoint,
 		createSchema: ui.createSchema,
+		createTextDocument: ui.createTextDocument,
 	}
 } 
 

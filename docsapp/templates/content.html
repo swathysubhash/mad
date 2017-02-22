@@ -2,24 +2,26 @@
 		{{range .}}
 			{{ $Name := index . "name" }}
 			{{ $Type := index . "type" }}
+			{{ $Description := index . "descriptionHTML" }}
 			{{ $Properties := index . "properties" }}
 			<li class="attr-list-item">
 				<div class="attr-label">
-					<div>{{$Name}}</div>
+					<div class="label">{{$Name}}</div>
 					{{if eq $Type "array"}}
-						<div>List of {{index . "items"  "type"}}</div>
+						<div class="type">List of {{index . "items"  "type"}}</div>
 					{{ else }}
-						<div>{{$Type}}</div>
+						<div class="type">{{$Type}}</div>
 					{{ end }}
 					{{if index . "required"}}
-						<div>required</div>
+						<div class="required">required</div>
 					{{ end }}
 				</div>
 				<div class="attr-description">
-					"Test description"
+					{{html $Description}}
 				</div>
 				{{if eq $Type "object"}}
-					<div>Show Child Properties</div>
+					<div class="show-child-attr">Show Child Properties</div>
+					<div class="hide-child-attr">Hide Child Properties</div>
 					<ul class="child-attr-list">
 						{{template "Attributes" $Properties}}
 					</ul>
@@ -42,64 +44,85 @@
 		{{if eq .SubgroupType "endpoint"}}
 			<div class="col-left">
 				<h1>{{.Name}}</h1>
-				<div class="description">{{html .DescriptionHTML}}</div>
+				<div class="description"><p>{{html .DescriptionHTML}}</p></div>
 				{{ if gt (len .UrlParameters) 0 }}
 					<div>
 						<h5>Url Parameters</h5>
-						{{ range .UrlParameters }}
-							<div>{{ .Name }}</div>
-							<div>{{ html .DescriptionHTML }}</div>
-						{{ end }}
+						<div class="attr-list">
+							{{ range .UrlParameters }}
+								<div class="attr-list-item">
+									<div class="attr-label">
+										<div class="label">{{ .Name }}</div>
+									</div>
+									<div class="attr-description"><p>{{ html .DescriptionHTML }}</p></div>
+								</div>
+							{{ end }}
+						</div>
 					</div>
 				{{ end }}
 				{{ if gt (len .QueryParameters) 0 }}
 					<div>
 						<h5>Query Parameters</h5>
-						{{ range .QueryParameters }}
-							<div>{{ .Name }}</div>
-							<div>{{ html .DescriptionHTML }}</div>
-						{{ end }}
+						<div class="attr-list">
+							{{ range .QueryParameters }}
+								<div class="attr-list-item">
+									<div class="attr-label">
+										<div class="label">{{ .Name }}</div>
+									</div>
+									<div class="attr-label-description"><p>{{ html .DescriptionHTML }}</p></div>
+								</div>
+							{{ end }}
+						</div>
 					</div>
 				{{ end }}
 			</div>
 			<div class="col-right">
 				<div class="xhr-detail">
 					<div>
-						<div>Example Request</div>
-						<div class="hl-code"><pre><code class="language-json">{{.Url}}</code></pre><button class="try-btn">Try it out</button></div>
+						<h5>Example Request</h5>
+						<div class="url-ex">
+							<div class="hl-code">{{.Url}}</div>
+							<div style="float: right;"><button class="try-btn">Try</button></div>
+						</div>
 					</div>
 					{{ if gt (len .RequestHeaders) 0 }}
 						<div>
 							<h5>Request Headers</h5>
-							{{ range .RequestHeaders }}
-								<div>Key : {{ .Name }}</div>
-								<div>Value : {{ .Value }}</div>
-							{{ end }}
+							<div class="headers-ex">
+								{{ range .RequestHeaders }}
+									<div>
+										<span class="name">{{ .Name }}: </span>
+										<span>{{ .Value }}</span>
+									</div>
+								{{ end }}
+							</div>
 						</div>
 					{{ end }}
 					{{ if gt (len .RequestBody) 0 }}
 						<div>
-							<div>Example Request Body</div>
-							<div class="hl-code"><pre><code class="language-json">{{.RequestBody}}</code></pre></div>
+							<h5>Sample Request Body</h5>
+							<div class="body-ex">
+							<div class="hl-code"><pre class="line-numbers"><code class="language-json">{{.RequestBody}}</code></pre></div>
+							</div>
 						</div>
 					{{ end }}
 					{{ if gt (len .ResponseHeaders) 0 }}
 						<div>
 							<h5>Response Headers</h5>
-							<div class="hl-code"><pre><code class="language-json">
+							<div class="headers-ex">
 								{{ range .ResponseHeaders }}
-									{
-										"Key":{{ .Name }},
-										"Value": {{ .Value }}
-									}
+									<span class="name">{{ .Name }}</span>
+									<span>{{ .Value }}</span>
 								{{ end }}
-							</code></pre></div>
+							</div>
 						</div>
 					{{ end }}
 					{{ if gt (len .ResponseBody) 0 }}
 						<div>
-							<div>Example Response Body</div>
-							<div class="hl-code"><pre><code class="language-json">{{.ResponseBody}}</code></pre></div>
+							<h5>Sample Response Body</h5>
+							<div class="body-ex">
+							<div class="hl-code"><pre class="line-numbers"><code class="language-json">{{.ResponseBody}}</code></pre></div>
+							</div>
 						</div>
 					{{ end }}
 				</div>
@@ -107,8 +130,10 @@
 		{{else if eq .SubgroupType "schema"}}
 			<div class="col-left">
 				<h1>{{.Name}}</h1>
+				{{ $sDescription := index .SchemaMap "descriptionHTML" }}
+				<p>{{html $sDescription}}</p>
 				<div>
-					Attributes
+					<h5>Attributes</h5>
 				</div>
 					{{range $key, $value := .SchemaMap}}
 						{{ if eq $key "properties" }}
@@ -131,7 +156,7 @@
 	<div class="row-full">
 			<div class="col-left">
 				<h1>{{.Name}}</h1>
-				<div class="description">{{html .DescriptionHTML}}</div>
+				<div class="description"><p>{{html .DescriptionHTML}}<p></div>
 			</div>
 			<div class="col-right"></div>
 	</div>

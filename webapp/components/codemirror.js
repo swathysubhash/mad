@@ -63,4 +63,4 @@ class CodeMirror extends Component {
 	}
 }
 
-module.exports = CodeMirror;
+export default CodeMirror;

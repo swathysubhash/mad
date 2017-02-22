@@ -6,12 +6,10 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	"os"
 	"path/filepath"
 	// "strconv"
 )
 
-var cwd, _ = os.Getwd()
 var TemplateDir = filepath.Join(cwd, "docsapp", "templates")
 
 func LoadTemplates() {

@@ -1,4 +1,4 @@
-[]byte(treq.RequestBody)package main
+package main
 
 import (
 	"encoding/json"
@@ -21,7 +21,7 @@ var docStaticDir = filepath.Join(cwd, "docsapp", "static")
 var assets Assets
 
 func init() {
-	file, err := ioutil.ReadFile("./dist/asset-manifest.json")
+	file, err := ioutil.ReadFile("./dist/static/manifest.json")
 	if err != nil {
 		log.Printf("Not able to find asset file.Error: %v\n", err)
 		os.Exit(1)
@@ -62,7 +62,7 @@ func main() {
 		userId := r.Context().Value("userid").(string)
 		userImage := r.Context().Value("userimage").(string)
 		state := "{\"userId\": \"" + userId + "\", \"userImage\": \"" + userImage + "\"}"
-		renderTemplate(w, "./dist/index", &Page{
+		renderTemplate(w, "./webapp/index", &Page{
 			Title:  "Home",
 			State:  state,
 			Assets: assets,

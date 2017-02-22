@@ -1,6 +1,8 @@
 package model
 
 type Style struct {
+	BrandImageUrl                     string `json:"brandImageUrl" bson:"brandImageUrl"`
+	BrandImageLink                    string `json:"brandImageLink" bson:"brandImageLink"`
 	Column                            int    `json:"column" bson:"column"`
 	Object                            string `json:"object",omitempty" bson:"object,omitempty"`
 	LinkColor                         string `json:"linkColor" bson:"linkColor"`
@@ -21,8 +23,6 @@ type Style struct {
 	CodeFontColor                     string `json:"codeFontColor" bson:"codeFontColor"`
 	CodeHighlightColor                string `json:"codeHighlightColor" bson:"codeHighlightColor"`
 	CodeBackgroundColor               string `json:"codeBackgroundColor" bson:"codeBackgroundColor"`
-	OrgNameFontColor                  string `json:"orgNameFontColor" bson:"orgNameFontColor"`
-	OrgApiStringFontColor             string `json:"orgApiStringFontColor" bson:"orgApiStringFontColor"`
 }
 
 type Api struct {
@@ -47,10 +47,10 @@ type Api struct {
 
 type Revision struct {
 	Id          string   `json:"id,omitempty" bson:"_id,omitempty"`
-	ApiId       string   `json:"apiId" bson:"apiId" validate:"nonzero"`
-	Object      string   `json:"object",omitempty" bson:"object,omitempty"`
-	Number      int64    `json:"number" bson:"number" validate:"nonzero"`
-	GroupList   []string `json:"groupList" bson:"groupList" validate:"nonzero"`
+	ApiId       string   `json:"apiId,omitempty" bson:"apiId,omitempty" validate:"nonzero"`
+	Object      string   `json:"object,omitempty" bson:"object,omitempty"`
+	Number      int64    `json:"number,omitempty" bson:"number,omitempty" validate:"nonzero"`
+	GroupList   []string `json:"groupList,omitempty" bson:"groupList,omitempty" validate:"nonzero"`
 	CustomStyle *Style   `json:"customStyle,omitempty" bson:"customStyle,omitempty" validate:"nonzero"`
 }
 
@@ -91,7 +91,7 @@ func GetDefaultStyle() *Style {
 		CodeFontColor:                     "#B7B8B8",
 		CodeHighlightColor:                "#9DC158",
 		CodeBackgroundColor:               "#272B2D",
-		OrgNameFontColor:                  "#32325D",
-		OrgApiStringFontColor:             "#0199E5",
+		BrandImageUrl:                     "",
+		BrandImageLink:                    "",
 	}
 }

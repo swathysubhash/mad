@@ -13,60 +13,68 @@ import { renderMarkdown, removeEmptyObjects } from '../../helpers/util'
 import Form from '../../components/form'
 import Text from '../../components/text'
 
+const EMPTY_GROUP = {
+	name: '',
+	description: '',
+	separator: false,
+}
+
 class DocumentsGroupCreate extends Component {
 	constructor(props){
 		super(props)
 		this.state = {
 			loading: false,
 			groupId: this.props.params.groupId,
-			mode: this.props.params.groupId == 'create' ? 'Create' : 'Edit'
+			mode: this.props.params.groupId == 'create' ? 'Create' : 'Edit',
+			values: EMPTY_GROUP,
 		}
 
 		this.isLoading = this.isLoading.bind(this)
 		this.onSubmit = this.onSubmit.bind(this)
-		this.cancel = this.cancel.bind(this)
+	}
+
+	toState(data) {
+		return {
+			...EMPTY_GROUP,
+			...data,
+		}
 	}
 
 	fetchGroupDetails(groupId) {
 		const store = this.context.store
-		store.dispatch({ type: 'GET_GROUP_REQUEST'})
 		this.setState({ loading: true })
 		getGroup({ groupId:  groupId })
 		.then(res => {
-			this.setState({ loading: false })
-			store.dispatch({ type: 'GET_GROUP_RESPONSE', data: res.data})
+			this.setState({ loading: false, values: this.toState(res.data) })
+			// store.dispatch({ type: 'GET_GROUP_RESPONSE', data: res.data})
 		}).catch(err => {
 			this.setState({ loading: false })
-			store.dispatch({ type: 'GET_GROUP_FAILURE', data: err.response.data})
+			store.dispatch({ type: 'SET_NOTIFICATION', data: { type: 'danger', message: err.response.data }	})
 		})		
 	}
 
 	componentWillMount() {
 		if (this.props.params.groupId !== 'create') {
 			this.context.store.dispatch({ type: 'GROUP_SELECT', data: this.props.params.groupId})
-			this.setState({ mode: 'Edit' })
-		} else {
-			this.setState({ mode: 'Create' })
 		}
 	}
 
 	componentDidMount() {	
-		if (this.props.params.groupId === 'create') {
-			this.context.store.dispatch({ type: 'GROUP_CREATE'})
-		} else {
+		if (this.props.params.groupId !== 'create') {
 			this.fetchGroupDetails(this.props.params.groupId)	
+		} else {
+			this.context.store.dispatch({ type: 'GROUP_CREATE'})
 		}
 	}
 
 
 	componentWillReceiveProps(nextProps) {
-		if (this.props.group.id === nextProps.group.id) return
+		// if (this.props.group.id === nextProps.group.id) return
 
-		if (nextProps.group.id) { //Group will be empty in create group
-			this.fetchGroupDetails(nextProps.group.id)
-			this.setState({ mode: 'Edit' })
+		if (nextProps.selected) {
+			this.fetchGroupDetails(nextProps.selected)
 		} else {
-			this.setState({ mode: 'Create' })
+			this.setState({ values: EMPTY_GROUP })
 		}
 	}
 
@@ -119,18 +127,15 @@ class DocumentsGroupCreate extends Component {
 		return this.state.loading
 	}
 
-	cancel() {
-		console.log('Click cancel')
-	}
 	render() {
 		return (
 			<div>
 				<div className={"form-header-loader"}>
-					<div className={"form-header"}><span>{this.state.mode} Group</span></div>
+					<div className={"form-header"}><span>{this.props.mode} Group</span></div>
 					<div className={"loader"}>{this.state.loading ? <i class="fa fa-spinner fa-spin" aria-hidden="true"></i> : ""}</div>
 				</div>
 				<div>
-					<Form values={this.props.group} onSubmit={this.onSubmit}>
+					<Form values={this.state.values} onSubmit={this.onSubmit}>
 						<Text name={"name"} placeholder={"Group Name"} label={"What is the name of your group?"}  validate={['required', 'name']}/>
 						<Text name={"description"} placeholder={"Group Description"} label={"Provide some description of your group?"} type={"textarea"}/>
 						<Text name={"separator"} label={"Is this just a separator?"} type={"checkbox"}/>
@@ -143,24 +148,11 @@ class DocumentsGroupCreate extends Component {
 }
 
 function mapStateToProps(state, ownProps) {
-	let selectedGroup = state.entities.ui.apiSummary.selectedGroup
-	if (state.entities.ui.apiSummary.createGroup) {
-		return {
-			group: {
-				name: '',
-				description: '',
-				separator: false
-			},
-			selectedGroup: ''
-		}
-	}
+	let selected = state.entities.ui.apiSummary.selectedGroup
+
 	return {
-		group: selectedGroup && state.entities.groups.byIds[selectedGroup] || {
-			name: '',
-			description: '',
-			separator: false
-		},
-		selectedGroup
+		mode: selected ? 'Edit' : 'Create',
+		selected,
 	}
 }
 

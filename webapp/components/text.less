@@ -15,13 +15,14 @@
 
 .input-row input {
 	border: 1px solid @color-border;
-	padding: 5px;
+	padding: 10px;
 	font-size: 13px;
-	width: 260px;
+	width: 300px;
 	position: relative;
 	color: inherit;
 	&:focus {
-		border-color: @color-primary;
+		//border-color: @color-primary;
+		box-shadow: 0 0 1px 1px @color-primary;
 	}
 } 
 
@@ -44,10 +45,10 @@
 }
 
 .dropdown-root {
-	max-width: 260px;
+	max-width: 300px;
 	font-size: 13px;
 	.dropdown-control {
-		padding: 5px;
+		padding: 10px;
     //background: @input-bg;
     border: 1px solid @color-border;
     //border: none;
@@ -57,7 +58,7 @@
 		//border-radius: 2px;
     border: none;
     box-shadow: 0 0 1px 1px rgba(128, 128, 128, 0.4);
-    margin-top: -29px;
+    margin-top: -39px;
 	}
 }
 

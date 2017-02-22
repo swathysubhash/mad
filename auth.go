@@ -28,8 +28,8 @@ type Credentials struct {
 var cred Credentials
 
 type Assets struct {
-	Js  string `json:"app.js"`
-	Css string `json:"app.css"`
+	Js  string `json:"bundle.js"`
+	Css string `json:"style.css"`
 }
 
 type Page struct {

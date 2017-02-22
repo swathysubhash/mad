@@ -72,7 +72,7 @@ func getApi(w http.ResponseWriter, r *http.Request) error {
 	api, err := store.Api.Get("Myntra", apiId)
 
 	user := r.Context().Value("userid").(string)
-	if CheckAccess(apiId, user, "read") == false {
+	if CheckAccess(apiId, "api", user, "read") == false {
 		w.WriteHeader(http.StatusForbidden)
 		return writeJSON(w, errors.New("Read permission denied. Please contact the owner."))
 	}
@@ -104,7 +104,7 @@ func updateApi(w http.ResponseWriter, r *http.Request) error {
 	apiId := vars["APIID"]
 
 	user := r.Context().Value("userid").(string)
-	if CheckAccess(apiId, user, "write") == false {
+	if CheckAccess(apiId, "api", user, "write") == false {
 		w.WriteHeader(http.StatusForbidden)
 		return writeJSON(w, errors.New("Write permission denied. Please contact the owner."))
 	}
@@ -159,7 +159,7 @@ func publishApi(w http.ResponseWriter, r *http.Request) error {
 	apiId := vars["APIID"]
 
 	user := r.Context().Value("userid").(string)
-	if CheckAccess(apiId, user, "admin") == false {
+	if CheckAccess(apiId, "api", user, "admin") == false {
 		w.WriteHeader(http.StatusForbidden)
 		return writeJSON(w, errors.New("Publish permission denied. You will need admin permission for publishing the document. Please contact the owner."))
 	}
@@ -251,7 +251,7 @@ func summaryApi(w http.ResponseWriter, r *http.Request) error {
 	apiId := vars["APIID"]
 
 	user := r.Context().Value("userid").(string)
-	if CheckAccess(apiId, user, "read") == false {
+	if CheckAccess(apiId, "api", user, "read") == false {
 		w.WriteHeader(http.StatusForbidden)
 		return writeJSON(w, errors.New("Read permission denied. Please contact the owner."))
 	}
@@ -284,6 +284,10 @@ func GetApiById(apiId string) (*model.Api, error) {
 		return nil, errors.New("Api not found with api id " + apiId)
 	}
 	return api, nil
+}
+
+func GetRevisionByApiId(apiId string, revisionNo int64) (*model.Revision, error) {
+	return store.Revision.Get("Myntra", apiId+"_"+strconv.FormatInt(revisionNo, 10))
 }
 
 func GetApiSummary(api *model.Api) (*model.ApiSummary, error) {

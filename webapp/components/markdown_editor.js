@@ -71,4 +71,4 @@ class MarkdownEditor extends Component {
 	}
 }
 
-module.exports = MarkdownEditor
+export default MarkdownEditor

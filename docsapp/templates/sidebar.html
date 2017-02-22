@@ -1,5 +1,12 @@
 {{define "Sidebar"}}
 <div id="sidebar">
+	{{ $style := $.Revision.CustomStyle }}
+	<div class="header-3-col">
+		<a href="{{$style.BrandImageLink}}" style="padding: 20px; display: block; color: inherit;">
+			<img class="logo" width="50px" src="{{$style.BrandImageUrl}}" />
+			<div style="color: inherit; font-weight: 600">Api Reference</div>
+		</a>
+	</div>
   <nav role="navigation" class="sidebar-nav">
     <ul>
     </ul>
