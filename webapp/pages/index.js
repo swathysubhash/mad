@@ -1,6 +1,4 @@
 import UserProfile from './user_profile/index'
-import ApiList from './api_list/index'
-import ApiForm from './api_form/index'
 
 import Documents from './document/index'
 import DocumentsEditor from './document/editor'
@@ -13,10 +11,13 @@ import DocumentsGroupCreate from './document/group_create'
 import DocumentsEndpointCreate from './document/endpoint_create'
 import LoginRedirect from './login_redirect'
 
+import DocumentList from './documents/index'
+import CreateDocument from './documents/create_document'
+import AllList from './documents/all_list'
+import ByMeList from './documents/byme_list'
+
 export default {
 	UserProfile,
-	ApiList,
-	ApiForm,
 	Documents,
 	DocumentsEditor,
 	LoginRedirect,
@@ -26,5 +27,10 @@ export default {
 	DocumentsSettings,
 	DocumentsStyle,
 	DocumentsGroupCreate,
-	DocumentsEndpointCreate
+	DocumentsEndpointCreate, 
+
+	DocumentList,
+	CreateDocument,
+	AllList,
+	ByMeList,
 }

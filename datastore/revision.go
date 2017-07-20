@@ -2,9 +2,9 @@ package datastore
 
 import (
 	"fmt"
+	"github.com/swathysubhash/mad/model"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"mad/model"
 )
 
 type revisionStore struct {
@@ -38,8 +38,8 @@ func (r *revisionStore) Create(orgName string, revision *model.Revision) error {
 }
 
 func (r *revisionStore) Upsert(orgName string, revision *model.Revision) error {
-	fmt.Println("####", revision)
-	err := r.DB.C(orgName+"/REVISIONLIST").Update(bson.M{"_id": revision.Id}, bson.M{"$set": revision})
+	fmt.Println("test")
+	_, err := r.DB.C(orgName+"/REVISIONLIST").Upsert(bson.M{"_id": revision.Id}, bson.M{"$set": revision})
 
 	if err != nil {
 		return err
@@ -58,4 +58,16 @@ func (r *revisionStore) Get(orgName, revisionId string) (*model.Revision, error)
 	}
 
 	return revision, nil
+}
+
+func (r *revisionStore) RemoveGroup(orgName, revisionId, groupId string) error {
+	c := r.DB.C(orgName + "/REVISIONLIST")
+
+	err := c.Update(bson.M{"_id": revisionId}, bson.M{"$pull": bson.M{"groupList": groupId}})
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -65,7 +65,9 @@
     "rollup-plugin-node-resolve": "^2.0.0",
     "rollup-plugin-replace": "^1.1.1",
     "rollup-plugin-uglify": "^1.0.1",
+    "rollup-stream": "^1.19.0",
     "string-replace-webpack-plugin": "0.0.5",
+    "uglify-js": "github:mishoo/UglifyJS2#harmony",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
     "webpack": "^1.12.14",
@@ -74,10 +76,11 @@
   },
   "scripts": {
     "start": "NODE_ENV=development node ./webpack.devserver.js",
-    "build": "NODE_ENV=production webpack",
+    "build": "NODE_ENV=production ./node_modules/.bin/gulp release",
     "embed": "go-bindata-assetfs -o dist/dist_gen.go -ignore 'map|go' -pkg dist -nocompress=true dist/...",
     "lint": "eslint src/",
-    "watch": "webpack -w"
+    "watch": "./node_modules/.bin/gulp",
+    "prepublish": "npm run build"
   },
   "repository": {
     "type": "git",

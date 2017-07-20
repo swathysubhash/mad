@@ -5,6 +5,7 @@ import { Link } from 'inferno-router'
 import { createApi } from '../../actions/api'
 import FormInput from '../../components/form_input'
 import FormButton from '../../components/form_button'
+import { renderMarkdown } from '../../helpers/util'
 
 import Form from '../../components/form'
 import Text from '../../components/text'
@@ -29,7 +30,10 @@ class ApiForm extends Component {
 	}
 
 	onSubmit(values) {
-		console.log(values)
+		values = {
+			...values,
+			...{ descriptionHTML: renderMarkdown(values.description) }
+		}
 
 		// this.context.router.push('/editor')
 		event.preventDefault()
@@ -91,7 +95,7 @@ class ApiForm extends Component {
 						<div>
 							<Form values={this.state.values} onSubmit={this.onSubmit}>
 								<Text name={"name"} placeholder={"Api Name"} label={"What is the name of your Api?"}  validate={['required', 'name']}/>
-								<Text name={"description"} placeholder={"Group Description"} label={"Provide some description of your api?"} type={"textarea"}/>
+								<Text name={"description"} placeholder={"Api Description"} label={"Provide some description of your api?"} type={"textarea"}/>
 								<Text name={"version"} placeholder={"Api Version"} label={"What is the version of your Api?"}  validate={['required', 'version']}/>
 								<Text name={"protocol"} placeholder={"Api Protocol"} label={"What is the protocol of your Api?"}  validate={['required']}/>
 								<Text name={"host"} placeholder={"api.myntra.com"} label={"What is the hostname of your Api?"}  validate={['required']}/>

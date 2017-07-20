@@ -21,7 +21,10 @@ class DocumentsAccess extends Component {
 		getApiAccess({ documentId })
 		.then(res => {
 			store.dispatch({ type: 'GET_ACCESS_RESPONSE', data: { ...res.data, ...{ id: documentId }}})
-		}).catch(err => store.dispatch({ type: 'GET_ACCESS_FAILURE', data: err.response.data}))		
+		}).catch(err => {
+			store.dispatch({ type: 'GET_ACCESS_FAILURE', data: err.response.data})
+			store.dispatch({ type: 'SET_NOTIFICATION', data: { type: 'danger', message: err.response.data && err.response.data.message }	})
+		})		
 	}
 
 	updateAnonymous(values) {
@@ -29,8 +32,12 @@ class DocumentsAccess extends Component {
 		store.dispatch({ type: 'UPDATE_API_REQUEST'})
 		updateApi({ apiId: this.props.apiId, anonymousAccess: values.access.value })
 		.then(res => {
+			store.dispatch({ type: 'SET_NOTIFICATION', data: { type: 'success', message: 'Updated successfully.' }	})
 			store.dispatch({ type: 'UPDATE_API_RESPONSE', data: res.data})
-		}).catch(err => store.dispatch({ type: 'UPDATE_API_FAILURE', data: err.response.data}))		
+		}).catch(err => {
+			store.dispatch({ type: 'UPDATE_API_FAILURE', data: err.response.data})
+			store.dispatch({ type: 'SET_NOTIFICATION', data: { type: 'danger', message: err.response.data && err.response.data.message }	})
+		})		
 	}
 
 	updateUser(old, newUser) {
@@ -45,14 +52,22 @@ class DocumentsAccess extends Component {
 			store.dispatch({ type: 'UPDATE_ACCESS_REQUEST'})
 			updateApiAccess(newUser)
 			.then(res => {
+				store.dispatch({ type: 'SET_NOTIFICATION', data: { type: 'success', message: 'Updated successfully.' }	})
 				store.dispatch({ type: 'UPDATE_ACCESS_RESPONSE', data: res.data})
-			}).catch(err => store.dispatch({ type: 'UPDATE_ACCESS_FAILURE', data: err.response.data}))			
+			}).catch(err => {
+				store.dispatch({ type: 'UPDATE_ACCESS_FAILURE', data: err.response.data})
+				store.dispatch({ type: 'SET_NOTIFICATION', data: { type: 'danger', message: err.response.data && err.response.data.message }	})
+			})			
 		} else {
 			store.dispatch({ type: 'CREATE_ACCESS_REQUEST'})
 			createApiAccess(newUser)
 			.then(res => {
+				store.dispatch({ type: 'SET_NOTIFICATION', data: { type: 'success', message: 'Created successfully.' }	})
 				store.dispatch({ type: 'CREATE_ACCESS_RESPONSE', data: res.data})
-			}).catch(err => store.dispatch({ type: 'CREATE_ACCESS_FAILURE', data: err.response.data}))			
+			}).catch(err => {
+				store.dispatch({ type: 'CREATE_ACCESS_FAILURE', data: err.response.data})
+				store.dispatch({ type: 'SET_NOTIFICATION', data: { type: 'danger', message: err.response.data && err.response.data.message }	})
+			})			
 		}
 	}
 
@@ -75,7 +90,6 @@ class DocumentsAccess extends Component {
 				<div>
 					<div className={"sub-header"}>Anonymous Access</div>
 					<div className={"anon-form"}>
-						<div>Only you have access now (Private).</div>
 						<Form values={this.props.anonymousAccess} onSubmit={this.updateAnonymous}>
 							<Text 
 							name={"access"} type={"dropdown"} label={"What anonymous users can do?"}

@@ -3,14 +3,13 @@ package api
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/extemporalgenome/slug"
 	"github.com/gorilla/mux"
 	"github.com/imdario/mergo"
+	"github.com/swathysubhash/mad/model"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"gopkg.in/validator.v2"
-	"mad/model"
 	"net/http"
 	"strconv"
 	"time"
@@ -22,21 +21,21 @@ func createApi(w http.ResponseWriter, r *http.Request) error {
 	user := r.Context().Value("userid").(string)
 
 	if len(user) == 0 {
-		return writeError(w, "C10001", &[]string{})
+		return writeError(w, http.StatusBadRequest, "User not logged in.")
 	}
 
 	if err != nil {
-		return writeError(w, "C10001", &[]string{})
+		return writeError(w, http.StatusBadRequest, "Error while parsing request body.")
 	}
 
 	if err := validator.Validate(api); err != nil {
 		errs, ok := err.(validator.ErrorMap)
 		if ok {
 			for f, _ := range errs {
-				return writeError(w, "C10002", &[]string{f})
+				return writeError(w, http.StatusBadRequest, "Error while parsing request body. Error with field - "+f)
 			}
 		} else {
-			return writeError(w, "C10001", &[]string{})
+			return writeError(w, http.StatusBadRequest, "Error while parsing request body.")
 		}
 	}
 
@@ -57,10 +56,10 @@ func createApi(w http.ResponseWriter, r *http.Request) error {
 	err = store.Api.Create("Myntra", &api)
 
 	if err != nil {
-		fmt.Println("err", err)
 		if mgo.IsDup(err) {
-			return writeError(w, "A90001", &[]string{api.Slug})
+			return writeError(w, http.StatusBadRequest, "Api with the same name exits.")
 		}
+		return writeError(w, http.StatusInternalServerError, "Error occured while creating api.")
 	}
 
 	return writeJSON(w, api)
@@ -73,12 +72,11 @@ func getApi(w http.ResponseWriter, r *http.Request) error {
 
 	user := r.Context().Value("userid").(string)
 	if CheckAccess(apiId, "api", user, "read") == false {
-		w.WriteHeader(http.StatusForbidden)
-		return writeJSON(w, errors.New("Read permission denied. Please contact the owner."))
+		return writeError(w, http.StatusForbidden, "Read permission denied. Please contact the owner.")
 	}
 
 	if err != nil {
-		return writeError(w, "A90002", &[]string{apiId})
+		return writeError(w, http.StatusBadRequest, "Not able to find api with given id.")
 	}
 
 	return writeJSON(w, api)
@@ -86,17 +84,70 @@ func getApi(w http.ResponseWriter, r *http.Request) error {
 }
 
 func getAllApi(w http.ResponseWriter, r *http.Request) error {
-	apiList, err := store.Api.GetAll("Myntra")
-	fmt.Println("req.Context().Valu", r.Context().Value("userid"))
+	q := r.URL.Query()
+	gt := ""
+	lt := ""
+	limit := 8
+	next := ""
+	previous := ""
+	gts, ok := q["gt"]
+	if ok {
+		gt = gts[0]
+	}
+	lts, ok := q["lt"]
+	if ok {
+		lt = lts[0]
+	}
+	limits, ok := q["limit"]
+	if ok {
+		limit, _ = strconv.Atoi(limits[0])
+	}
+	vars := mux.Vars(r)
+	createdBy := vars["CREATEDBY"]
+
+	user := r.Context().Value("userid").(string)
+	if len(createdBy) > 0 && user != createdBy {
+		return writeError(w, http.StatusForbidden, "Permission denied.")
+	}
+
+	apiList, err := store.Api.GetAll("Myntra", gt, lt, limit+1, createdBy)
+
+	baseUrl := "/madapi/apis"
+	if len(createdBy) > 0 {
+		baseUrl = baseUrl + "/createdby/" + createdBy
+	}
+
+	if len(apiList) == limit+1 {
+		apiList = apiList[:len(apiList)-1]
+		next = baseUrl + "?lt=" + apiList[limit-1].Id + "&limit=" + strconv.Itoa(limit)
+		if len(lt) > 0 || len(gt) > 0 {
+			previous = baseUrl + "?gt=" + apiList[0].Id + "&limit=" + strconv.Itoa(limit)
+		}
+	} else if len(lt) > 0 {
+		next = ""
+		previous = baseUrl + "?gt=" + apiList[0].Id + "&limit=" + strconv.Itoa(limit)
+	} else if len(gt) > 0 {
+		next = baseUrl + "?lt=" + apiList[limit-1].Id + "&limit=" + strconv.Itoa(limit)
+		previous = ""
+	}
+
 	if err != nil {
-		return writeError(w, "A90003", &[]string{})
+		return writeError(w, http.StatusInternalServerError, "Error while fetching list of apis.")
 	}
 
 	return writeJSON(w, &model.ApiListResponse{
 		Count:  len(apiList),
 		Object: "list",
 		Data:   apiList,
+		Pagination: &model.Pagination{
+			Next:     next,
+			Previous: previous,
+		},
 	})
+}
+
+func getAllApiByMe(w http.ResponseWriter, r *http.Request) error {
+	return getAllApi(w, r)
 }
 
 func updateApi(w http.ResponseWriter, r *http.Request) error {
@@ -105,41 +156,43 @@ func updateApi(w http.ResponseWriter, r *http.Request) error {
 
 	user := r.Context().Value("userid").(string)
 	if CheckAccess(apiId, "api", user, "write") == false {
-		w.WriteHeader(http.StatusForbidden)
-		return writeJSON(w, errors.New("Write permission denied. Please contact the owner."))
+		return writeError(w, http.StatusForbidden, "Write permission denied. Please contact the owner.")
 	}
 
 	var api model.Api
 	err := json.NewDecoder(r.Body).Decode(&api)
 
 	if err != nil {
-		return writeError(w, "C10001", &[]string{})
+		return writeError(w, http.StatusBadRequest, "Error while decoding request body.")
 	}
 
 	oldApi, err := store.Api.Get("Myntra", apiId)
 
 	if err != nil {
-		return writeError(w, "A90004", &[]string{apiId})
+		return writeError(w, http.StatusInternalServerError, "Server error occured. Please try again.")
 	}
 
 	// No manual update for following fields
 	api.CurrentRevision = oldApi.CurrentRevision
 	api.PublishedRevision = oldApi.PublishedRevision
+
 	if len(api.AnonymousAccess) > 0 {
 		api.AnonymousAccessSlice, _ = convertPermission(api.AnonymousAccess)
 	}
 
 	mergo.Merge(&api, oldApi)
 	api.Slug = slug.Slug(api.Name + "-" + api.Version)
+	api.UpdatedBy = user
+	api.UpdatedAt = time.Now().Unix()
 
 	if err := validator.Validate(api); err != nil {
 		errs, ok := err.(validator.ErrorMap)
 		if ok {
 			for f, _ := range errs {
-				return writeError(w, "C10002", &[]string{f})
+				return writeError(w, http.StatusBadRequest, "Error while decoding request body. Issue with field - "+f)
 			}
 		} else {
-			return writeError(w, "C10001", &[]string{})
+			return writeError(w, http.StatusBadRequest, "Error while decoding request body")
 		}
 	}
 
@@ -147,8 +200,9 @@ func updateApi(w http.ResponseWriter, r *http.Request) error {
 
 	if err != nil {
 		if mgo.IsDup(err) {
-			return writeError(w, "C10003", &[]string{})
+			return writeError(w, http.StatusBadRequest, "Bad request")
 		}
+		return writeError(w, http.StatusInternalServerError, "Error occured while updating api")
 	}
 
 	return writeJSON(w, api)
@@ -160,8 +214,7 @@ func publishApi(w http.ResponseWriter, r *http.Request) error {
 
 	user := r.Context().Value("userid").(string)
 	if CheckAccess(apiId, "api", user, "admin") == false {
-		w.WriteHeader(http.StatusForbidden)
-		return writeJSON(w, errors.New("Publish permission denied. You will need admin permission for publishing the document. Please contact the owner."))
+		return writeError(w, http.StatusForbidden, "Publish permission denied. You will need admin permission for publishing the document. Please contact the owner.")
 	}
 
 	api, err := store.Api.Get("Myntra", apiId)
@@ -174,15 +227,14 @@ func publishApi(w http.ResponseWriter, r *http.Request) error {
 
 	newGroups := make([]model.Group, 0, 0)
 	newEndpoints := make([]model.Endpoint, 0, 0)
-
 	groups, err := store.Group.GetByApi("Myntra", apiId, currentRevision)
 	if err != nil {
-		return writeError(w, "C10005", &[]string{})
+		return writeError(w, http.StatusBadRequest, "Error while fetching groups of the current revision. Please try again.")
 	}
 
 	endpoints, err := store.Endpoint.GetByApi("Myntra", apiId, currentRevision)
 	if err != nil {
-		return writeError(w, "C10005", &[]string{})
+		return writeError(w, http.StatusBadRequest, "Error while fetching endpoints of the current revision. Please try again.")
 	}
 
 	for _, group := range groups {
@@ -205,7 +257,7 @@ func publishApi(w http.ResponseWriter, r *http.Request) error {
 
 	revision, err := store.Revision.Get("Myntra", apiId+"_"+s_currentRevision)
 	if err != nil {
-		return writeError(w, "C10005", &[]string{})
+		return writeError(w, http.StatusInternalServerError, "Error while fetching revision data of the current revision. Please try again.")
 	}
 
 	gIds := make([]string, 0, 0)
@@ -218,17 +270,16 @@ func publishApi(w http.ResponseWriter, r *http.Request) error {
 
 	err = store.Revision.Upsert("Myntra", revision)
 	if err != nil {
-		return writeError(w, "C10005", &[]string{})
+		return writeError(w, http.StatusInternalServerError, "Error while updating revision data for new revision. Please try again.")
 	}
 
 	err = store.Group.UpsertMany("Myntra", newGroups)
 	if err != nil {
-		return writeError(w, "C10005", &[]string{})
+		return writeError(w, http.StatusInternalServerError, "Error while updating group data for new revision. Please try again.")
 	}
-
 	err = store.Endpoint.UpsertMany("Myntra", newEndpoints)
 	if err != nil {
-		return writeError(w, "C10005", &[]string{})
+		return writeError(w, http.StatusInternalServerError, "Error while updating endpoint data for new revision. Please try again.")
 	}
 
 	api.PublishedRevision = currentRevision
@@ -236,7 +287,7 @@ func publishApi(w http.ResponseWriter, r *http.Request) error {
 
 	err = store.Api.Update("Myntra", api.Id, api)
 	if err != nil {
-		return writeError(w, "C10005", &[]string{})
+		return writeError(w, http.StatusInternalServerError, "Error while updating api data for new revision. Please try again.")
 	}
 
 	return writeJSON(w, &model.SuccessResponse{
@@ -246,22 +297,42 @@ func publishApi(w http.ResponseWriter, r *http.Request) error {
 
 }
 
+func deleteApi(w http.ResponseWriter, r *http.Request) error {
+	vars := mux.Vars(r)
+	apiId := vars["APIID"]
+
+	user := r.Context().Value("userid").(string)
+	if CheckAccess(apiId, "api", user, "admin") == false {
+		return writeError(w, http.StatusForbidden, "Delete permission denied. Please contact the owner.")
+	}
+
+	err := store.Api.Remove("Myntra", apiId)
+
+	if err != nil {
+		return writeError(w, http.StatusInternalServerError, "Error while deleting api data. Please try again.")
+	}
+
+	return writeJSON(w, &model.SuccessResponse{
+		Object:  "success",
+		Message: "Api deleted successfully",
+	})
+}
+
 func summaryApi(w http.ResponseWriter, r *http.Request) error {
 	vars := mux.Vars(r)
 	apiId := vars["APIID"]
 
 	user := r.Context().Value("userid").(string)
 	if CheckAccess(apiId, "api", user, "read") == false {
-		w.WriteHeader(http.StatusForbidden)
-		return writeJSON(w, errors.New("Read permission denied. Please contact the owner."))
+		return writeError(w, http.StatusForbidden, "Read permission denied. Please contact the owner.")
 	}
 
 	api, err := store.Api.Get("Myntra", apiId)
 	if err != nil {
-		return writeError(w, "A90002", &[]string{apiId})
+		return writeError(w, http.StatusBadRequest, "Error while fetching api with given id.")
 	}
 
-	apiSummary, err := GetApiSummary(api)
+	apiSummary, err := GetApiSummary(api, api.CurrentRevision)
 
 	if err != nil {
 		return writeJSON(w, err)
@@ -290,26 +361,22 @@ func GetRevisionByApiId(apiId string, revisionNo int64) (*model.Revision, error)
 	return store.Revision.Get("Myntra", apiId+"_"+strconv.FormatInt(revisionNo, 10))
 }
 
-func GetApiSummary(api *model.Api) (*model.ApiSummary, error) {
+func GetApiSummary(api *model.Api, selRevision int64) (*model.ApiSummary, error) {
 	apiId := api.Id
-	currentRevision := api.CurrentRevision
-	s_currentRevision := strconv.FormatInt(currentRevision, 10)
+	s_selRevision := strconv.FormatInt(selRevision, 10)
 
-	revision, err := store.Revision.Get("Myntra", apiId+"_"+s_currentRevision)
+	revision, err := store.Revision.Get("Myntra", apiId+"_"+s_selRevision)
 	if err != nil {
 		return nil, errors.New("Revision not found with API id" + apiId)
-		// return writeError(w, "R20001", &[]string{apiId})
 	}
-	groups, err := store.Group.GetByApi("Myntra", apiId, currentRevision)
+	groups, err := store.Group.GetByApi("Myntra", apiId, selRevision)
 	if err != nil {
 		return nil, errors.New("Group not found with API id" + apiId)
-		// return writeError(w, "G80005", &[]string{apiId})
 	}
 
-	endpoints, err := store.Endpoint.GetByApi("Myntra", apiId, currentRevision)
+	endpoints, err := store.Endpoint.GetByApi("Myntra", apiId, selRevision)
 	if err != nil {
 		return nil, errors.New("Endpoints not found with API id" + apiId)
-		// return writeError(w, "E30001", &[]string{apiId})
 	}
 
 	groupBriefs := make([]model.GroupBrief, 0, 0)
@@ -341,7 +408,7 @@ func GetApiSummary(api *model.Api) (*model.ApiSummary, error) {
 	return &model.ApiSummary{
 		ApiId:           apiId,
 		Object:          "summary",
-		CurrentRevision: currentRevision,
+		CurrentRevision: api.CurrentRevision,
 		GroupIds:        revision.GroupList,
 		Groups:          groupBriefs,
 		Endpoints:       endpointBriefs,

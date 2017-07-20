@@ -50,7 +50,7 @@ class ApiSummary extends Component {
 	}
 
 	componentWillReceiveProps(nextProps) {
-		if(nextProps.apiSummary.stale === true) {
+		if(nextProps.apiSummary.stale === true && (this.props.apiSummary.stale !== nextProps.apiSummary.stale)) {
 			this.fetchApiSummary(nextProps.documentId)
 		}
 	}

@@ -426,8 +426,42 @@ function getHeaders(tabSection) {
 
 }
 
+function setWaypoints() {
+  var rows = document.querySelectorAll('#content section.row')
+  for (var t = 0; t < rows.length; t++) {
+    new Waypoint({
+      continuous: false,
+      context: document.getElementById('content'),
+      element: rows[t],
+      handler: waypointHandler,
+    })
+  }
+}
+
+function waitForImages(done) {
+  var allImages = document.querySelectorAll("#content img"),
+    totalImg = allImages.length;
+
+  if (totalImg === 0) {
+    done()
+    return
+  }
+
+  var waitImgDone = function(done) {
+      totalImg--
+      if (!totalImg) done()
+  }
+
+  for (var num = 0; num < totalImg; num++) {
+    allImages[num].onload = waitImgDone(done)
+    allImages[num].onerror = waitImgDone(done)
+  }  
+}
+
+
 window.onload = function () {
   var toBeFetched = document.querySelectorAll(".row.not-fetched")
+  var fetchedCount = 0;
   for (var t = 0; t < toBeFetched.length; t++) {
     if (toBeFetched[t].id) {
       toBeFetched[t].fetchCallback = (function(el) {
@@ -441,6 +475,10 @@ window.onload = function () {
             var codes = el.querySelectorAll("code");
             for (var n = 0; n < codes.length; n++)
                 Prism.highlightElement(codes[n])
+          }
+          fetchedCount++
+          if (fetchedCount === toBeFetched.length) {
+            waitForImages(setWaypoints)
           }
         }
       })(toBeFetched[t])
@@ -470,16 +508,6 @@ window.onload = function () {
   // window.addEventListener('hashchange', function(event) {
   //   event.preventDefault();
   // }, false)
-
-  var rows = document.querySelectorAll('#content section.row')
-  for (var t = 0; t < rows.length; t++) {
-    new Waypoint({
-      continuous: false,
-      context: document.getElementById('content'),
-      element: rows[t],
-      handler: waypointHandler
-    })
-  }
 
   tryOut.addEventListener('click', function(event) {
     event.stopPropagation()
@@ -561,6 +589,22 @@ window.onload = function () {
       target.parentNode.classList.add('show-child')
     } else if (clist.contains('hide-child-attr')) {
       target.parentNode.classList.remove('show-child')
+    } else if (clist.contains('tab-header-item')) {
+      var tabs = _.closer(target, 'tabs')
+      var activeTabHeader = tabs.querySelector('.active.tab-header-item')
+      var activeTabItem = tabs.querySelector('.active.tab-item')
+      if (target !== activeTabHeader) {
+        activeTabHeader.classList.remove('active')
+        activeTabItem.classList.remove('active')
+        target.classList.add('active')
+        tabs.querySelector('.tab-item.' + target.getAttribute('data-tab-item')).classList.add('active')
+      } 
     }
   })
+
+  if (window.location.hash === '') {
+    sidebar.querySelector('.group').classList.add('expand')
+  } else {
+    window.location.hash = window.location.hash
+  }
 }

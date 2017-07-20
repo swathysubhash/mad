@@ -1,13 +1,17 @@
 import Page from './components/layout/page';
 import Pages from './pages/index';
 import Inferno from 'inferno'
-import { Router, Route, IndexRoute } from 'inferno-router'
+import { Router, Route, IndexRoute, Redirect } from 'inferno-router'
 
 export const routes = (
 	<Route component={Page}>
-		<IndexRoute component={Pages.ApiList}/>
-		<Route path="/documentlist" component={Pages.ApiList} />
-		<Route path="/documentlist/create" component={Pages.ApiForm} />
+		<IndexRoute component={Pages.DocumentList}/>
+		<Route path="/documentlist" component={Pages.DocumentList} >
+			<IndexRoute component={Pages.AllList}/>
+			<Route path="/list" component={Pages.AllList}/>
+			<Route path="/create" component={Pages.CreateDocument} />
+			<Route path="/byme" component={Pages.ByMeList} />
+		</Route>
 		<Route path="/account" component={Pages.UserProfile} />
 		<Route path="/documents/:documentId" component={Pages.Documents} >
 			<Route title="Editor" path="/editor" component={Pages.DocumentsEditor}>

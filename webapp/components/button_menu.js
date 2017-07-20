@@ -32,10 +32,13 @@ class ButtonMenu extends Component {
 	render() {
 		return (
 				<div className="button-menu" ref={(menu) => { this.buttonMenu = menu; }}>
-					<button onClick={this.onClick}>{this.props.text}</button>
+					<span onClick={this.onClick} class="fa fa-ellipsis-v" aria-hidden="true"></span>
 					{this.state.itemsVisible ? 
 						<div className="button-menu-items">
-							{this.props.children.map(child => Inferno.cloneVNode(child, { closeMenu: this.closeMenu }))}
+							{this.props.children.map 
+								? this.props.children.map(child => Inferno.cloneVNode(child, { closeMenu: this.closeMenu }))
+								: Inferno.cloneVNode(this.props.children, { closeMenu: this.closeMenu })
+							}
 						</div> :
 					''
 					}

@@ -4,12 +4,24 @@ const get = axios.get
 const post = axios.post
 const put = axios.put
 
-export function getApiList() {
+export function getApiList(url) {
+	if (url) {
+		return get(url)
+	}
 	return get('/madapi/apis')
 }
 
 export function getApi(data) {
 	return get('/madapi/apis/' + data.apiId)
+}
+
+export function getApiListByMe(url) {
+	if (url) {
+		return get(url)
+	}
+	if (window.STATE_FROM_SERVER && window.STATE_FROM_SERVER.userId) {
+		return get('/madapi/apis/createdby/' + window.STATE_FROM_SERVER.userId)
+	}
 }
 
 export function getApiSummary(data) {
@@ -48,5 +60,13 @@ export function createApi(data) {
 
 export function updateApi(data) {
 	return post('/madapi/apis/' + data.apiId, data)
+}
+
+export function publishApi(data) {
+	return post('/madapi/apis/' + data.apiId + '/publish', data)
+}
+
+export function deleteApi(data) {
+	return post('/madapi/apis/' + data.id + '/delete', data)
 }
 

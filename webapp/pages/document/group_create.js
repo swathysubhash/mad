@@ -72,8 +72,9 @@ class DocumentsGroupCreate extends Component {
 		// if (this.props.group.id === nextProps.group.id) return
 
 		if (nextProps.selected) {
-			this.fetchGroupDetails(nextProps.selected)
-		} else {
+			if (nextProps.selected !== this.props.selected)
+				this.fetchGroupDetails(nextProps.selected)
+		} else if (nextProps.mode !== this.props.mode && nextProps.mode === 'Create') {
 			this.setState({ values: EMPTY_GROUP })
 		}
 	}
@@ -104,7 +105,7 @@ class DocumentsGroupCreate extends Component {
 			})
 			.catch(err => {
 				this.setState({ loading: false })
-				store.dispatch({ type: 'SET_NOTIFICATION', data: { type: 'danger', message: err.response.data }	})
+				store.dispatch({ type: 'SET_NOTIFICATION', data: { type: 'danger', message: err.response.data && err.response.data.message }	})
 			})
 		} else {
 			values.groupId = this.props.params.groupId
@@ -117,7 +118,7 @@ class DocumentsGroupCreate extends Component {
 			})
 			.catch(err => {
 				this.setState({ loading: false })
-				store.dispatch({ type: 'SET_NOTIFICATION', data: { type: 'danger', message: err.response.data }	})
+				store.dispatch({ type: 'SET_NOTIFICATION', data: { type: 'danger', message: err.response.data && err.response.data.message }	})
 			})
 		}
 

@@ -15,3 +15,7 @@ export function getGroup(data) {
 export function updateGroup(data) {
 	return post('/madapi/groups/' + data.groupId, data)
 }
+
+export function deleteGroup(data) {
+	return post('/madapi/groups/' + data.id + '/delete', data)
+}

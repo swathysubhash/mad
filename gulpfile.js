@@ -10,6 +10,7 @@ var browserify = require('browserify');
 var source = require('vinyl-source-stream');
 var buffer = require('vinyl-buffer');
 var rollup = require('rollup');
+var rollup = require('rollup-stream');
 var rollupUglify = require('rollup-plugin-uglify');
 var gulpif = require('gulp-if');
 var hash = require('rollup-plugin-hash');
@@ -17,7 +18,6 @@ var rollupLess = require('rollup-plugin-less');
 var rimraf = require('gulp-rimraf');
 var rev = require('gulp-rev');
 var assetManifest = require('gulp-asset-manifest');
-var debug = require('gulp-debug');
 var copy = require('gulp-copy');
 var cjs = require('rollup-plugin-commonjs');
 var globals = require('rollup-plugin-node-globals');
@@ -33,10 +33,12 @@ gulp.task('setIsRelease', function() {
 });
 
 
-gulp.task('docsapp-rollup', [ 'docsapp-clean' ], function(done) {
-  rollup.rollup({
+gulp.task('docsapp-rollup', [ 'docsapp-clean' ], function() {
+  return rollup({
     entry: './docsapp/static/js/main.js',
     context: 'window',
+    sourceMap: true,
+    format: 'iife',
     plugins: [
       gulpif(isRelease, rollupUglify()),
       rollupLess({
@@ -44,13 +46,19 @@ gulp.task('docsapp-rollup', [ 'docsapp-clean' ], function(done) {
       })
     ]
   })
-  .then( function ( bundle ) {
-    bundle.write({
-      format: 'iife',
-      dest: DOCSAPP_BUILD_PATH + 'bundle.js'
-    });
-    done();
-  });
+  .pipe(source('bundle.js', './docsapp/static/js'))
+  .pipe(buffer())
+  .pipe(sourcemaps.init({loadMaps: true}))
+  .pipe(sourcemaps.write('.'))
+  // .pipe(source('bundle.js'))
+  .pipe(gulp.dest(DOCSAPP_BUILD_PATH));
+  // .then( function ( bundle ) {
+  //   bundle.write({
+  //     format: 'iife',
+  //     dest: DOCSAPP_BUILD_PATH + 'bundle.js'
+  //   });
+  //   done();
+  // });
 });
 
 
@@ -84,10 +92,12 @@ gulp.task('docsapp-release', [ 'setIsRelease', 'docsapp-build' ]);
 
 
 
-gulp.task('madapp-rollup', [ 'madapp-clean' ], function(done) {
-  rollup.rollup({
+gulp.task('madapp-rollup', [ 'madapp-clean' ], function() {
+  return  rollup({
     entry: './webapp/index.js',
     context: 'window',
+    sourceMap: true,
+    format: 'iife',
     plugins: [
       babel({
         babelrc: false,
@@ -98,12 +108,13 @@ gulp.task('madapp-rollup', [ 'madapp-clean' ], function(done) {
       cjs({
         include: [ 'node_modules/**' ],
         namedExports: {
+          'node_modules/redux/es/index.js': ['default'],
           'node_modules/inferno-redux/inferno-redux.js': [ 'Provider', 'connect' ],
-          'node_modules/inferno-router/inferno-router.js': [ 'Link', 'Router', 'Route', 'IndexRoute' ],
+          'node_modules/inferno-router/inferno-router.js': [ 'Link', 'Router', 'Route', 'IndexRoute', 'Redirect' ],
         }
       }),
       globals(),
-      replace({ 'process.env.NODE_ENV': JSON.stringify('development') }),
+      replace({ 'process.env.NODE_ENV': JSON.stringify('production') }),
       resolve({
         browser: true,
         main: true
@@ -114,13 +125,19 @@ gulp.task('madapp-rollup', [ 'madapp-clean' ], function(done) {
       })
     ]
   })
-  .then( function ( bundle ) {
-    bundle.write({
-      format: 'iife',
-      dest: './dist/static/bundle.js'
-    });
-    done();
-  });
+  .pipe(source('bundle.js', './webapp'))
+  .pipe(buffer())
+  .pipe(sourcemaps.init({loadMaps: true}))
+  .pipe(sourcemaps.write('.'))
+  // .pipe(source('bundle.js'))
+  .pipe(gulp.dest('./dist/static/'));
+  // .then( function ( bundle ) {
+  //   bundle.write({
+  //     format: 'iife',
+  //     dest: './dist/static/bundle.js'
+  //   });
+  //   done();
+  // });
 });
 
 gulp.task('madapp-assets', ['madapp-clean', 'madapp-rollup'], function() {

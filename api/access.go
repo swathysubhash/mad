@@ -5,15 +5,16 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gorilla/mux"
+	"github.com/swathysubhash/mad/model"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/validator.v2"
-	"mad/model"
 	"net/http"
 	"time"
 )
 
 func convertPermission(permission string) ([]int, error) {
 	permissionMap := make(map[string][]int)
+	permissionMap["none"] = []int{0, 0, 0}
 	permissionMap["read"] = []int{1, 0, 0}
 	permissionMap["write"] = []int{1, 1, 0}
 	permissionMap["admin"] = []int{1, 1, 1}
@@ -40,16 +41,25 @@ func getPermission(permissionSlice []int, permission string) bool {
 func createAccess(w http.ResponseWriter, r *http.Request) error {
 	var access model.Access
 	err := json.NewDecoder(r.Body).Decode(&access)
+	user := r.Context().Value("userid").(string)
+
+	if len(user) == 0 {
+		return writeError(w, http.StatusBadRequest, "User not logged in.")
+	}
 
 	if err != nil {
-		return writeError(w, "C10001", &[]string{})
+		return writeError(w, http.StatusBadRequest, "Error while decoding request body.")
+	}
+
+	if CheckAccess(access.ResourceId, "api", user, "write") == false {
+		return writeError(w, http.StatusForbidden, "Write permission denied. Please contact the owner.")
 	}
 
 	currentTime := time.Now().Unix()
 
 	access.Object = "access"
-	access.CreatedBy = "SwathySubhash"
-	access.UpdatedBy = "SwathySubhash"
+	access.CreatedBy = user
+	access.UpdatedBy = user
 	access.CreatedAt = currentTime
 	access.UpdatedAt = currentTime
 	access.PermissionSlice, err = convertPermission(access.Permission)
@@ -58,11 +68,10 @@ func createAccess(w http.ResponseWriter, r *http.Request) error {
 		errs, ok := err.(validator.ErrorMap)
 		if ok {
 			for f, _ := range errs {
-				return writeError(w, "C10002", &[]string{f})
+				return writeError(w, http.StatusBadRequest, "Error while decoding request body. Issue with field - "+f)
 			}
 		} else {
-			fmt.Println(errs)
-			return writeError(w, "C10001", &[]string{})
+			return writeError(w, http.StatusBadRequest, "Error while decoding request body.")
 		}
 	}
 
@@ -71,8 +80,9 @@ func createAccess(w http.ResponseWriter, r *http.Request) error {
 	if err != nil {
 		fmt.Println(err)
 		if mgo.IsDup(err) {
-			return writeError(w, "G80001", &[]string{})
+			return writeError(w, http.StatusBadRequest, "Duplicate access error")
 		}
+		return writeError(w, http.StatusInternalServerError, "Server error occured. Please try again.")
 	}
 
 	return writeJSON(w, access)
@@ -81,20 +91,29 @@ func createAccess(w http.ResponseWriter, r *http.Request) error {
 func updateAccess(w http.ResponseWriter, r *http.Request) error {
 	var access model.Access
 	err := json.NewDecoder(r.Body).Decode(&access)
+	user := r.Context().Value("userid").(string)
 
+	if len(user) == 0 {
+		return writeError(w, http.StatusBadRequest, "User not logged in.")
+	}
 	if err != nil {
-		return writeError(w, "C10001", &[]string{})
+		return writeError(w, http.StatusBadRequest, "Error while decoding request body.")
+	}
+
+	if CheckAccess(access.ResourceId, "api", user, "write") == false {
+		return writeError(w, http.StatusForbidden, "Write permission denied. Please contact the owner.")
 	}
 
 	access.UpdatedAt = time.Now().Unix()
-	access.UpdatedBy = "swathysubhash@gmail.com"
+	access.UpdatedBy = user
 	access.PermissionSlice, err = convertPermission(access.Permission)
 	err = store.Access.Update("Myntra", &access)
 
 	if err != nil {
 		if mgo.IsDup(err) {
-			return writeError(w, "C10003", &[]string{})
+			return writeError(w, http.StatusBadRequest, "Duplicate access error")
 		}
+		return writeError(w, http.StatusInternalServerError, "Server error occured. Please try again.")
 	} else {
 		updated, _ := store.Access.Get("Myntra", access.ResourceId, access.ActorId)
 		return writeJSON(w, updated)
@@ -108,7 +127,7 @@ func getAllAccess(w http.ResponseWriter, r *http.Request) error {
 	accessList, err := store.Access.GetAllByResourceId("Myntra", resourceId)
 
 	if err != nil {
-		return writeError(w, "G80003", &[]string{})
+		return writeError(w, http.StatusInternalServerError, "Error while fetching all accesses.")
 	}
 
 	return writeJSON(w, &model.AccessListResponse{
@@ -122,7 +141,6 @@ func CheckAccess(resourceId, resourceType, actorId, permission string) bool {
 	if resourceType == "api" {
 		api, err := store.Api.Get("Myntra", resourceId)
 		if err != nil {
-			fmt.Println(err)
 			return false
 		}
 		if getPermission(api.AnonymousAccessSlice, permission) {
@@ -132,7 +150,6 @@ func CheckAccess(resourceId, resourceType, actorId, permission string) bool {
 
 	access, err := store.Access.Get("Myntra", resourceId, actorId)
 	if err != nil {
-		fmt.Println(err)
 		return false
 	}
 

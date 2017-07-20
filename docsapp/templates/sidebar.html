@@ -3,12 +3,23 @@
 	{{ $style := $.Revision.CustomStyle }}
 	<div class="header-3-col">
 		<a href="{{$style.BrandImageLink}}" style="padding: 20px; display: block; color: inherit;">
-			<img class="logo" width="50px" src="{{$style.BrandImageUrl}}" />
+			{{ if gt (len $style.BrandImageUrl) 0 }}
+				<img class="logo" width="50px" src="{{$style.BrandImageUrl}}" />
+			{{ end }}
 			<div style="color: inherit; font-weight: 600">Api Reference</div>
 		</a>
+		<span id="select-nav">
+			<select class="group-select">
+				{{ range .ApiSummary.GroupIds }}
+					{{ $Group := index $.GroupsMap .}}
+					<option value="#{{$Group.Slug}}">{{$Group.Name}}</option>
+				{{ end }}
+			</select>
+		</span>
 	</div>
   <nav role="navigation" class="sidebar-nav">
-    <ul>
+    <ul class="group">
+    	<a class="sidebar-nav-item group" href="#api-reference">Api Reference</a>
     </ul>
 		{{ range .ApiSummary.GroupIds }}
 		{{ $Group := index $.GroupsMap .}}

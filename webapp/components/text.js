@@ -88,6 +88,7 @@ class Text extends Component {
 						/></div>
 					: this.props.type === 'checkbox' ? 
 						<div className={"switch"}>
+							{this.props.labels === false ? <span>{this.props.label}</span>: ""}
 							<input
 							id={this.props.id + this.props.row}
 							className={"input"}

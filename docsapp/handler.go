@@ -7,10 +7,10 @@ import (
 	// "html/template"
 	"bytes"
 	"encoding/json"
+	services "github.com/swathysubhash/mad/api"
+	"github.com/swathysubhash/mad/model"
+	"github.com/swathysubhash/mad/router"
 	"log"
-	services "mad/api"
-	"mad/model"
-	"mad/router"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -84,13 +84,26 @@ func getDocs(w http.ResponseWriter, r *http.Request) error {
 		return nil
 	}
 
-	revision, err := services.GetRevisionByApiId(api.Id, api.CurrentRevision)
+	q := r.URL.Query()
+	current := "0"
+	currents, ok := q["c"]
+	if ok {
+		current = currents[0]
+	}
+
+	var revision *model.Revision
+	if current == "1" {
+		revision, err = services.GetRevisionByApiId(api.Id, api.CurrentRevision)
+	} else {
+		revision, err = services.GetRevisionByApiId(api.Id, api.PublishedRevision)
+	}
+
 	if err != nil {
 		w.Write([]byte(err.Error()))
 		return nil
 	}
 
-	apiSummary, _ := services.GetApiSummary(api)
+	apiSummary, _ := services.GetApiSummary(api, revision.Number)
 	groupsMap := make(map[string]model.GroupBrief)
 	endpointsMap := make(map[string]model.EndpointBrief)
 	fullGroupsMap := make(map[string]*model.Group)
@@ -111,14 +124,18 @@ func getDocs(w http.ResponseWriter, r *http.Request) error {
 
 	for _, groupId := range (apiSummary.GroupIds)[0:gLen] {
 		fullGroupsMap[groupId], _ = services.GetGroup(groupId)
-		for _, endpointId := range groupsMap[groupId].Endpoints {
-			fullEndpointsMap[endpointId], _ = services.GetEndpoint(endpointId)
-			if fullEndpointsMap[endpointId].SubgroupType == "schema" {
-				schemaMap := make(map[string]interface{})
-				json.Unmarshal([]byte(fullEndpointsMap[endpointId].Schema), &schemaMap)
-				fullEndpointsMap[endpointId].SchemaMap = schemaMap
-			} else if fullEndpointsMap[endpointId].SubgroupType == "endpoint" {
-				fullEndpointsMap[endpointId].Url = api.Protocol + "://" + api.Host + fullEndpointsMap[endpointId].Url
+		if fullGroupsMap[groupId] != nil {
+			for _, endpointId := range groupsMap[groupId].Endpoints {
+				fullEndpointsMap[endpointId], _ = services.GetEndpoint(endpointId)
+				if fullEndpointsMap[endpointId] != nil {
+					if fullEndpointsMap[endpointId].SubgroupType == "schema" {
+						schemaMap := make(map[string]interface{})
+						json.Unmarshal([]byte(fullEndpointsMap[endpointId].Schema), &schemaMap)
+						fullEndpointsMap[endpointId].SchemaMap = schemaMap
+					} else if fullEndpointsMap[endpointId].SubgroupType == "endpoint" {
+						fullEndpointsMap[endpointId].Url = api.Protocol + "://" + api.Host + fullEndpointsMap[endpointId].Url
+					}
+				}
 			}
 		}
 	}
@@ -167,7 +184,18 @@ func getSection(w http.ResponseWriter, r *http.Request) error {
 
 	if sectionType[0] == "subgroup" {
 		subgroup, err := services.GetEndpoint(sectionId[0])
-
+		if subgroup.SubgroupType == "schema" {
+			schemaMap := make(map[string]interface{})
+			json.Unmarshal([]byte(subgroup.Schema), &schemaMap)
+			subgroup.SchemaMap = schemaMap
+		} else if subgroup.SubgroupType == "endpoint" {
+			api, err := services.GetApiById(subgroup.ApiId)
+			if err != nil {
+				w.Write([]byte(err.Error()))
+				return nil
+			}
+			subgroup.Url = api.Protocol + "://" + api.Host + subgroup.Url
+		}
 		if err != nil {
 			w.Write([]byte(err.Error()))
 			return nil

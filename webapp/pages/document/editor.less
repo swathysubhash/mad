@@ -18,17 +18,22 @@
 		width: 25%;
 		overflow: auto;
     box-sizing: border-box;
-    border-right: 1px solid @color-border;
+    //border-right: 1px solid @color-border;
     border-left: 1px solid @color-border;
     position: absolute;
     top: 0;
     bottom: 0;
     left: 0;
+    font-weight: 400;
+    //background: #f4f7f8;
 		button {
+			text-align: left;
 			background: none;
 			display: block;
 	    border: none;
 	    cursor: pointer;
+	    padding: 4px 0;
+	    white-space: nowrap;
 		}
 	}
 	.right {
@@ -43,8 +48,8 @@
 }
 
 .add-actions {
-	border-bottom: 1px solid @color-border;
-	padding: 12px;
+	// border-bottom: 1px solid @color-border;
+	padding: 10px 30px;
 	button.selected {
 		font-weight: 700;
 		color: @color-primary;
@@ -77,23 +82,87 @@
 	}
 	.method {
 		text-decoration: none !important;
-    font-size: 12px;
-    padding-right: 6px;
+    font-size: 10px;
     text-transform: uppercase;
+    color: white;
+    border-radius: 3px;
+    padding: 0px 2px;
+    margin-right: 4px;
+    vertical-align: middle;
     &.POST {
-    	color: @color-warning;
+    	background: @color-warning;
     }
     &.GET {
-    	color: @color-success;
+    	background: @color-success;
     }
     &.PUT {
-    	color: @color-danger;
+    	background: @color-danger;
+    }
+    &.DELETE {
+    	background: brown;
     }
     &.schema {
-    	color: @color-rose;
+    	background: @color-rose;
     }
     &.textdocument {
-    	color: @color-purple;
+    	background: @color-purple;
     }
 	}
 }
+
+.editor-preview {
+	strong {
+  font-weight: 600;
+	}
+	em {
+	  font-style: italic;
+	}
+
+	blockquote {
+	  padding: 0 1rem;
+	  margin-left: 0;
+	  color: #819198;
+	  border-left: 0.3rem solid #dce6f0;
+	  background: #fafafa;
+	}
+
+	code {
+	  padding: 2px 4px;
+	  font-family: Consolas,"Liberation Mono",Menlo,Courier,monospace;
+	  font-size: 0.9rem;
+	  color: #383e41;
+	  background-color: #f3f6fa;
+	  border-radius: 0.3rem;
+	}
+	li {
+		list-style-type: inherit;
+	}
+	ul {
+	  list-style-type: disc;
+	  padding-left: 20px;
+	}
+	ol {
+	  list-style-type: decimal;
+	  padding-left: 20px;
+	}	
+}
+
+
+.overview-revisions {
+	padding: 30px 0;
+}
+
+.danger {
+	padding: 10px 0;
+	text-decoration: underline;
+	color: @color-danger;
+	border-radius: 3px;
+	margin-bottom: 10px;
+}
+
+.success {
+	padding: 10px 0;
+	color: #2A942D;
+	margin-bottom: 10px;
+}
+

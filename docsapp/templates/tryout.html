@@ -1,7 +1,7 @@
 {{define "Tryout"}}
 <div id="try-out">
-	<div>
-	<button type="button" class="close-try-out">Go Back</button>
+	<div style="text-align: right;">
+	<button type="button" class="close-try-out">Close</button>
 	</div>
 	<form id="try-http-meta">
 		<select name="method">
@@ -24,14 +24,14 @@
 			<div class="tabs">
 				<div class="headers-tab">
 					<div class="input-row">
-						<input type="text" class="key" name="h-key" placeholder="key"></input>
+						<input type="text" class="key" name="h-key" placeholder="name"></input>
 						<input type="text" class="value" name="h-value" placeholder="value"></input>
 						<button type="button" data-template="header-row-template" data-parent="headers-tab" class="headers add-row">Add</button>
 					</div>
 				</div>
 				<div class="parameters-tab">
 					<div class="input-row">
-						<input type="text" class="key" name="p-key" placeholder="key"></input>
+						<input type="text" class="key" name="p-key" placeholder="name"></input>
 						<input type="text" class="value" name="p-value" placeholder="value"></input>
 						<button type="button" data-template="parameter-row-template" data-parent="parameters-tab" class="add-row">Add</button>
 					</div>
@@ -43,14 +43,14 @@
 		</div>
 	</form>
 	<form id="try-response-data">
-		<h5>Response</h5>
+		<h5 class="form-header">Response</h5>
 		<div class="response-body">
 			<textarea name="res-body"></textarea>
 		</div>
 	</form>
 	<div id="header-row-template" style="display: none;">
 		<div class="input-row">
-			<input type="text" class="key" name="h-key" placeholder="key"></input>
+			<input type="text" class="key" name="h-key" placeholder="name"></input>
 			<input type="text" class="value" name="h-value" placeholder="value"></input>
 			<button type="button" data-template="header-row-template" data-parent="headers-tab" class="add-row">Add</button>
 			<button type="button" data-template="header-row-template" data-parent="headers-tab" class="del-row">Del</button>
@@ -58,7 +58,7 @@
 	</div>
 	<div id="parameter-row-template" style="display: none;">
 		<div class="input-row">
-			<input type="text" class="key" name="p-key" placeholder="key"></input>
+			<input type="text" class="key" name="p-key" placeholder="name"></input>
 			<input type="text" class="value" name="p-value" placeholder="value"></input>
 			<button type="button" data-template="parameter-row-template" data-parent="parameters-tab" class="add-row">Add</button>
 			<button type="button" data-template="parameter-row-template" data-parent="parameters-tab" class="del-row">Del</button>

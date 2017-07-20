@@ -12,12 +12,12 @@ class Header extends Component {
 			<div>
 				<div className={"header-sub middle"}>
 					<div>
-						<Link to={"/"}><div class="logo"><span class="brand">Mad</span><span> Writer</span></div></Link>
+						<Link to={"/"}><div class="logo"><span class="fa fa-archive" aria-hidden="true"></span><span class="brand">Mad</span><span> Writer</span></div></Link>
 					</div>
 					<div className={"right"}>
 						<img height={"28px"} width={"28px"} className={"userimage"} src={window.STATE_FROM_SERVER.userImage.replace("https", "http")}></img>
 						<div className={"username"}>{window.STATE_FROM_SERVER.userId}</div>
-						<button className={"logout"}>Log out</button>
+						<a href="/logout"><button className={"logout"}>Log out</button></a>
 					</div>
 				</div>
 			</div>

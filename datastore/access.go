@@ -2,9 +2,9 @@ package datastore
 
 import (
 	"fmt"
+	"github.com/swathysubhash/mad/model"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"mad/model"
 )
 
 type accessStore struct {

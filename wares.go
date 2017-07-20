@@ -82,7 +82,7 @@ func userHandler(next http.Handler) http.Handler {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, fmt.Errorf("Unexpected signing method")
 			}
-			return []byte("1##DIEANOTHERDAY##1"), nil
+			return []byte(JWT_SECRET_KEY), nil
 		})
 
 		if err != nil {
@@ -92,7 +92,6 @@ func userHandler(next http.Handler) http.Handler {
 		}
 
 		if claims, ok := token.Claims.(*Claims); ok && token.Valid {
-			fmt.Println("CLAIMS", claims)
 			ctx := context.WithValue(r.Context(), "userid", claims.Username)
 			r = r.WithContext(ctx)
 			ctx = context.WithValue(r.Context(), "userimage", claims.Picture)

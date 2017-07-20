@@ -15,7 +15,7 @@ const EMPTY_SUBGROUP = {
 	name: '',
 	description: '',
 	url: '',
-	method: '',
+	method: { value: '', label: '--Select--' },
 	groupName: { label: 'Select Group', value: '' },
 	queryParameters: [{name: '', defaultValue: '', description: '', required: true}],
 	urlParameters: [{name: '', defaultValue: '', description: '', required: true}],
@@ -23,7 +23,27 @@ const EMPTY_SUBGROUP = {
 	requestBody: '',
 	responseHeaders: [{name: '', value: ''}],
 	responseBody: '',
-	languageSnippets: [],
+	languageSnippets: [{
+		lang: 'curl',
+		code: '',
+		object: 'snippet',
+	}, {
+		lang: 'go',
+		code: '',
+		object: 'snippet',
+	}, {
+		lang: 'java',
+		code: '',
+		object: 'snippet',
+	}, {
+		lang: 'node',
+		code: '',
+		object: 'snippet',
+	}, {
+		lang: 'python',
+		code: '',
+		object: 'snippet',
+	}],
 	schema: '{}',
 }
 
@@ -50,6 +70,7 @@ class DocumentsEndpointCreate extends Component {
 		if (data.urlParameters && !data.urlParameters.length) data.urlParameters = ''	
 		if (data.requestHeaders && !data.requestHeaders.length) data.requestHeaders = ''
 		if (data.responseHeaders && !data.responseHeaders.length) data.responseHeaders = ''
+		if (data.languageSnippets && !data.languageSnippets.length) data.languageSnippets = EMPTY_SUBGROUP.languageSnippets
 
 		return {
 			...EMPTY_SUBGROUP,
@@ -83,13 +104,13 @@ class DocumentsEndpointCreate extends Component {
 			// this.context.store.dispatch({ type: 'ENDPOINT_SELECT', data: this.props.params.endpointId})
 		} else {
 			if (this.props.subgroupType === 'schema') {
-				this.context.store.dispatch({ type: 'SCHEMA_CREATE'})	
+				this.context.store.dispatch({ type: 'SCHEMA_CREATE', data: this.props.withGroup})	
 			} else if (this.props.subgroupType === 'textdocument'){
-				this.context.store.dispatch({ type: 'TEXTDOCUMENT_CREATE'})	
+				this.context.store.dispatch({ type: 'TEXTDOCUMENT_CREATE', data: this.props.withGroup})	
 			} else {
-				this.context.store.dispatch({ type: 'ENDPOINT_CREATE'})	
+				this.context.store.dispatch({ type: 'ENDPOINT_CREATE', data: this.props.withGroup})	
 			}
-		}	
+		}
 	}
 
 	componentWillReceiveProps(nextProps) {
@@ -98,9 +119,16 @@ class DocumentsEndpointCreate extends Component {
 		// }
 		
 		if (nextProps.selected) { //Group will be empty in create group
-			this.fetchEndpointDetails(nextProps.selected)
+			if (nextProps.selected !== this.props.selected)
+				this.fetchEndpointDetails(nextProps.selected)
 		} else {
-			this.setState({ values:  EMPTY_SUBGROUP })
+			let selectedGroup = {}
+			if (nextProps.selectedGroup) {
+				selectedGroup = { 
+					groupName: { label: nextProps.selectedGroup.name, value: nextProps.selectedGroup.id }
+				}
+			}
+			this.setState({ values:  { ...EMPTY_SUBGROUP, ...selectedGroup } })
 		}	
 		
 	}
@@ -147,7 +175,7 @@ class DocumentsEndpointCreate extends Component {
 			})
 			.catch(err => {
 				this.setState({ loading: false })
-				store.dispatch({ type: 'SET_NOTIFICATION', data: { type: 'danger', message: err.response.data }	})
+				store.dispatch({ type: 'SET_NOTIFICATION', data: { type: 'danger', message: err.response.data && err.response.data.message }	})
 			})
 		} else {
 			// values.endpointId = this.state.values.id
@@ -160,7 +188,8 @@ class DocumentsEndpointCreate extends Component {
 			})
 			.catch(err => {
 				this.setState({ loading: false })
-				store.dispatch({ type: 'UPDATE_ENDPOINT_FAILURE', data: err.response.data})
+				store.dispatch({ type: 'UPDATE_ENDPOINT_FAILURE', data: err.response.data && err.response.data.message})
+				store.dispatch({ type: 'SET_NOTIFICATION', data: { type: 'danger', message: err.response.data && err.response.data.message }	})
 			})
 		}
 	}
@@ -180,25 +209,26 @@ class DocumentsEndpointCreate extends Component {
 						<div className={"loader"}>{this.state.loading ? <i class="fa fa-spinner fa-spin" aria-hidden="true"></i> : ""}</div>
 					</div>
 					<div>
+						{groupOptions.length === 0 ?<div className={"danger"}>You have not created any groups till now. You have to create atleast one group to create endpoint</div>: "" }
 						<Form values={this.state.values} onSubmit={this.onSubmit}>
 							<Text name={"groupName"} type={"dropdown"} label={"What is the group of your endpoint?"}  validate={['required']}
 								options={groupOptions}/>
-							<Text name={"name"} placeholder={"Endpoint Name"} label={"What is the name of your endpoint?"}  validate={['required', 'name']}/>
+							<Text name={"name"} placeholder={"Eg : Get resource"} label={"What is the name of your endpoint?"}  validate={['required', 'name']}/>
 							<Text name={"description"} placeholder={"Endpoint Description"} label={"Provide some description of your endpoint?"} type={"textarea"}/>
-							<Text name={"url"} placeholder={"Url"} label={"What is the url of your endpoint?"}  validate={['required']}/>
+							<Text name={"url"} placeholder={"Eg : /get/{url-param}?{query-param}"} label={"What is the base url of your endpoint?"}  validate={['required']}/>
 							<Text name={"method"} type={"dropdown"} label={"What is the http method of your endpoint?"}  validate={['required']}
-								options={[{ value: "GET", label: "GET"}, { value: "POST", label: "POST"}, { value: "PUT", label: "PUT"}]}/>
+								options={[{ value: "", label: "--Select--"}, { value: "GET", label: "GET"}, { value: "POST", label: "POST"}, { value: "PUT", label: "PUT"}, { value: "DELETE", label: "DELETE" }]}/>
 							<InputSet name={"queryParameters"} label={"Query Parameters"}>
 								<Text className={"col3"} name={"name"} placeholder={"Name"}/>
 								<Text className={"col5"} name={"description"} placeholder={"Description"} options={{toolbar: false, status: false}} label={"Provide some description of your endpoint?"} type={"textarea"}/>
 								<Text className={"col3"} name={"default"} placeholder={"Default Value"}/>
-								<Text className={"col3"} name={"required"} id={"qpr"} type={"checkbox"}/>
+								<Text className={"col3"} label={"required : "} name={"required"} id={"qpr"} type={"checkbox"}/>
 							</InputSet>
 							<InputSet name={"urlParameters"} label={"Url Parameters"}>
 								<Text className={"col3"} name={"name"} placeholder={"Name"}/>
 								<Text className={"col5"} name={"description"} placeholder={"Description"} options={{toolbar: false, status: false}} label={"Provide some description of your endpoint?"} type={"textarea"}/>
 								<Text className={"col3"} name={"default"} placeholder={"Default Value"}/>
-								<Text className={"col3"} name={"required"} id={"upr"} type={"checkbox"}/>
+								<Text className={"col3"} label={"required : "} name={"required"} id={"upr"} type={"checkbox"}/>
 							</InputSet>
 							<InputSet name={"requestHeaders"} label={"Request Headers"}>
 								<Text className={"col5"} name={"name"} placeholder={"Name"}/>
@@ -210,6 +240,10 @@ class DocumentsEndpointCreate extends Component {
 								<Text className={"col5"} name={"value"} placeholder={"value"} />
 							</InputSet>
 							<Text name={"responseBody"} label={"Response json?"} type={"codemirror"}/>
+							<InputSet name={"languageSnippets"} label={"Language Snippets"} fixed={true} tabs={this.state.values.languageSnippets.map(l => l.lang)}>
+								<Text className={"col5"} name={"lang"} placeholder={"Lang"} />
+								<Text className={"col5"} name={"code"} placeholder={"Type code here..."} options={{toolbar: false, status: false}} label={"Provide code snippet"} type={"textarea"}/>
+							</InputSet>
 							<Button action={"submit"} loading={this.state.loading} text="save"/>
 						</Form>
 					</div>
@@ -222,6 +256,7 @@ class DocumentsEndpointCreate extends Component {
 					<div className={"form-header"}><span>{this.state.mode} Schema</span></div>
 					<div className={"loader"}>{this.state.loading ? <i class="fa fa-spinner fa-spin" aria-hidden="true"></i> : ""}</div>
 				</div>
+				{groupOptions.length === 0 ?<div className={"danger"}>You have not created any groups till now. You have to create atleast one group to create schema</div>: "" }
 				<Form values={this.state.values} onSubmit={this.onSubmit}>
 				<Text name={"groupName"} type={"dropdown"} label={"What is the group of your schema?"}  validate={['required']}
 								options={groupOptions}/>
@@ -238,6 +273,7 @@ class DocumentsEndpointCreate extends Component {
 					<div className={"form-header"}><span>{this.state.mode} Text Document</span></div>
 					<div className={"loader"}>{this.state.loading ? <i class="fa fa-spinner fa-spin" aria-hidden="true"></i> : ""}</div>
 				</div>
+				{groupOptions.length === 0 ?<div className={"danger"}>You have not created any groups till now. You have to create atleast one group to create text document</div>: "" }
 				<Form values={this.state.values} onSubmit={this.onSubmit}>
 				<Text name={"groupName"} type={"dropdown"} label={"What is the group of your text document?"}  validate={['required']}
 								options={groupOptions}/>
@@ -253,14 +289,27 @@ class DocumentsEndpointCreate extends Component {
 }
 
 function mapStateToProps(state, ownProps) {
-	let selected = state.entities.ui.apiSummary.selectedEndpoint
 	let subgroupType = ownProps.subgroupType
-	let groups = state.entities.groups.byIds
+	let selected = state.entities.ui.apiSummary.selectedEndpoint
+	let withGroup = state.entities.ui.apiSummary.withGroup
+	let apiId = ownProps.params.documentId
+	let apis = state.entities.apis.byIds
+	let groupList = state.entities.groups.byIds
+	let groups = []
+	let selectedGroup = ''
+	if (apiId && apis && apis[apiId] && apis[apiId].groupIds) {
+		groups = apis[apiId].groupIds.filter(id => groupList[id])
+		groups = groups.reduce((acc, id) => { acc[id] = groupList[id]; return acc }, {})
+		selectedGroup = groups[withGroup]
+	}
+	
 	return {
 		mode: selected ? 'Edit' : 'Create',
 		selected,
 		subgroupType,
-		groups
+		groups,
+		selectedGroup,
+		withGroup
 	}
 	// let selectedEndpoint = state.entities.ui.apiSummary.selectedEndpoint
 	// let subgroupType = ownProps.subgroupType

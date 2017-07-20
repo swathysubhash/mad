@@ -32,12 +32,21 @@ class MarkdownEditor extends Component {
 		this.simplemde.codemirror.on('focus', this.focusChanged.bind(this, true));
 		this.simplemde.codemirror.on('blur', this.focusChanged.bind(this, false));
 		this.simplemde.value(this.props.defaultValue || this.props.value || '');
+		setTimeout(() => {
+			this.simplemde.codemirror.refresh();
+		},1);
 	}
 	componentWillReceiveProps (nextProps) {
+		if (this.simplemde.isPreviewActive()) {
+			this.simplemde.togglePreview()
+		}
 		if (this.simplemde 
 			&& nextProps.value !== undefined 
 			&& normalizeLineEndings(this.simplemde.value()) !== normalizeLineEndings(nextProps.value)) {
 			this.simplemde.value(nextProps.value);
+			setTimeout(() => {
+				this.simplemde.codemirror.refresh();
+			},1);
 		}
 	}
 	componentWillUnmount () {

@@ -1,9 +1,9 @@
 package datastore
 
 import (
+	"github.com/swathysubhash/mad/model"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"mad/model"
 )
 
 type endpointStore struct {
@@ -12,7 +12,8 @@ type endpointStore struct {
 
 func (e *endpointStore) EnsureIndex(orgName string) error {
 	index := mgo.Index{
-		Key: []string{"groupId", "revision", "subgroupType"},
+		Key:    []string{"groupId", "revision", "subgroupType", "name"},
+		Unique: true,
 	}
 	err := e.DB.C(orgName + "/ENDPOINTLIST").EnsureIndex(index)
 
@@ -20,7 +21,8 @@ func (e *endpointStore) EnsureIndex(orgName string) error {
 		return err
 	}
 	index = mgo.Index{
-		Key: []string{"apiId", "revision", "subgroupType"},
+		Key:    []string{"apiId", "revision", "subgroupType", "name"},
+		Unique: true,
 	}
 	err = e.DB.C(orgName + "/ENDPOINTLIST").EnsureIndex(index)
 
@@ -113,6 +115,18 @@ func (e *endpointStore) UpsertMany(orgName string, endpoints []model.Endpoint) e
 		if err != nil {
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (e *endpointStore) Remove(orgName, endpointId string) error {
+	c := e.DB.C(orgName + "/ENDPOINTLIST")
+
+	err := c.Remove(bson.M{"_id": endpointId})
+
+	if err != nil {
+		return err
 	}
 
 	return nil

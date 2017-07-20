@@ -72,6 +72,11 @@ export default function entities(state = initialState, action) {
   			...state,
   			ui: uiReducer(state.ui, {type: 'STOP_LOADING'})
   		}		
+    case 'RESET_API_SUMMARY':
+      return {
+        ...state,
+        ui: uiReducer(state.ui, {type: 'FETCH_DATA'}),
+      }
   	case 'CREATE_GROUP_RESPONSE':
   		return {
   			...state,
@@ -122,17 +127,17 @@ export default function entities(state = initialState, action) {
   	case 'ENDPOINT_CREATE':
   		return {
   			...state,
-  			ui: uiReducer(state.ui, {type: 'ENDPOINT_CREATE'})
+  			ui: uiReducer(state.ui, {type: 'ENDPOINT_CREATE', data: data })
   		}
     case 'SCHEMA_CREATE':
       return {
         ...state,
-        ui: uiReducer(state.ui, {type: 'SCHEMA_CREATE'})
+        ui: uiReducer(state.ui, {type: 'SCHEMA_CREATE', data: data })
       }
     case 'TEXTDOCUMENT_CREATE':
       return {
         ...state,
-        ui: uiReducer(state.ui, {type: 'TEXTDOCUMENT_CREATE'})
+        ui: uiReducer(state.ui, {type: 'TEXTDOCUMENT_CREATE', data: data })
       }
     case 'SET_NOTIFICATION':
       return {
@@ -287,7 +292,8 @@ function apiSummary(state = { loading: false, stale: false }, action) {
         createEndpoint: false,
         createTextDocument: false,
         selected: data,
-				selectedGroup: data
+				selectedGroup: data,
+        withGroup: ''
 			}
 		case 'GROUP_CREATE':
 			return {
@@ -298,6 +304,7 @@ function apiSummary(state = { loading: false, stale: false }, action) {
         createTextDocument: false,
         selected: '',
 				selectedGroup: '',
+        withGroup: '',
 			}
 		case 'ENDPOINT_SELECT':
 			return {
@@ -307,7 +314,8 @@ function apiSummary(state = { loading: false, stale: false }, action) {
         createSchema: false,
         createTextDocument: false,
         selected: data,
-				selectedEndpoint: data
+				selectedEndpoint: data,
+        withGroup: '',
 			}
 		case 'ENDPOINT_CREATE':
 			return {
@@ -318,6 +326,7 @@ function apiSummary(state = { loading: false, stale: false }, action) {
         createTextDocument: false,
 				selectedEndpoint: '',
         selected: '',
+        withGroup: data,
 			}
     case 'SCHEMA_CREATE':
       return {
@@ -327,7 +336,9 @@ function apiSummary(state = { loading: false, stale: false }, action) {
         selectedSchema: '',
         createGroup: false,
         createTextDocument: false,
+        selectedEndpoint: '',
         selected: '',
+        withGroup: data,
       }
     case 'TEXTDOCUMENT_CREATE':
       return {
@@ -338,6 +349,8 @@ function apiSummary(state = { loading: false, stale: false }, action) {
         createGroup: false,
         createTextDocument: true,
         selected: '',
+        selectedEndpoint: '',
+        withGroup: data
       }
 		case 'START_LOADING':
 			return {
@@ -358,10 +371,12 @@ function notifications(state = [], action) {
   let data = action.data
   switch(action.type) {
     case 'SET_NOTIFICATION':
-      return [...state.concat(data)]
+      // return [...state.concat(data)]
+      return [data]
     case 'DISMISS_NOTIFICATION':
-      let index = state.indexOf(data)
-      return [...state.slice(0,index).concat(state.slice(index + 1))]
+      // let index = state.indexOf(data)
+      return []
+      // return [...state.slice(0,index).concat(state.slice(index + 1))]
     default:
       return state
   }

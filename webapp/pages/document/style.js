@@ -59,10 +59,14 @@ class DocumentsStyle extends Component {
 	}
 
 	componentWillReceiveProps(nextProps) {
-		this.fetchStyle(nextProps.documentId)
+		if (nextProps.documentId !== this.props.documentId) {
+			this.fetchStyle(nextProps.documentId)	
+		}
 	}
 
 	onSubmit(values) {
+		values.column = parseInt(values.column) || 3
+		values.fontSize = parseInt(values.fontSize) || 14
 		this.setState({ loading: true })
 		updateStyle({documentId: this.props.documentId, ...values})
 		.then(res => {

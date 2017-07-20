@@ -69,7 +69,7 @@
 									<div class="attr-label">
 										<div class="label">{{ .Name }}</div>
 									</div>
-									<div class="attr-label-description"><p>{{ html .DescriptionHTML }}</p></div>
+									<div class="attr-description"><p>{{ html .DescriptionHTML }}</p></div>
 								</div>
 							{{ end }}
 						</div>
@@ -79,11 +79,37 @@
 			<div class="col-right">
 				<div class="xhr-detail">
 					<div>
-						<h5>Example Request</h5>
+						<h5>Request Url</h5>
 						<div class="url-ex">
 							<div class="hl-code">{{.Url}}</div>
 							<div style="float: right;"><button class="try-btn">Try</button></div>
 						</div>
+					</div>
+					<div class="tabs">
+						<div class="tab-header">
+							{{ range $Index, $Snippet := .LanguageSnippets }}
+								{{ if eq $Index 0}}
+									<h5 class="tab-header-item active" data-tab-item="{{$Snippet.Lang}}">{{$Snippet.Lang}}</h5>
+								{{ else }}
+									<h5 class="tab-header-item" data-tab-item="{{$Snippet.Lang}}">{{$Snippet.Lang}}</h5>
+								{{ end }}
+							{{ end }}
+						</div>
+						{{ range $Index, $Snippet := .LanguageSnippets }}
+							{{ if eq $Index 0}}
+									{{ if eq (len $Snippet.Code)  0}}
+										<div class="tab-item active {{$Snippet.Lang}}"><pre class="line-numbers"><code class="language-bash">Snippet not found</code></pre></div>
+									{{ else }}
+										<div class="tab-item active {{$Snippet.Lang}}"><pre class="line-numbers"><code class="language-bash">{{$Snippet.Code}}</code></pre></div>
+									{{ end }}
+								{{ else }}
+									{{ if eq (len $Snippet.Code) 0}}
+										<div class="tab-item {{$Snippet.Lang}}"><pre class="line-numbers"><code class="language-bash">Snippet not found</code></pre></div>
+									{{ else }}
+										<div class="tab-item {{$Snippet.Lang}}"><pre class="line-numbers"><code class="language-bash">{{$Snippet.Code}}</code></pre></div>
+									{{ end }}
+								{{ end }}
+						{{ end }}	
 					</div>
 					{{ if gt (len .RequestHeaders) 0 }}
 						<div>
@@ -144,6 +170,15 @@
 					{{end}}
 			</div>
 			<div class="col-right">
+				<div class="xhr-detail"></div>
+			</div>
+		{{else if eq .SubgroupType "textdocument"}}
+			<div class="col-left">
+				<h1>{{.Name}}</h1>
+				<p>{{html .DescriptionHTML}}</p>
+			</div>
+			<div class="col-right">
+				<div class="xhr-detail"></div>
 			</div>
 		{{end}}
 		<script>
@@ -158,7 +193,9 @@
 				<h1>{{.Name}}</h1>
 				<div class="description"><p>{{html .DescriptionHTML}}<p></div>
 			</div>
-			<div class="col-right"></div>
+			<div class="col-right">
+				<div class="xhr-detail"></div>
+			</div>
 	</div>
 {{end}}
 
@@ -169,6 +206,22 @@
 	</div>
 </div>
 <div id="content">
+	<section class="row first" data-type="api" data-id="api-reference" id="api-reference">
+		<div class="row-full">
+				<div class="col-left">
+					<h1>{{.Api.Name}} Reference</h1>
+					<p>{{html .Api.DescriptionHTML}}</p>
+				</div>
+				<div class="col-right">
+					<div class="xhr-detail">
+						<div>
+							<h5>Api base url</h5>
+							<pre class="api-base-url language-json"><code>{{.Api.Protocol}}://{{.Api.Host}}</code></pre>
+						</div>
+					</div>
+				</div>
+		</div>
+	</section>
   {{ range .ApiSummary.GroupIds }}
 	{{ $Group := index $.GroupsMap .}}
 	{{ $FullGroup := index $.FullGroupsMap .}}
@@ -177,14 +230,18 @@
 					{{ template "GroupSection" $FullGroup}}
 				</section>
 			{{else}}
-				<section class="row first not-fetched" data-type="group" data-id={{$Group.Id}} id="{{$Group.Slug}}">
-					<div class="row-full">
-							<div class="col-left">
-								<h1>{{$Group.Name}}</h1>
-							</div>
-							<div class="col-right"></div>
-					</div>
-				</section>
+				{{ if gt (len $Group.Id) 0 }}
+					<section class="row first not-fetched" data-type="group" data-id={{$Group.Id}} id="{{$Group.Slug}}">
+						<div class="row-full">
+								<div class="col-left">
+									<h1>{{$Group.Name}}</h1>
+								</div>
+								<div class="col-right">
+									<div class="xhr-detail"></div>
+								</div>
+						</div>
+					</section>
+				{{ end }}
 			{{end}}
 		{{ if gt (len $Group.Endpoints) 0 }}
 			{{ range $Group.Endpoints }}
@@ -195,18 +252,112 @@
 							{{ template "EndpointSection" $FullEndpoint }}
 						</section>
 					{{else}}
-						<section class="row not-fetched" data-type="subgroup" data-id={{$Endpoint.Id}} id="{{$Group.Slug}}_{{$Endpoint.Slug}}">
-							<div class="row-full">
-								<div class="col-left">
-									<h1>{{$Endpoint.Name}}</h1>
-									<h5>Loading...</h5>
+						{{ if gt (len $Endpoint.Id) 0 }}
+							<section class="row not-fetched" data-type="subgroup" data-id={{$Endpoint.Id}} id="{{$Group.Slug}}_{{$Endpoint.Slug}}">
+								<div class="row-full">
+									<div class="col-left">
+										<h1>{{$Endpoint.Name}}</h1>
+										<h5>Loading...</h5>
+									</div>
+									<div class="col-right">
+										<div class="xhr-detail"></div>
+									</div>
 								</div>
-								<div class="col-right"></div>
-							</div>
-						</section>
+							</section>
+						{{ end }}
 					{{end}}
 			{{ end }}
 		{{end}}
 	{{end}}
 </div>
+{{end}}
+
+
+{{define "Style"}}
+	<style>
+		{{ $CustomStyle := .Revision.CustomStyle }}
+		{{if gt (len $CustomStyle.LinkColor) 0}}
+			a {
+				color: {{ $CustomStyle.LinkColor }};
+			}
+		{{ end }}
+		{{if gt (len $CustomStyle.HeaderBackgroundColor) 0}}
+			.header-3-col {
+				background-color: {{ $CustomStyle.HeaderBackgroundColor }};
+			}
+		{{ end }}
+		{{if gt (len $CustomStyle.HeaderFontColor) 0}}
+			.header-3-col {
+				color: {{ $CustomStyle.HeaderFontColor }};
+			}
+		{{ end }}
+		{{if gt (len $CustomStyle.SidePanelBackgroundColor) 0}}
+			#sidebar {
+				background-color: {{ $CustomStyle.SidePanelBackgroundColor }};
+			}
+		{{ end }}
+		{{if gt (len $CustomStyle.SidePanelFontColor) 0}}
+			#sidebar .sidebar-nav-item {
+				color: {{ $CustomStyle.SidePanelFontColor }};
+			}
+		{{ end }}
+		{{if gt (len $CustomStyle.SidePanelLightFontColor) 0}}
+			#sidebar .light{
+				color: {{ $CustomStyle.SidePanelLightFontColor }};
+			}
+		{{ end }}
+		{{if gt (len $CustomStyle.SidePanelSecondaryFontColor) 0}}
+			#sidebar .group.expand > a, #sidebar .subgroup.highlight{
+				color: {{ $CustomStyle.SidePanelSecondaryFontColor }};
+			}
+			#sidebar .group.expand {
+				border-left: 2px solid {{ $CustomStyle.SidePanelSecondaryFontColor }};
+			}			
+		{{ end }}
+		{{if gt (len $CustomStyle.LeftPanelBackgroundColor) 0}}
+			.col-left {
+				background-color: {{ $CustomStyle.LeftPanelBackgroundColor }};
+			}
+		{{ end }}
+		{{if gt (len $CustomStyle.LeftPanelFontColor) 0}}
+			.col-left {
+				color: {{ $CustomStyle.LeftPanelFontColor }};
+			}
+		{{ end }}
+		{{if gt (len $CustomStyle.LeftPanelLightFontColor) 0}}
+			.col-left h5{
+				color: {{ $CustomStyle.LeftPanelLightFontColor }};
+			}
+		{{ end }}
+		{{if gt (len $CustomStyle.LeftPanelHighlightFontColor) 0}}
+			.col-left .highlight{
+				color: {{ $CustomStyle.LeftPanelHighlightFontColor }};
+			}
+		{{ end }}
+		{{if gt (len $CustomStyle.LeftPanelHighlightBackgroundColor) 0}}
+			.col-left .highlight{
+				background-color: {{ $CustomStyle.LeftPanelHighlightBackgroundColor }};
+			}
+		{{ end }}
+		{{if gt (len $CustomStyle.RightPanelBackgroundColor) 0}}
+			#background .background-actual {
+				background-color: {{ $CustomStyle.RightPanelBackgroundColor }};
+			}
+		{{ end }}
+		{{if gt (len $CustomStyle.RightPanelFontColor) 0}}
+			.col-right h5 {
+				color: {{ $CustomStyle.RightPanelFontColor }};
+			}
+		{{ end }}
+		{{if gt (len $CustomStyle.CodeFontColor) 0}}
+			.token.property, .token.tag, .token.boolean, .token.number, .token.constant, .token.symbol, .token.deleted {
+				color: {{ $CustomStyle.CodeFontColor }};
+			}
+		{{ end }}
+		{{if gt (len $CustomStyle.CodeHighlightColor) 0}}
+			code .highlight{
+				color: {{ $CustomStyle.CodeHighlightColor }};
+			}
+		{{ end }}
+	</style>
 {{end}}

@@ -24,12 +24,18 @@ class CodeMirror extends Component {
 		this.codeMirror.on('focus', this.focusChanged.bind(this, true));
 		this.codeMirror.on('blur', this.focusChanged.bind(this, false));
 		this.codeMirror.setValue(this.props.defaultValue || this.props.value || '');
+		setTimeout(() => {
+			this.codeMirror.refresh();
+		}, 1);
 	}
 	componentWillReceiveProps (nextProps) {
 		if (this.codeMirror 
 			&& nextProps.defaultValue !== undefined 
 			&& normalizeLineEndings(this.codeMirror.getValue()) !== normalizeLineEndings(nextProps.defaultValue)) {
 			this.codeMirror.setValue(nextProps.defaultValue);
+			setTimeout(() => {
+				this.codeMirror.refresh();
+			}, 1);
 		}
 	}
 	componentWillUnmount () {

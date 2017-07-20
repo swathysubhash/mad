@@ -2,6 +2,8 @@
 <html>
 	<head>
 		<link href="https://fonts.googleapis.com/css?family=Lato:300,400,700" rel="stylesheet">
+		<link href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css
+" rel="stylesheet" />
 		<meta charset="UTF-8">
 		<title>{{.Title}}</title>
 		<style>
@@ -19,7 +21,7 @@
 
 		body {
 		    line-height: 1;
-		    color: #000;
+		    color: #24292e;
 		    background: #fff;
 		    font-family: 'Lato';
 		}
@@ -48,10 +50,15 @@
 		a img {
 		    border: none
 		}
+		.fa {
+			color: #E13B33;
+		}
 		.brand {
-			font-weight: 300;
-	    font-size: 36	px;
+	    font-size: 60px;
 	    margin-bottom: 10px;
+		}
+		.logo {
+			font-weight: 700;
 		}
 		.login {
 		  width: 194px;
@@ -62,7 +69,7 @@
 	    box-shadow: none;
 	    border: none;
 	    cursor: pointer;
-	    background: #5D91F7;
+	    background: #24292e;
 	    color: white;
 	    margin-top: 75px;
 		}
@@ -71,12 +78,14 @@
 	<body>
 		<div id="container">
 				<div class="brand">
-					MAD
+					<span class="fa fa-archive" aria-hidden="true"></span>
+					<span class="logo">MAD</span>
+					<span>Writer</span>
 				</div>
 				<div>
-					Clean, Easy Api Documentation
+					Easy Api Documentation. Single place to store all your api documents.
 				</div>
-				<a href={{.GoogleLoginUrl}}><button class="login" >Log in</button> </a>
+				<a href={{.GoogleLoginUrl}}><button class="login" >Log in with <span style="padding-left: 3px;" class="fa fa-google-plus" aria-hidden="true"></span></button> </a>
 		</div>
 	</body>
 </html>

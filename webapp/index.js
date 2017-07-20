@@ -7,7 +7,7 @@ import { Provider } from 'inferno-redux'
 import { createStore } from 'redux'
 import rootReducer from './reducers/index'
 import Component from 'inferno-component'
-import { Router, Route, IndexRoute } from 'inferno-router'
+import { Router, Route, IndexRoute, Redirect } from 'inferno-router'
 import createBrowserHistory from 'history/createBrowserHistory'
 
 /*eslint-enable */
@@ -19,6 +19,7 @@ class App extends Component {
 		return (
 			<Provider store={store}>
 				<Router history={browserHistory}>
+					<Redirect from="/" to="/documentlist"/>
 					{routes}
 				</Router>
 			</Provider>

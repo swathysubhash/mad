@@ -55,9 +55,10 @@ type Revision struct {
 }
 
 type ApiListResponse struct {
-	Count  int    `json:"count"`
-	Object string `json:"object"`
-	Data   []Api  `json:"data"`
+	Count      int         `json:"count"`
+	Object     string      `json:"object"`
+	Data       []Api       `json:"data"`
+	Pagination *Pagination `json:"pagination"`
 }
 
 type ApiSummary struct {
@@ -73,22 +74,22 @@ func GetDefaultStyle() *Style {
 	return &Style{
 		Column:                            3,
 		Object:                            "style",
-		LinkColor:                         "#131313",
+		LinkColor:                         "#11A0E7",
 		FontSize:                          14,
-		HeaderBackgroundColor:             "#F7F7F7",
-		HeaderFontColor:                   "#44492A",
-		SidePanelBackgroundColor:          "#FAFCFC",
-		SidePanelFontColor:                "#676F73",
+		HeaderBackgroundColor:             "#FFFFFF",
+		HeaderFontColor:                   "#4C555A",
+		SidePanelBackgroundColor:          "#FFFFFF",
+		SidePanelFontColor:                "#4C555A",
 		SidePanelLightFontColor:           "#9AA4AA",
-		SidePanelSecondaryFontColor:       "#11A0E7",
+		SidePanelSecondaryFontColor:       "#F13AB1",
 		LeftPanelBackgroundColor:          "#FFFFFF",
 		LeftPanelFontColor:                "#4C555A",
-		LeftPanelLightFontColor:           "#959FA5",
-		LeftPanelHighlightFontColor:       "#BC4671",
-		LeftPanelHighlightBackgroundColor: "#FAFCFC",
-		RightPanelBackgroundColor:         "#2D3134",
-		RightPanelFontColor:               "#CACFD1",
-		CodeFontColor:                     "#B7B8B8",
+		LeftPanelLightFontColor:           "#939DA3",
+		LeftPanelHighlightFontColor:       "#11A0E7",
+		LeftPanelHighlightBackgroundColor: "#FFFFFF",
+		RightPanelBackgroundColor:         "#2B2F3E",
+		RightPanelFontColor:               "#939da3",
+		CodeFontColor:                     "#88D3A1",
 		CodeHighlightColor:                "#9DC158",
 		CodeBackgroundColor:               "#272B2D",
 		BrandImageUrl:                     "",

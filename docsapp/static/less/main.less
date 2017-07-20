@@ -16,9 +16,9 @@ body {
     line-height: 26px;
     color: #4c555a;
     background: #fff;
-    font-family: "Open Sans";
-    font-size: 14px;
-    -webkit-font-smoothing: antialiased;
+    font-family: "Lato";
+    font-size: 15px;
+   -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
 }
 
@@ -103,18 +103,17 @@ footer {
 	top: 0;
   line-height: 21px;
 	z-index: 75;
-	width: 220px;
-	//background: #fafcfc;
-	//border-right: 1px solid #f0f4f7;
+	width: 240px;
+  border-right: 1px solid #f0f4f7;
 }
 
 #sidebar .sidebar-nav-item{
   display: block;
   margin: 0;
-  padding: 0px 12px;
+  padding: 4px 12px;
   color: #4c555a;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 15px;
   list-style-type: none;
   white-space: nowrap;
   overflow: hidden;
@@ -138,9 +137,9 @@ header {
 }
 
 #sidebar ul ul .sidebar-nav-item {
-  padding: 0px 40px;
+  padding: 0px 20px;
   box-sizing: border-box;
-  font-size: 13px;
+  font-size: 15px;
 }
 
 #sidebar .sidebar-nav-item:hover {
@@ -157,14 +156,16 @@ header {
 }
 
 #sidebar .subgroup.highlight {
-  color: red;
+  color: #EF41B0;
+  font-weight: 600;
 }
 
 #sidebar .group.expand {
-  border-left: 2px solid red;
+  border-left: 2px solid #EF41B0;
 }
 #sidebar .group.expand > a{
-  color: red;
+  color: #EF41B0;
+  font-weight: 600;
 }
 
 #sidebar .group.expand ul {
@@ -180,7 +181,7 @@ header {
   color: inherit;
   font-weight: 600;
   padding: 10px;
-  text-transform: uppercase;
+  text-decoration: underline;
   cursor: pointer;
 }
 
@@ -206,9 +207,9 @@ header {
   position: fixed;
   top: 0;
   right: 0;
-  width: 45%;
+  width: 46%;
   background: #2B2F3E;
-  padding: 10px;
+  padding: 0 10px;
   color: #dde4e8;
   bottom: 0;
   box-sizing: border-box;
@@ -236,23 +237,28 @@ header {
 }
 
 #try-http-meta input {
-  padding: 10px 20px;
+  padding: 6px 20px;
   width: 60%;
   font: inherit;
   border: none;
   outline: 0;
   color: inherit;
   background: inherit;
-  font-weight: 600;
 }
 
 #try-http-meta button {
-  width: 15%;
+  width: 12%;
   margin: 0;
   border: 0;
-  height: 35px;
   font: inherit;
   border-radius: 3px;
+  padding: 7px;
+  text-transform: uppercase;
+  background: #88D3A1;
+  color: #2B2F3E;
+  font-weight: 600;
+  cursor: pointer;
+  float: right;
 }
 
 #try-request-data {
@@ -261,6 +267,7 @@ header {
 .tab-menu {
   display: inline-block;
   width: 100%;
+  margin-top: 35px;
 }
 
 .input-row {
@@ -296,13 +303,13 @@ header {
   float: left;
   padding: 6px 18px;
   cursor: pointer;
-  color: #939da3;
   text-transform: uppercase;
   font-size: 12px;
 }
 
 .tab-menu-item.selected {
   border-bottom: 3px solid;
+  color: #88D3A1;
 }
 
 .tab .headers-tab, .tab .body-tab, .tab .parameters-tab{
@@ -315,7 +322,6 @@ header {
 }
 .tab.body .body-tab {
   display: block;
-  padding: 6px;
 }
 .tab.parameters .parameters-tab {
   display: block;
@@ -329,16 +335,18 @@ header {
   border: none;
   background: inherit;
   color: #939da3;
-  border-radius: 3px;
   outline: 0;
   font: inherit;
   padding: 12px;
-  border: 1px solid;
   box-sizing: border-box;
+  border: 1px solid #3A3D50;
+  resize: none;
+  border-radius: 3px;
 }
 
 .response-body textarea {
   height: 350px;
+  color: white;
 }
 
 #try-request-data .tabs{
@@ -350,7 +358,7 @@ header {
 	bottom: 0;
 	right: 0;
 	position: absolute;
-	left: 221px;
+	left: 240px;
 	top: 0;
 	z-index: 50;
 	box-sizing: border-box;
@@ -375,18 +383,19 @@ header {
 	padding: 40px;
 	width: 45%;
   box-sizing: border-box;
+  border-top: 1px solid #f0f4f7;
 }
 
 .col-right {
 	position: relative;
 	z-index: 2;
-	margin-left: 45%;
-	padding: 42px 0 50px;
+	margin-left: 46%;
 	color: #dde4e8;
 }
 
 .xhr-detail {
   padding: 40px;
+  border-top: 1px solid #3A3D50;
 }
 
 .hl-code pre {
@@ -396,7 +405,7 @@ header {
 
 #background {
 	bottom: 0;
-  left: 221px;
+  left: 249px;
   position: fixed;
   right: 0;
   top: 0;
@@ -422,7 +431,7 @@ header {
   display: inline-block;
   width: 49%;
   vertical-align: top;
-  font-size: 13px;
+  font-size: 14px;
   margin-top: 0;
   line-height: 21px;
 }
@@ -439,7 +448,7 @@ header {
 
 .attr-label .type {
   color: #939da3;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
 }
 
@@ -463,7 +472,7 @@ header {
   display: none;
 }
 
-.attr-list-item.show-child .child-attr-list {
+.attr-list-item.show-child > .child-attr-list {
   display: block;
 }
 
@@ -477,15 +486,15 @@ header {
   font-weight: 600;
 }
 
-.attr-list-item.show-child .show-child-attr {
+.attr-list-item.show-child > .show-child-attr {
   display: none;
 }
 
-.attr-list-item .hide-child-attr {
+.attr-list-item > .hide-child-attr {
   display: none;
 }
 
-.attr-list-item.show-child .hide-child-attr {
+.attr-list-item.show-child > .hide-child-attr {
   display: block;
 }
 
@@ -497,12 +506,230 @@ header {
   font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
+.url-ex, .headers-ex {
+  padding: 10px 0;
+}
+
 .headers-ex .name {
   color: #F17F49;
 }
 
 .url-ex > div {
-  padding: 10px 0;
   display: inline-block;
 }
 
+h5.form-header {
+  padding: 6px 12px;
+  color: inherit;
+  font-size: 15px;
+  margin-top: 15px;
+  text-transform: none;
+}
+
+#api-reference {
+  margin-top: 1px;
+  .col-left, .xhr-detail {
+    border: 0;
+  }
+}
+
+.api-base-url {
+  padding: 10px 0px !important;
+}
+
+strong {
+  font-weight: 600;
+}
+em {
+  font-style: italic;
+}
+
+blockquote {
+  padding: 0 1rem;
+  margin-left: 0;
+  color: #819198;
+  border-left: 0.3rem solid #dce6f0;
+  background: #fafafa;
+}
+
+.col-left code {
+  padding: 2px 4px;
+  font-family: Consolas,"Liberation Mono",Menlo,Courier,monospace;
+  font-size: 0.9rem;
+  color: #383e41;
+  background-color: #f3f6fa;
+  border-radius: 0.3rem;
+}
+.col-left ul {
+  list-style-type: disc;
+  padding-left: 20px;
+}
+.col-left ol {
+  list-style-type: decimal;
+  padding-left: 20px;
+}
+
+ul.attr-list, ul.child-attr-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.col-right {
+  .tabs {
+    margin-bottom: 40px;
+    margin-top: 15px;
+  }
+  .tab-header-item {
+    display: inline-block;
+    cursor: pointer;
+    padding: 3px 10px;
+    &.active {
+      border-bottom: 2px solid #88D3A1;
+    }
+  }
+  .tab-item {
+    display: none;
+    &.active {
+      display: block;
+    }
+  }
+}
+
+#select-nav {
+  display: none;
+  .group-select {
+    font-size: 16px;
+    border-radius: 2px;
+    height: 33px;
+    border: 1px solid #EEE;
+    font-family: inherit;
+    outline: 0;
+  }
+}
+
+
+body.two-column{
+  .row {
+    border-bottom: 1px solid #EEE;
+  }
+  .col-left {
+    float: none;
+    width: 100%;
+    border: 0;
+    width: 70%;
+    padding-bottom: 40px;
+    padding-right: 0;
+  }
+  .col-right {
+    margin: 0;
+    padding: 40px;
+    width: 70%;
+    padding-top: 0;
+  }
+  .attr-label {
+    width: 20%;
+  }
+  .show-child-attr, .hide-child-attr {
+    width: 18%;
+  }
+  .xhr-detail {
+    padding: 0;
+    border: 0;
+    background: #2B2F3E;
+    border-radius: 4px;
+    > div {
+      padding: 0 25px;
+    }
+    > div:first-child {
+      padding-top: 25px;
+    }
+    > div:last-child {
+      padding-bottom: 25px;
+    }
+  }
+  #background {
+    display: none;
+  }
+
+}
+ @media only screen and (max-width: 1100px)  {
+  .row {
+    border-bottom: 1px solid #EEE;
+  }
+  .col-left {
+    float: none;
+    width: 100%;
+    border: 0;
+    width: 70%;
+    padding-bottom: 40px;
+    padding-right: 0;
+  }
+  .col-right {
+    margin: 0;
+    padding: 40px;
+    width: 70%;
+    padding-top: 0;
+  }
+  .col-right, .col-left {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .col-left {
+    padding-right: 40px;
+  }
+  .attr-label {
+    width: 20%;
+  }
+  .show-child-attr, .hide-child-attr {
+    width: 18%;
+  }
+  .xhr-detail {
+    padding: 0;
+    border: 0;
+    background: #2B2F3E;
+    border-radius: 4px;
+    > div {
+      padding: 0 25px;
+    }
+    > div:first-child {
+      padding-top: 25px;
+    }
+    > div:last-child {
+      padding-bottom: 25px;
+    }
+  }
+  #background {
+    display: none;
+  }
+  #try-out {
+    width: 80%;
+  }
+ }
+
+@media only screen and (max-width: 700px)  {
+  #select-nav {
+    display: inline-block;
+  }
+  .header-3-col {
+    position: fixed;
+    left: 0;
+    right: 0;
+    border-bottom: 1px solid #EEE;
+    > a {
+      display: inline-block !important;
+    }
+  }
+  #sidebar {
+    width: 0;
+    nav {
+      display: none;
+    }
+  }
+  #content {
+    left: 0;
+    margin-top: 50px;
+  }
+  #try-out {
+    width: 100%;
+  }
+}

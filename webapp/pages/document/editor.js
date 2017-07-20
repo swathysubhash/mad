@@ -42,10 +42,11 @@ class DocumentsEditor extends Component {
 				<div className={"fixed-wrapper middle"}>
 					<div className={"left"}> 
 						<div className={"add-actions"}>
-							<button className={this.props.createGroup ? "selected": ""} onClick={this.groupCreate}>Add Group</button>
-							<button className={this.props.createEndpoint ? "selected": ""} onClick={this.endpointCreate}>Add Endpoint</button>
-							<button className={this.props.createSchema ? "selected": ""} onClick={this.schemaCreate}>Add Schema</button>
-							<button className={this.props.createTextDocument ? "selected": ""} onClick={this.textDocumentCreate}>Add Text Document</button>
+							<button className={this.props.createGroup ? "selected": ""} onClick={this.groupCreate}><i class="fa fa-folder" aria-hidden="true"></i>Add Group</button>
+							<button className={this.props.createEndpoint ? "selected": ""} onClick={this.endpointCreate}><i class="fa fa-file-o" aria-hidden="true"></i>Add Endpoint</button>
+							<button className={this.props.createSchema ? "selected": ""} onClick={this.schemaCreate}><i class="fa fa-file-code-o" aria-hidden="true"></i>
+Add Schema</button>
+							<button className={this.props.createTextDocument ? "selected": ""} onClick={this.textDocumentCreate}><i class="fa fa-file-text-o" aria-hidden="true"></i>Add Text Document</button>
 							{/*<ButtonMenu text="Add new">
 								<ButtonMenuItem onClick={this.groupCreate} text="Group"></ButtonMenuItem>
 								<ButtonMenuItem onClick={this.endpointCreate} text="Endpoint"></ButtonMenuItem>

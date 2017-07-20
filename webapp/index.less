@@ -19,9 +19,10 @@ body {
   font-family: @font-family-base;
   font-size: @font-size-base;
   color: @text-color;
-  font-weight: 300;
-  //-webkit-font-smoothing: antialiased;
-  //text-rendering: optimizeLegibility;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 hr {
@@ -39,6 +40,10 @@ pre {
   white-space: pre-wrap;
   word-wrap: break-word;
   box-sizing: border-box;
+}
+
+.fa {
+  padding-right: 5px;
 }
 
 input, textarea, keygen, select, button {
@@ -136,9 +141,10 @@ input:focus, textarea:focus, keygen:focus, select:focus {
   position: fixed;
   left: 0;
   right: 0;
-  top: 85px;
+  top: 83px;
   z-index: 5;
   background: white;
+  padding: 0 30px;
 }
 
 .tabs {

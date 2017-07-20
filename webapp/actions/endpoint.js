@@ -15,3 +15,8 @@ export function getEndpoint(data) {
 export function updateEndpoint(data) {
 	return post('/madapi/endpoints/' + data.id, data)
 }
+
+
+export function deleteEndpoint(data) {
+	return post('/madapi/endpoints/' + data.id + '/delete', data)
+}

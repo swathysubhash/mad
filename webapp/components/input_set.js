@@ -16,6 +16,7 @@ class InputSet extends Component {
     this.getValue = this.getValue.bind(this)
     this.updateValue = this.updateValue.bind(this)
     this.onClick = this.onClick.bind(this)
+    this.tabClick = this.tabClick.bind(this)
     this.deleteClick = this.deleteClick.bind(this)
   }
 
@@ -58,7 +59,7 @@ class InputSet extends Component {
   }
 
   onClick(row) {
-    if (this.state.valueSet.length - 1 === row) {
+    if (this.state.valueSet.length - 1 === row && !this.props.fixed) {
       this.setState({
         valueSet: [ ...this.state.valueSet, this.copyOf(this.state.valueSet[0]) ]
       })
@@ -75,12 +76,29 @@ class InputSet extends Component {
     return this.state.valueSet[row][name]
   }
 
+  tabClick(event) {
+    let target = event.target;
+    let tabItem = target.getAttribute('data-tab-item')
+    let active = this.ref.querySelector('.active.tab-item')
+    let activeTabHeader = this.ref.querySelector('.active.tab-header-item')
+    let newActive = this.ref.querySelector('.tab-item.' + tabItem)
+    if (active !== newActive) {
+      active.classList.remove('active')
+      activeTabHeader.classList.remove('active')
+      target.classList.add('active')
+      newActive.classList.add('active')
+    }
+  }
+
   render() {
     return (
-      <div className={"input-set-group"}>
+      <div ref={(ref) => { this.ref = ref }} className={"input-set-group"}>
         {this.props.label ? <div className={"input-set-label"}>{this.props.label}</div>: ''}
+        {this.props.tabs ? <div>{this.props.tabs.map((t, index) => (
+          <div onClick={this.tabClick} className={index === 0 ? "tab-header-item active" : "tab-header-item"} data-tab-item={t}>{t}</div>
+        ))}</div>: ''}
         {this.state.valueSet.map((v, index) => (
-          <div className={"input-set"}>
+          <div className={this.props.tabs && this.props.tabs[index] ?  index === 0 ? "input-set tab-item active " + this.props.tabs[index] : "input-set tab-item "  + this.props.tabs[index] : "input-set"}>
             {this.props.children.map(child => Inferno.cloneVNode(child, {
                                                                       row: index,
                                                                       labels: false,
@@ -91,7 +109,7 @@ class InputSet extends Component {
                                                                       updateValue: this.updateValue.bind(this, index),
                                                                     }
                                                                   ))}
-            {this.state.valueSet.length - 1 !== index 
+            {this.state.valueSet.length - 1 !== index && !this.props.fixed 
                 ? <button className={"secondary-btn"} onClick={this.deleteClick.bind(this, index)}>Delete</button> 
                 : ''}
           </div>

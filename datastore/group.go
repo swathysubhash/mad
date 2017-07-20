@@ -2,9 +2,9 @@ package datastore
 
 import (
 	"fmt"
+	"github.com/swathysubhash/mad/model"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"mad/model"
 	"strconv"
 )
 
@@ -107,6 +107,30 @@ func (g *groupStore) UpsertMany(orgName string, groups []model.Group) error {
 		if err != nil {
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (g *groupStore) RemoveSubgroup(orgName, groupId, subgroupId string) error {
+	c := g.DB.C(orgName + "/GROUPLIST")
+
+	err := c.Update(bson.M{"_id": groupId}, bson.M{"$pull": bson.M{"endpoints": subgroupId}})
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (g *groupStore) Remove(orgName, groupId string) error {
+	c := g.DB.C(orgName + "/GROUPLIST")
+
+	err := c.Remove(bson.M{"_id": groupId})
+
+	if err != nil {
+		return err
 	}
 
 	return nil

@@ -10,3 +10,8 @@ type SuccessResponse struct {
 	Object  string `json:"object"`
 	Message string `json:"message"`
 }
+
+type Pagination struct {
+	Next     string `json:"next"`
+	Previous string `json:"previous"`
+}
